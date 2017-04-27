@@ -133,7 +133,8 @@ func expand(transes [][]string) []Trans {
 
 	}
 	var expanded = []Trans{}
-	for _, phns := range res {
+	for x := len(res) - 1; x >= 0; x-- { // the loop above generates a reverse list -- why?
+		phns := res[x]
 		expanded = append(expanded, Trans{Phonemes: phns})
 	}
 	return expanded

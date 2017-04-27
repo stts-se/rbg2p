@@ -14,9 +14,9 @@ u -> }
 å -> o
 ä -> {
 
-skt -> st / _ #
+skt -> (s t, s k t) / _
 
-sch -> (x, S) / _# 
+sch -> (S, x) / _# 
 sch -> S
 
 v -> f / _ VOICELESS
@@ -39,3 +39,4 @@ TEST dusch -> (d } S, d } x)
 TEST duscha -> d } S a
 TEST borta -> b o rt a
 TEST abt -> a p t
+TEST busktdusch -> (b } s t d } S,  b } s k t d } x,  b } s t d } S,  b } s k t d } x)
