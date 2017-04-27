@@ -1,0 +1,37 @@
+// Variables
+
+VAR VOICELESS [p|k|t|f|s|h|c]
+VAR VOICED [b|d|g|z]
+
+// Rules
+
+a -> a
+e -> e
+i -> i
+o -> i
+u -> }
+ö -> 2
+å -> o
+ä -> {
+
+skt -> st / _ #
+
+sch -> (x, S) / _# 
+
+v -> f / _ VOICELESS
+
+ck -> k
+k -> k
+
+rt -> rt
+
+b -> b
+d -> d
+s -> s
+h -> h
+t -> t
+
+// Tests
+
+TEST dusch -> (d } S, d } x)
+TEST borta -> b o rt a

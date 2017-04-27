@@ -1,14 +1,29 @@
 package rbg2p
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 )
+
+// Trans is a container for phonemes in a transcriptions
+type Trans struct {
+	Phonemes []string
+}
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
 	regexp *regexp.Regexp
+}
+
+// Matches checks if the input string matches the context rule
+func (c Context) Matches(s string) bool {
+	if c.IsDefined() {
+		return c.regexp.MatchString(s)
+	}
+	return true
 }
 
 // IsDefined return true if the contained regexp is defined
@@ -73,4 +88,60 @@ type RuleSet struct {
 	Vars  map[string]string
 	Rules []Rule
 	Tests []Test
+}
+
+// Test runs the built-in tests. Returns an array of errors, if any.
+func (rs RuleSet) Test() []error {
+	var errs []error
+	for _, test := range rs.Tests {
+		input := test.Input
+		expect := test.Output
+		result, err := rs.Apply(input)
+		//fmt.Printf("%s %v %v\n", input, expect, result)
+		if err != nil {
+			errs = append(errs, errors.New(fmt.Sprintf("%v", err)))
+		}
+		if !reflect.DeepEqual(expect, result) {
+			errs = append(errs, errors.New(fmt.Sprintf("for '%s', expected %v, got %v", input, expect, result)))
+		}
+	}
+	return errs
+}
+
+func expand(transes [][]string) []Trans {
+	return []Trans{}
+}
+
+// Apply applies the rules to an input string, returns a slice of transcriptions
+func (rs RuleSet) Apply(s0 string) ([]Trans, error) {
+	var i = 0
+	res := [][]string{}
+	var couldntMap = []string{}
+	for i < len(s0) {
+		s := s0[i:len(s0)]
+		left := s0[0:i]
+		var matchFound = false
+		for _, rule := range rs.Rules {
+			if strings.HasPrefix(s, rule.Input) &&
+				rule.LeftContext.Matches(left) {
+				right := s0[i+1 : i+len(rule.Output)]
+				if rule.RightContext.Matches(right) {
+					i = i + len(rule.Input)
+					res = append(res, rule.Output)
+					matchFound = true
+					break
+				}
+			}
+		}
+		if !matchFound {
+			res = append(res, []string{"_"})
+			i = i + 1
+			couldntMap = append(couldntMap, s[0:1])
+		}
+	}
+	if len(couldntMap) > 0 {
+		return []Trans{}, fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s0)
+	} else {
+		return expand(res), nil
+	}
 }

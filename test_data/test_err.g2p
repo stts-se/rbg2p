@@ -1,0 +1,19 @@
+// Variables
+
+VAR VOICELESS = [p|k|t|f|s|h|c]
+VAR VOICED [b|d|g|z]
+
+// Rules
+
+a -> ?A /#_
+a -> A
+b -> p / _ VOICELESS
+sch -> (x, S) / _#
+ccs -> tS:
+cs -> dZ / _ VOICED
+
+
+// Tests
+
+TEST hit -> h i t
+TEST dusch -> (d u x, d u S)

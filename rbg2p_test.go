@@ -5,9 +5,7 @@ import (
 	"testing"
 )
 
-var fsExpGot = "Expected: /%v/ got: /%v/"
-
-//t.Errorf(fsExpGot, expect, result)
+var fsExpGot = "Expected: %v got: %v"
 
 // container to compare variables in testing
 type tVar struct {
@@ -15,13 +13,11 @@ type tVar struct {
 	Value string
 }
 
-func TestLoadFile(t *testing.T) {
-}
-
-func TestNewtVar(t *testing.T) {
+func TestNewVar(t *testing.T) {
 	validLines := map[string]tVar{
-		"VAR VOICED_PLOSIVE [dgb]": tVar{Name: "VOICED_PLOSIVE", Value: "[dgb]"},
-		"VAR VOWEL [aoiuye]":       tVar{Name: "VOWEL", Value: "[aoiuye]"},
+		"VAR VOICED_PLOSIVE [dgb]":      tVar{Name: "VOICED_PLOSIVE", Value: "[dgb]"},
+		"VAR VOWEL [aoiuye]":            tVar{Name: "VOWEL", Value: "[aoiuye]"},
+		"VAR VOICELESS [p|k|t|f|s|h|c]": tVar{Name: "VOICELESS", Value: "[p|k|t|f|s|h|c]"},
 	}
 	invalidLines := map[string]tVar{
 		"VAR VOICED_PLOSIVE [dgb]": tVar{Name: "VOICED_PLOSIVE", Value: "dgb"},
@@ -64,16 +60,18 @@ func TestNewtVar(t *testing.T) {
 func TestNewTest(t *testing.T) {
 	validLines := map[string]Test{
 		"TEST anka -> AnkA":            Test{Input: "anka", Output: []string{"AnkA"}},
-		"TEST banka -> {bAnkA, bANkA}": Test{Input: "banka", Output: []string{"bAnkA", "bANkA"}},
+		"TEST banka -> (bAnkA, bANkA)": Test{Input: "banka", Output: []string{"bAnkA", "bANkA"}},
 	}
 	invalidLines := map[string]Test{
 		"TEST anka -> AnkA":            Test{Input: "anka", Output: []string{"anka"}},
-		"TEST banka -> {bAnkA, bANkA}": Test{Input: "banka", Output: []string{"bAnkA", "bANKkA"}},
+		"TEST banka -> (bAnkA, bANkA)": Test{Input: "banka", Output: []string{"bAnkA", "bANKkA"}},
 	}
 	failLines := []string{
 		"TEST anka",
 		"TEST anka AnkA",
 		"TEST anka -> AnkA -> ANkA",
+		"TEST anka -> (AnkA)",
+		"TEST banka -> bAnkA, bANkA",
 	}
 
 	for l, expect := range validLines {
@@ -108,11 +106,11 @@ func TestNewRule(t *testing.T) {
 		"VOICED": "[dgjlvbnm]",
 	}
 	validLines := map[string]Rule{
-		"sch -> {x, S} / _ #": Rule{Input: "sch",
+		"sch -> (x, S) / _ #": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
 			RightContext: Context{regexp.MustCompile("$")}},
-		"sch -> {x, S}": Rule{Input: "sch",
+		"sch -> (x, S)": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
 			RightContext: Context{}},
@@ -124,10 +122,15 @@ func TestNewRule(t *testing.T) {
 			Output:       []string{"A"},
 			LeftContext:  Context{},
 			RightContext: Context{regexp.MustCompile("[dgjlvbnm]")}},
+		"a -> A / _ VOICED #": Rule{Input: "a",
+			Output:       []string{"A"},
+			LeftContext:  Context{},
+			RightContext: Context{regexp.MustCompile("[dgjlvbnm]$")}},
 	}
 	invalidLines := map[string]Rule{}
 	failLines := []string{
-		"",
+		"sch -> x, S",
+		"sch -> (x)",
 	}
 
 	for l, expect := range validLines {
@@ -155,4 +158,55 @@ func TestNewRule(t *testing.T) {
 		}
 	}
 
+}
+func TestLoadFile1(t *testing.T) {
+	fName := "test_data/test.g2p"
+	_, err := LoadFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+}
+func TestLoadFile2(t *testing.T) {
+	fName := "test_data/test_err.g2p"
+	_, err := LoadFile(fName)
+	if err == nil {
+		t.Errorf("expected error for input file %s :", fName)
+	}
+}
+
+func TestApply(t *testing.T) {
+	fName := "test_data/test.g2p"
+	rs, err := LoadFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+	_, err = rs.Apply("hix")
+	if err == nil {
+		t.Errorf("expected error for input file %s : %s", fName)
+	}
+
+	_, err = rs.Apply("hit")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+
+	_, err = rs.Apply("dusch")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+
+	_, err = rs.Apply("duscha")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+
+	// errors := rs.Test()
+	// if len(errors) > 0 {
+	// 	fmt.Printf("%d OF %d TESTS FAILED:\n", len(errors), len(rs.Tests))
+	// 	for _, err = range errors {
+	// 		fmt.Printf("%v\n", err)
+	// 	}
+	// } else {
+	// 	fmt.Printf("ALL %d TESTS PASSED\n", len(rs.Tests))
+	// }
 }
