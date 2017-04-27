@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+var commentAtEndRe = regexp.MustCompile("^(.+)//.*$")
+
+func trimComment(s string) string {
+	return commentAtEndRe.ReplaceAllString(s, "$1")
+}
+
 func isComment(s string) bool {
 	return strings.HasPrefix(s, "//")
 }
@@ -40,7 +46,7 @@ func LoadFile(fName string) (RuleSet, error) {
 			return ruleSet, err
 		}
 		n++
-		l := strings.TrimSpace(s.Text())
+		l := trimComment(strings.TrimSpace(s.Text()))
 		if isBlankLine(l) || isComment(l) {
 		} else if isVar(l) {
 			name, value, err := newVar(l)
@@ -169,6 +175,7 @@ var ruleOutputReSimple = regexp.MustCompile("^([^,()]+)$")
 var ruleOutputReVariants = regexp.MustCompile("^[(](.+,.+)[)]$")
 
 func newRuleOutput(s string, l string) ([]string, error) {
+	s = strings.TrimSpace(s)
 	var outputS string
 	var matchRes []string
 	matchRes = ruleOutputReSimple.FindStringSubmatch(s)

@@ -97,7 +97,7 @@ func (rs RuleSet) Test() []error {
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		result0, err := rs.Apply(input)
+		result0, err := rs.Apply(strings.ToLower(input))
 		result := []string{}
 		for _, trans := range result0 {
 			result = append(result, strings.Join(trans.Phonemes, " "))
@@ -140,23 +140,39 @@ func expand(transes [][]string) []Trans {
 	return expanded
 }
 
+var debug = true
+
 // Apply applies the rules to an input string, returns a slice of transcriptions
-func (rs RuleSet) Apply(s0 string) ([]Trans, error) {
+func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 	var i = 0
+	var s0 = []rune(s00)
 	res := [][]string{}
 	var couldntMap = []string{}
 	for i < len(s0) {
-		s := s0[i:len(s0)]
-		left := s0[0:i]
+		s := string(s0[i:len(s0)])
+		left := string(s0[0:i])
 		var matchFound = false
 		for _, rule := range rs.Rules {
 			if strings.HasPrefix(s, rule.Input) &&
 				rule.LeftContext.Matches(left) {
-				right := s0[i+len(rule.Input) : len(s0)]
+				// if debug {
+				// 	fmt.Printf("%s %d %d %d %s %s\n", s00, i, i+len(rule.Input), len(s0), left, s)
+				// 	fmt.Printf("RULE=%v\n", rule)
+				// }
+				right := string(s0[i+len(rule.Input) : len(s0)])
+				//fmt.Println("MADEIT")
 				if rule.RightContext.Matches(right) {
 					i = i + len(rule.Input)
 					res = append(res, rule.Output)
 					matchFound = true
+					// if debug {
+					// 	fmt.Printf("%s %d %s %s\n", s0, i, right, s)
+					// 	fmt.Printf("LEFT=%s\n", rule.LeftContext.regexp)
+					// 	fmt.Printf("RIGHT=%s\n", rule.RightContext.regexp)
+					// 	fmt.Printf("OUTPUT=%v\n", rule.Output)
+					// 	fmt.Printf("MATCH=%v\n", rule.RightContext.Matches(right))
+					// 	fmt.Printf("RES=%v\n\n", res)
+					// }
 					break
 				}
 			}
