@@ -1,2 +1,2 @@
 # rbg2p
-Utilities for rule based grapheme to phoneme rules
+Utilities for rule based, manually written, grapheme to phoneme rules
