@@ -1,7 +1,6 @@
 package rbg2p
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -103,10 +102,10 @@ func (rs RuleSet) Test() []error {
 			result = append(result, strings.Join(trans.Phonemes, " "))
 		}
 		if err != nil {
-			errs = append(errs, errors.New(fmt.Sprintf("%v", err)))
+			errs = append(errs, fmt.Errorf("%v", err))
 		}
 		if !reflect.DeepEqual(expect, result) {
-			errs = append(errs, errors.New(fmt.Sprintf("for '%s', expected %v, got %v", input, expect, result)))
+			errs = append(errs, fmt.Errorf("for '%s', expected %v, got %v", input, expect, result))
 		}
 	}
 	return errs
@@ -118,26 +117,21 @@ func expand(transes [][]string) []Trans {
 		n = n * len(arr)
 	}
 
-	res := make([][]string, n, 2*n)
+	res := make([]Trans, n, 2*n)
 
 	k := 0
 	for _, arr := range transes {
+		k = 0
 		for j := 0; j < n; j++ {
-			k++
 			if k == len(arr) {
 				k = 0
 			}
+			res[j] = Trans{Phonemes: append(res[j].Phonemes, arr[k])}
+			k++
 
-			res[j] = append(res[j], arr[k])
 		}
-
 	}
-	var expanded = []Trans{}
-	for x := len(res) - 1; x >= 0; x-- { // the loop above generates a reverse list -- why?
-		phns := res[x]
-		expanded = append(expanded, Trans{Phonemes: phns})
-	}
-	return expanded
+	return res
 }
 
 // Apply applies the rules to an input string, returns a slice of transcriptions
@@ -159,14 +153,6 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 					i = i + ruleInputLen
 					res = append(res, rule.Output)
 					matchFound = true
-					// if s00 == "лалја" {
-					// 	fmt.Printf("%s %s %d %s %s %s\n", s00, rule.Input, i, left, s, right)
-					// 	fmt.Printf("LEFT=%s\n", rule.LeftContext.regexp)
-					// 	fmt.Printf("RIGHT=%s\n", rule.RightContext.regexp)
-					// 	fmt.Printf("OUTPUT=%v\n", rule.Output)
-					// 	fmt.Printf("MATCH=%v\n", rule.RightContext.Matches(right))
-					// 	fmt.Printf("RES=%v\n\n", res)
-					// }
 					break
 				}
 			}
@@ -178,8 +164,7 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 		}
 	}
 	if len(couldntMap) > 0 {
-		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s0)
-	} else {
-		return expand(res), nil
+		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s00)
 	}
+	return expand(res), nil
 }

@@ -129,12 +129,10 @@ func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp.Regexp,
 			splitted[i] = val
 		}
 	}
-	//return regexp.Compile(strings.Join(splitted, ""))
 	if isLeft {
 		return regexp.Compile(strings.Join(splitted, "") + "$")
-	} else {
-		return regexp.Compile("^" + strings.Join(splitted, ""))
 	}
+	return regexp.Compile("^" + strings.Join(splitted, ""))
 }
 
 var contextRe = regexp.MustCompile("^ +/ +((?:[^_>]+)?) *_ *((?:[^_>]+)?)$")
