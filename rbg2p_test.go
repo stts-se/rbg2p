@@ -175,7 +175,7 @@ func TestLoadFile2(t *testing.T) {
 	}
 }
 
-func xxxTestHun(t *testing.T) {
+func TestHun(t *testing.T) {
 	fName := "test_data/hun.g2p"
 	rs, err := LoadFile(fName)
 	if err != nil {
@@ -194,7 +194,7 @@ func xxxTestHun(t *testing.T) {
 	}
 }
 
-func xxxTestMkd(t *testing.T) {
+func TestMkd(t *testing.T) {
 	fName := "test_data/mkd.g2p"
 	rs, err := LoadFile(fName)
 	if err != nil {
