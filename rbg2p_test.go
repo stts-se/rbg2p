@@ -222,7 +222,7 @@ func TestApply(t *testing.T) {
 	}
 	_, err = rs.Apply("hix")
 	if err == nil {
-		t.Errorf("expected error for input file %s : %s", fName)
+		t.Errorf("expected error for input file %s", fName)
 		return
 	}
 
