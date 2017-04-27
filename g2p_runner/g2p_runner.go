@@ -44,6 +44,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	errors := ruleSet.Test()
+	if len(errors) > 0 {
+		for _, err = range errors {
+			fmt.Printf("%v\n", err)
+		}
+		l.Printf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(ruleSet.Tests), g2pFile)
+		os.Exit(1)
+	} else {
+		l.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), g2pFile)
+	}
+
 	nTotal := 0
 	nErrs := 0
 	nTrans := 0
