@@ -26,7 +26,7 @@ func (c Context) Matches(s string) bool {
 	return true
 }
 
-// IsDefined return true if the contained regexp is defined
+// IsDefined returns true if the contained regexp is defined
 func (c Context) IsDefined() bool {
 	return (nil != c.regexp)
 }
@@ -39,7 +39,7 @@ func (c Context) String() string {
 	return ""
 }
 
-// Equals checks for equality (with correct result for underlying regexps)
+// Equals checks for equality (including underlying regexps)
 func (c Context) Equals(c2 Context) bool {
 	if c.IsDefined() && !c2.IsDefined() {
 		return false
@@ -64,7 +64,7 @@ func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
 }
 
-// Equals checks for equality (with correct result for underlying slices and regexps)
+// Equals checks for equality (including underlying underlying slices and regexps)
 func (r Rule) Equals(r2 Rule) bool {
 	return r.Input == r2.Input &&
 		reflect.DeepEqual(r.Output, r2.Output) &&
@@ -78,7 +78,7 @@ type Test struct {
 	Output []string
 }
 
-// Equals checks for equality (with correct result for underlying slices)
+// Equals checks for equality (including underlying slices)
 func (t1 Test) Equals(t2 Test) bool {
 	return t1.Input == t2.Input && reflect.DeepEqual(t1.Output, t2.Output)
 }
