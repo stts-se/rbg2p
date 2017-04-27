@@ -1,6 +1,7 @@
 package rbg2p
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 )
@@ -109,7 +110,7 @@ func TestNewRule(t *testing.T) {
 		"sch -> (x, S) / _ #": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
-			RightContext: Context{regexp.MustCompile("$")}},
+			RightContext: Context{"#", regexp.MustCompile("$")}},
 		"sch -> (x, S)": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
@@ -121,11 +122,11 @@ func TestNewRule(t *testing.T) {
 		"a -> A / _ VOICED": Rule{Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{regexp.MustCompile("[dgjlvbnm]")}},
+			RightContext: Context{"VOICED", regexp.MustCompile("[dgjlvbnm]")}},
 		"a -> A / _ VOICED #": Rule{Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{regexp.MustCompile("[dgjlvbnm]$")}},
+			RightContext: Context{"VOICED #", regexp.MustCompile("[dgjlvbnm]$")}},
 	}
 	invalidLines := map[string]Rule{}
 	failLines := []string{
@@ -174,39 +175,63 @@ func TestLoadFile2(t *testing.T) {
 	}
 }
 
+func TestHun(t *testing.T) {
+	fName := "test_data/hun.g2p"
+	rs, err := LoadFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+
+	errors := rs.Test()
+	if len(errors) > 0 {
+		for _, err = range errors {
+			fmt.Printf("%v\n", err)
+		}
+		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+	}
+}
+
 func TestApply(t *testing.T) {
 	fName := "test_data/test.g2p"
 	rs, err := LoadFile(fName)
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
 	}
 	_, err = rs.Apply("hix")
 	if err == nil {
 		t.Errorf("expected error for input file %s : %s", fName)
+		return
 	}
 
 	_, err = rs.Apply("hit")
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
 	}
 
 	_, err = rs.Apply("dusch")
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
 	}
 
 	_, err = rs.Apply("duscha")
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
 	}
 
-	// errors := rs.Test()
-	// if len(errors) > 0 {
-	// 	fmt.Printf("%d OF %d TESTS FAILED:\n", len(errors), len(rs.Tests))
-	// 	for _, err = range errors {
-	// 		fmt.Printf("%v\n", err)
-	// 	}
-	// } else {
-	// 	fmt.Printf("ALL %d TESTS PASSED\n", len(rs.Tests))
-	// }
+	errors := rs.Test()
+	if len(errors) > 0 {
+		for _, err = range errors {
+			fmt.Printf("%v\n", err)
+		}
+		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+	}
 }

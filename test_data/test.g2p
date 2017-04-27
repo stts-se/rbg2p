@@ -8,7 +8,7 @@ VAR VOICED [b|d|g|z]
 a -> a
 e -> e
 i -> i
-o -> i
+o -> o
 u -> }
 ö -> 2
 å -> o
@@ -17,15 +17,17 @@ u -> }
 skt -> st / _ #
 
 sch -> (x, S) / _# 
+sch -> S
 
 v -> f / _ VOICELESS
 
 ck -> k
 k -> k
-
 rt -> rt
 
-b -> b
+b -> p / _ VOICELESS
+b -> b 
+
 d -> d
 s -> s
 h -> h
@@ -34,4 +36,6 @@ t -> t
 // Tests
 
 TEST dusch -> (d } S, d } x)
+TEST duscha -> d } S a
 TEST borta -> b o rt a
+TEST abt -> a p t

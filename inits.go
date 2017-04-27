@@ -123,7 +123,12 @@ func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp.Regexp,
 			splitted[i] = val
 		}
 	}
-	return regexp.Compile(strings.Join(splitted, ""))
+	//return regexp.Compile(strings.Join(splitted, ""))
+	if isLeft {
+		return regexp.Compile(strings.Join(splitted, "") + "$")
+	} else {
+		return regexp.Compile("^" + strings.Join(splitted, ""))
+	}
 }
 
 var contextRe = regexp.MustCompile("^ +/ +((?:[^_>]+)?) *_ *((?:[^_>]+)?)$")
@@ -145,6 +150,7 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}
 		left.regexp = re
+		left.input = leftS
 	}
 	rightS := strings.TrimSpace(matchRes[2])
 	if len(rightS) > 0 {
@@ -153,6 +159,7 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}
 		right.regexp = re
+		right.input = rightS
 	}
 	return left, right, nil
 }

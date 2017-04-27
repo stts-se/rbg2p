@@ -15,6 +15,7 @@ type Trans struct {
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
+	input  string
 	regexp *regexp.Regexp
 }
 
@@ -34,7 +35,7 @@ func (c Context) IsDefined() bool {
 // String returns a string representation of the Context
 func (c Context) String() string {
 	if c.IsDefined() {
-		return c.regexp.String()
+		return c.input
 	}
 	return ""
 }
@@ -48,7 +49,7 @@ func (c Context) Equals(c2 Context) bool {
 	} else if !c2.IsDefined() && !c.IsDefined() {
 		return true
 	}
-	return c.regexp.String() == c2.regexp.String()
+	return c.input == c2.input
 }
 
 // Rule is a g2p rule representation
@@ -96,8 +97,11 @@ func (rs RuleSet) Test() []error {
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		result, err := rs.Apply(input)
-		//fmt.Printf("%s %v %v\n", input, expect, result)
+		result0, err := rs.Apply(input)
+		result := []string{}
+		for _, trans := range result0 {
+			result = append(result, strings.Join(trans.Phonemes, " "))
+		}
 		if err != nil {
 			errs = append(errs, errors.New(fmt.Sprintf("%v", err)))
 		}
@@ -109,7 +113,30 @@ func (rs RuleSet) Test() []error {
 }
 
 func expand(transes [][]string) []Trans {
-	return []Trans{}
+	n := 1
+	for _, arr := range transes {
+		n = n * len(arr)
+	}
+
+	res := make([][]string, n, 2*n)
+
+	k := 0
+	for _, arr := range transes {
+		for j := 0; j < n; j++ {
+			k++
+			if k == len(arr) {
+				k = 0
+			}
+
+			res[j] = append(res[j], arr[k])
+		}
+
+	}
+	var expanded = []Trans{}
+	for _, phns := range res {
+		expanded = append(expanded, Trans{Phonemes: phns})
+	}
+	return expanded
 }
 
 // Apply applies the rules to an input string, returns a slice of transcriptions
@@ -124,7 +151,7 @@ func (rs RuleSet) Apply(s0 string) ([]Trans, error) {
 		for _, rule := range rs.Rules {
 			if strings.HasPrefix(s, rule.Input) &&
 				rule.LeftContext.Matches(left) {
-				right := s0[i+1 : i+len(rule.Output)]
+				right := s0[i+len(rule.Input) : len(s0)]
 				if rule.RightContext.Matches(right) {
 					i = i + len(rule.Input)
 					res = append(res, rule.Output)
@@ -139,8 +166,9 @@ func (rs RuleSet) Apply(s0 string) ([]Trans, error) {
 			couldntMap = append(couldntMap, s[0:1])
 		}
 	}
+	//fmt.Printf("%v\n", res)
 	if len(couldntMap) > 0 {
-		return []Trans{}, fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s0)
+		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s0)
 	} else {
 		return expand(res), nil
 	}
