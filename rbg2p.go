@@ -140,8 +140,6 @@ func expand(transes [][]string) []Trans {
 	return expanded
 }
 
-var debug = true
-
 // Apply applies the rules to an input string, returns a slice of transcriptions
 func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 	var i = 0
@@ -155,18 +153,14 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 		for _, rule := range rs.Rules {
 			if strings.HasPrefix(s, rule.Input) &&
 				rule.LeftContext.Matches(left) {
-				// if debug {
-				// 	fmt.Printf("%s %d %d %d %s %s\n", s00, i, i+len(rule.Input), len(s0), left, s)
-				// 	fmt.Printf("RULE=%v\n", rule)
-				// }
-				right := string(s0[i+len(rule.Input) : len(s0)])
-				//fmt.Println("MADEIT")
+				ruleInputLen := len([]rune(rule.Input))
+				right := string(s0[i+ruleInputLen : len(s0)])
 				if rule.RightContext.Matches(right) {
-					i = i + len(rule.Input)
+					i = i + ruleInputLen
 					res = append(res, rule.Output)
 					matchFound = true
-					// if debug {
-					// 	fmt.Printf("%s %d %s %s\n", s0, i, right, s)
+					// if s00 == "лалја" {
+					// 	fmt.Printf("%s %s %d %s %s %s\n", s00, rule.Input, i, left, s, right)
 					// 	fmt.Printf("LEFT=%s\n", rule.LeftContext.regexp)
 					// 	fmt.Printf("RIGHT=%s\n", rule.RightContext.regexp)
 					// 	fmt.Printf("OUTPUT=%v\n", rule.Output)
@@ -183,7 +177,6 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 			couldntMap = append(couldntMap, s[0:1])
 		}
 	}
-	//fmt.Printf("%v\n", res)
 	if len(couldntMap) > 0 {
 		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s0)
 	} else {
