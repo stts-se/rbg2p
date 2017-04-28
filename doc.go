@@ -1,6 +1,11 @@
 /*Package rbg2p contains utilities for rule based, manually written, grapheme to phoneme rules.
 
 Each g2p rule set is defined in a .g2p file with the following content:
+    * specific variables - used to define constant variables such as character set and phoneme delimiter
+    * variables (optional) - any variables for use in the context of the actual rules
+    * rules - g2p rules
+    * tests - input/output tests
+    * comments (optional)
 
 SPECIFIC VARIABLES
 
@@ -69,7 +74,7 @@ or with variants:
 
 Examples:
      TEST hit -> h i t
-     TEST kex -> (k e ks, C e ks)
+     TEST kex -> (k e k s, C e k s)
 
 
 For more examples (used for unit tests), see the test_data folder: https://github.com/stts-se/rbg2p/tree/master/test_data
