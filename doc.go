@@ -24,7 +24,7 @@ Grapheme to phoneme rules written in a format loosely based on phonotactic rules
 Context:
      <LEFT CONTEXT> _ <RIGHT CONTEXT>
 
-where # is used for anchoring (marks the start/end of the input string)
+# is used for anchoring (marks the start/end of the input string).
 
 Examples:
      a -> ? a / # _
@@ -50,7 +50,7 @@ Examples:
      TEST kex -> (k e ks, C e ks)
 
 
-For real world examples (used for unit tests), see the test_data folder: https://github.com/stts-se/rbg2p/tree/master/test_data
+For more examples (used for unit tests), see the test_data folder: https://github.com/stts-se/rbg2p/tree/master/test_data
 
 */
 package rbg2p
