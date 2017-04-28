@@ -91,13 +91,13 @@ func (t1 Test) equals(t2 Test) bool {
 
 // RuleSet is a set of g2p rules, with variables and built-in tests
 type RuleSet struct {
-	CharacterSet   []string
-	SymbolSet      string
-	PhnDelimiter   string
-	FallbackSymbol string
-	Vars           map[string]string
-	Rules          []Rule
-	Tests          []Test
+	CharacterSet     []string
+	SymbolSet        string
+	PhonemeDelimiter string
+	DefaultPhoneme   string
+	Vars             map[string]string
+	Rules            []Rule
+	Tests            []Test
 }
 
 // TestResult is a container for test results (errors, warnings, and failed tests from tests speficied in the g2p rule file)
@@ -148,7 +148,7 @@ func (rs RuleSet) Test() TestResult {
 		res0, err := rs.Apply(strings.ToLower(input))
 		res := []string{}
 		for _, trans := range res0 {
-			res = append(res, strings.Join(trans.Phonemes, rs.PhnDelimiter))
+			res = append(res, strings.Join(trans.Phonemes, rs.PhonemeDelimiter))
 		}
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
@@ -208,7 +208,7 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 			}
 		}
 		if !matchFound {
-			res = append(res, []string{rs.FallbackSymbol})
+			res = append(res, []string{rs.DefaultPhoneme})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}

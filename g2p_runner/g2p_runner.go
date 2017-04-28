@@ -27,11 +27,11 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
 		if force {
-			print(orth, transes, ruleSet.PhnDelimiter)
+			print(orth, transes, ruleSet.PhonemeDelimiter)
 		}
 		return false
 	}
-	print(orth, transes, ruleSet.PhnDelimiter)
+	print(orth, transes, ruleSet.PhonemeDelimiter)
 	return true
 }
 

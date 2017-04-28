@@ -33,8 +33,8 @@ func isBlankLine(s string) bool {
 // LoadFile loads a g2p rule set from the specified file
 func LoadFile(fName string) (RuleSet, error) {
 	ruleSet := RuleSet{Vars: map[string]string{}}
-	ruleSet.FallbackSymbol = "_"
-	ruleSet.PhnDelimiter = " "
+	ruleSet.DefaultPhoneme = "_"
+	ruleSet.PhonemeDelimiter = " "
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -103,9 +103,9 @@ func parseConst(s string, ruleSet *RuleSet) error {
 		} else if name == "SYMBOL_SET" {
 			ruleSet.SymbolSet = value
 		} else if name == "DEFAULT_PHONEME" {
-			ruleSet.FallbackSymbol = value
+			ruleSet.DefaultPhoneme = value
 		} else if name == "PHONEME_DELIMITER" {
-			ruleSet.PhnDelimiter = value
+			ruleSet.PhonemeDelimiter = value
 		} else {
 			return fmt.Errorf("invalid const definition: " + s)
 		}
