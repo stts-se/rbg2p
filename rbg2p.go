@@ -45,8 +45,8 @@ func (c Context) String() string {
 	return ""
 }
 
-// Equals checks for equality (including underlying regexps)
-func (c Context) Equals(c2 Context) bool {
+// equals checks for equality (including underlying regexps); used for unit tests
+func (c Context) equals(c2 Context) bool {
 	if c.IsDefined() && !c2.IsDefined() {
 		return false
 	} else if c2.IsDefined() && !c.IsDefined() {
@@ -70,12 +70,12 @@ func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
 }
 
-// Equals checks for equality (including underlying underlying slices and regexps)
-func (r Rule) Equals(r2 Rule) bool {
+// equals checks for equality (including underlying underlying slices and regexps); used for unit tests
+func (r Rule) equals(r2 Rule) bool {
 	return r.Input == r2.Input &&
 		reflect.DeepEqual(r.Output, r2.Output) &&
-		r.LeftContext.Equals(r2.LeftContext) &&
-		r.RightContext.Equals(r2.RightContext)
+		r.LeftContext.equals(r2.LeftContext) &&
+		r.RightContext.equals(r2.RightContext)
 }
 
 // Test defines a rule test (input -> output)
@@ -84,8 +84,8 @@ type Test struct {
 	Output []string
 }
 
-// Equals checks for equality (including underlying slices)
-func (t1 Test) Equals(t2 Test) bool {
+// equals checks for equality (including underlying slices); used for unit tests
+func (t1 Test) equals(t2 Test) bool {
 	return t1.Input == t2.Input && reflect.DeepEqual(t1.Output, t2.Output)
 }
 

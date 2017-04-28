@@ -79,7 +79,7 @@ func TestNewTest(t *testing.T) {
 		result, err := newTest(l)
 		if err != nil {
 			t.Errorf("didn't expect error for input test line %s : %s", l, err)
-		} else if !expect.Equals(result) {
+		} else if !expect.equals(result) {
 			t.Errorf(fsExpGot, expect, result)
 		}
 	}
@@ -88,7 +88,7 @@ func TestNewTest(t *testing.T) {
 		result, err := newTest(l)
 		if err != nil {
 			t.Errorf("didn't expect error for input test line %s : %s", l, err)
-		} else if expect.Equals(result) {
+		} else if expect.equals(result) {
 			t.Errorf(fsExpGot, expect, result)
 		}
 	}
@@ -138,7 +138,7 @@ func TestNewRule(t *testing.T) {
 		result, err := newRule(l, vars)
 		if err != nil {
 			t.Errorf("didn't expect error for input rule line %s : %s", l, err)
-		} else if !expect.Equals(result) {
+		} else if !expect.equals(result) {
 			t.Errorf(fsExpGot, expect, result)
 		}
 	}
@@ -147,7 +147,7 @@ func TestNewRule(t *testing.T) {
 		result, err := newRule(l, vars)
 		if err != nil {
 			t.Errorf("didn't expect error for input rule line %s : %s", l, err)
-		} else if expect.Equals(result) {
+		} else if expect.equals(result) {
 			t.Errorf(fsExpGot, expect, result)
 		}
 	}
