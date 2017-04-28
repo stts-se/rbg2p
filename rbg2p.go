@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// Trans is a container for phonemes in a transcriptions
+// Trans is a container for phonemes in a transcription
 type Trans struct {
 	Phonemes []string
 }
