@@ -12,17 +12,17 @@ Each g2p rule set is defined in a .g2p file with the following content:
 
 SPECIFIC VARIABLES
 
-Set some specific variables:
+Defines a set of constant variables, such as character set and phoneme delimiter
      <NAME> "<VALUE>" // (quotes are required)
 
-Available variables (* is optional):
-     CHARACTER_SET       (default: none)
+Available variables (* is required):
+     CHARACTER_SET*     (default: none)
       - used to check that each character in the character set has at least one rule
-     SYMBOL_SET*         (default: none)
+     SYMBOL_SET         (default: none)
       - used for server side validation of phonemes in g2p rules
-     DEFAULT_PHONEME*    (default: "_")
+     DEFAULT_PHONEME    (default: "_")
       - used for input input (orthographic) symbols
-     PHONEME_DELIMITER*  (default: " ")
+     PHONEME_DELIMITER  (default: " ")
       - used to concatenate phonemes into a transcriptions
 
 Examples:
