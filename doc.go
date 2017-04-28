@@ -7,11 +7,15 @@ SPECIFIC VARIABLES
 Set some specific variables:
      <NAME> "<VALUE>" // (quotes are required)
 
-Available variables:
-     DEFAULT_PHONEME    (default: "_")
-     PHONEME_DELIMITER  (default: " ")
+Available variables (* is optional):
+     CHARACTER_SET       (default: none) // used to check that each character in the character set has at least one rule
+     SYMBOL_SET*         (default: none) // used for server side validation of phonemes in g2p rules
+     DEFAULT_PHONEME*    (default: "_")  // used for input input (orthographic) symbols
+     PHONEME_DELIMITER*  (default: " ")  // used to concatenate phonemes into a transcriptions
 
 Examples:
+     CHARACTER_SET "abcdefghijklmnopqrstuvwxyzåäö"
+     SYMBOL_SET "sv-se_ws-sampa"
      DEFAULT_PHONEME "_"
      PHONEME_DELIMITER " "
 

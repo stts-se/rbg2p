@@ -91,6 +91,8 @@ func (t1 Test) Equals(t2 Test) bool {
 
 // RuleSet is a set of g2p rules, with variables and built-in tests
 type RuleSet struct {
+	CharacterSet   []string
+	SymbolSet      string
 	PhnDelimiter   string
 	FallbackSymbol string
 	Vars           map[string]string

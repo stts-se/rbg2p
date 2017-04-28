@@ -13,11 +13,11 @@ VAR VOICED [b|d|g|z]
 
 a -> a
 e -> e
-i -> i
-o -> o
-u -> }
+i -> I
+o -> O
+u -> u0
 ö -> 2
-å -> o
+å -> O
 ä -> {
 
 skt -> (s t, s k t) / _
@@ -30,6 +30,8 @@ v -> f / _ VOICELESS
 ck -> k
 k -> k
 rt -> rt
+n -> N / _ [kg]
+n -> n
 
 b -> p / _ VOICELESS
 b -> b 
@@ -42,8 +44,8 @@ t -> t
 
 // Tests
 
-TEST dusch -> (d } S, d } x)
-TEST duscha -> d } S a
-TEST borta -> b o rt a
+TEST dusch -> (d u0 S, d u0 x)
+TEST duscha -> d u0 S a
+TEST borta -> b O rt a
 TEST abt -> a p t
-TEST busktdusch -> (b } s t d } S,  b } s k t d } x,  b } s t d } S,  b } s k t d } x)
+TEST busktdusch -> (b u0 s t d u0 S,  b u0 s k t d u0 x,  b u0 s t d u0 S,  b u0 s k t d u0 x)

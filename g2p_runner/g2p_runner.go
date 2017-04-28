@@ -8,15 +8,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/rbg2p"
 )
 
 var l = log.New(os.Stderr, "", 0)
 
-func print(orth string, transes []rbg2p.Trans) {
+func print(orth string, transes []rbg2p.Trans, phnDelim string) {
 	ts := []string{}
 	for _, t := range transes {
-		ts = append(ts, strings.Join(t.Phonemes, rbg2p.PhnDelimiter))
+		ts = append(ts, strings.Join(t.Phonemes, phnDelim))
 	}
 	fmt.Printf("%s\t%s\n", orth, strings.Join(ts, "\t"))
 }
@@ -26,11 +27,11 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
 		if force {
-			print(orth, transes)
+			print(orth, transes, ruleSet.PhnDelimiter)
 		}
 		return false
 	}
-	print(orth, transes)
+	print(orth, transes, ruleSet.PhnDelimiter)
 	return true
 }
 
@@ -38,13 +39,15 @@ func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var ssFile = f.String("symbolset", "", "use specified symbol set for validating the symbols in the g2p rule set (default: none)")
 	var help = f.Bool("help", false, "print help message")
 
 	var usage = `go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>
 
 FLAGS:
-   -force  bool    print transcriptions even if errors are found (default: false)
-   -help   bool    print help message`
+   -force      bool    print transcriptions even if errors are found (default: false)
+   -symbolset  string  use specified symbol set for validating the symbols in the g2p rule set (default: none)
+   -help       bool    print help message`
 
 	f.Usage = func() {
 		l.Printf(usage)
@@ -76,6 +79,30 @@ FLAGS:
 	if err != nil {
 		l.Printf("couldn't load file %s : %s", g2pFile, err)
 		os.Exit(1)
+	}
+
+	if *ssFile != "" {
+		symbolSet, err := symbolset.LoadSymbolSet(*ssFile)
+		if err != nil {
+			l.Printf("couldn't load symbol set : %s", err)
+			os.Exit(1)
+		}
+		validation, err := rbg2p.CompareToSymbolSet(ruleSet, symbolSet)
+		if err != nil {
+			l.Printf("couldn't validate against symbol set : %s", err)
+			os.Exit(1)
+		}
+		if len(validation.Warnings) > 0 {
+			for _, err := range validation.Warnings {
+				l.Printf("SYMBOL SET WARNING: %v\n", err)
+			}
+		}
+		if len(validation.Errors) > 0 {
+			for _, err := range validation.Errors {
+				l.Printf("SYMBOL SET ERROR: %v\n", err)
+			}
+			os.Exit(1)
+		}
 	}
 
 	errors := ruleSet.Test()

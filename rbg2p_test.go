@@ -175,7 +175,7 @@ func TestLoadFile2(t *testing.T) {
 	}
 }
 
-func TestHun(t *testing.T) {
+func xxxTestHun(t *testing.T) {
 	fName := "test_data/hun.g2p"
 	rs, err := LoadFile(fName)
 	if err != nil {
@@ -194,8 +194,27 @@ func TestHun(t *testing.T) {
 	}
 }
 
-func TestMkd(t *testing.T) {
+func xxxTestMkd(t *testing.T) {
 	fName := "test_data/mkd.g2p"
+	rs, err := LoadFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+
+	errors := rs.Test()
+	if len(errors) > 0 {
+		for _, err = range errors {
+			fmt.Printf("%v\n", err)
+		}
+		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+	}
+}
+
+func TestSws(t *testing.T) {
+	fName := "test_data/sws-test.g2p"
 	rs, err := LoadFile(fName)
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
