@@ -134,7 +134,7 @@ func expand(transes [][]string) []Trans {
 	return res
 }
 
-// Apply applies the rules to an input string, returns a slice of transcriptions
+// Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 	var i = 0
 	var s0 = []rune(s00)
@@ -142,6 +142,7 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 	var couldntMap = []string{}
 	for i < len(s0) {
 		s := string(s0[i:len(s0)])
+		thisChar := string(s0[i : i+1])
 		left := string(s0[0:i])
 		var matchFound = false
 		for _, rule := range rs.Rules {
@@ -158,9 +159,9 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 			}
 		}
 		if !matchFound {
-			res = append(res, []string{"_"})
+			res = append(res, []string{"_"}) // TODO: default behaviour here?
 			i = i + 1
-			couldntMap = append(couldntMap, s[0:1])
+			couldntMap = append(couldntMap, thisChar)
 		}
 	}
 	if len(couldntMap) > 0 {
