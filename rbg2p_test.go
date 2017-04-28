@@ -284,7 +284,7 @@ func TestWithPhnDelim(t *testing.T) {
 
 }
 
-func xxxTestHun(t *testing.T) {
+func xTestHun(t *testing.T) {
 	_, err := loadAndTest(t, "test_data/hun.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
@@ -293,6 +293,13 @@ func xxxTestHun(t *testing.T) {
 
 func xxxTestMkd(t *testing.T) {
 	_, err := loadAndTest(t, "test_data/mkd.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestCze(t *testing.T) {
+	_, err := loadAndTest(t, "test_data/czc.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}

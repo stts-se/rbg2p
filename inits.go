@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-var commentAtEndRe = regexp.MustCompile("^(.+)//.*$")
+var commentAtEndRe = regexp.MustCompile("^(.*[^/]+)//+.*$")
 
 func trimComment(s string) string {
-	return commentAtEndRe.ReplaceAllString(s, "$1")
+	return strings.TrimSpace(commentAtEndRe.ReplaceAllString(s, "$1"))
 }
 
 func isComment(s string) bool {

@@ -115,7 +115,7 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 	// 	}
 	// }
 	// if len(errors) > 0 {
-	// 	validation.Warnings = append(validation.Warnings, fmt.Sprintf("no rules exist for characters: %s", strings.Join(errors, ",")))
+	// 	validation.Warnings = append(validation.Warnings, fmt.Sprintf("no rules exist for character(s): %s", strings.Join(errors, ",")))
 	// }
 
 	var errors = []string{}
@@ -125,7 +125,7 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 		}
 	}
 	if len(errors) > 0 {
-		validation.Errors = append(validation.Errors, fmt.Sprintf("no default rules for characters: %s", strings.Join(errors, ",")))
+		validation.Errors = append(validation.Errors, fmt.Sprintf("no default rule for character(s): %s", strings.Join(errors, ",")))
 	}
 }
 
@@ -138,7 +138,10 @@ func (rs RuleSet) Test() TestResult {
 		for _, char := range strings.Split(rule.Input, "") {
 			coveredChars[char] = true
 		}
-		individualChars[rule.Input] = true
+		coveredChars[rule.Input] = true
+		if !rule.LeftContext.IsDefined() && !rule.RightContext.IsDefined() {
+			individualChars[rule.Input] = true
+		}
 	}
 	rs.checkForUnusedChars(coveredChars, individualChars, &result)
 
