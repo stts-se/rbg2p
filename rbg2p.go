@@ -1,3 +1,4 @@
+// Utilities for rule based, manually written, grapheme to phoneme rules
 package rbg2p
 
 import (
