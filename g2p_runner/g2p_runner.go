@@ -15,7 +15,7 @@ var l = log.New(os.Stderr, "", 0)
 func print(orth string, transes []rbg2p.Trans) {
 	ts := []string{}
 	for _, t := range transes {
-		ts = append(ts, strings.Join(t.Phonemes, " "))
+		ts = append(ts, strings.Join(t.Phonemes, PhnDelimiter))
 	}
 	fmt.Printf("%s\t%s\n", orth, strings.Join(ts, "\t"))
 }

@@ -1,5 +1,8 @@
-// Utilities for rule based, manually written, grapheme to phoneme rules
 package rbg2p
+
+// TODO:
+// * default phn separator: _ but add switch to set another (or specify full symbol set file, see below)
+// * validate against symbolset
 
 import (
 	"fmt"
@@ -7,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 )
+
+var PhnDelimiter = " "
 
 // Trans is a container for phonemes in a transcriptions
 type Trans struct {
@@ -100,7 +105,7 @@ func (rs RuleSet) Test() []error {
 		result0, err := rs.Apply(strings.ToLower(input))
 		result := []string{}
 		for _, trans := range result0 {
-			result = append(result, strings.Join(trans.Phonemes, " "))
+			result = append(result, strings.Join(trans.Phonemes, PhnDelimiter))
 		}
 		if err != nil {
 			errs = append(errs, fmt.Errorf("%v", err))
