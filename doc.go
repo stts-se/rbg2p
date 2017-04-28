@@ -2,6 +2,20 @@
 
 Each g2p rule set is defined in a .g2p file with the following content:
 
+SPECIFIC VARIABLES
+
+Set some specific variables:
+     <NAME> "<VALUE>" // (quotes are required)
+
+Available variables:
+     DEFAULT_PHONEME    (default: "_")
+     PHONEME_DELIMITER  (default: " ")
+
+Examples:
+     DEFAULT_PHONEME "_"
+     PHONEME_DELIMITER " "
+
+
 VARIABLES
 
 Regexp variables prefixed by VAR:

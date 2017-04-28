@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -15,15 +16,18 @@ var l = log.New(os.Stderr, "", 0)
 func print(orth string, transes []rbg2p.Trans) {
 	ts := []string{}
 	for _, t := range transes {
-		ts = append(ts, strings.Join(t.Phonemes, PhnDelimiter))
+		ts = append(ts, strings.Join(t.Phonemes, rbg2p.PhnDelimiter))
 	}
 	fmt.Printf("%s\t%s\n", orth, strings.Join(ts, "\t"))
 }
 
-func transcribe(ruleSet rbg2p.RuleSet, orth string) bool {
+func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
 	transes, err := ruleSet.Apply(orth)
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
+		if force {
+			print(orth, transes)
+		}
 		return false
 	}
 	print(orth, transes)
@@ -32,22 +36,52 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string) bool {
 
 func main() {
 
-	if len(os.Args) < 3 {
-		log.Println("go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>")
+	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var help = f.Bool("help", false, "print help message")
+
+	var usage = `go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>
+
+FLAGS:
+   -force  bool    print transcriptions even if errors are found (default: false)
+   -help   bool    print help message`
+
+	f.Usage = func() {
+		l.Printf(usage)
+	}
+
+	var args = os.Args
+	if strings.HasSuffix(args[0], "g2p_runner") {
+		args = args[1:] // remove first argument if it's the program name
+	}
+	err := f.Parse(args)
+	if err != nil {
 		os.Exit(1)
 	}
 
-	g2pFile := os.Args[1]
+	args = f.Args()
+
+	if *help {
+		l.Println(usage)
+		os.Exit(1)
+	}
+
+	if len(args) < 2 {
+		l.Println(usage)
+		os.Exit(1)
+	}
+
+	g2pFile := args[0]
 	ruleSet, err := rbg2p.LoadFile(g2pFile)
 	if err != nil {
-		log.Printf("couldn't load file %s : %s", g2pFile, err)
+		l.Printf("couldn't load file %s : %s", g2pFile, err)
 		os.Exit(1)
 	}
 
 	errors := ruleSet.Test()
 	if len(errors) > 0 {
 		for _, err = range errors {
-			fmt.Printf("%v\n", err)
+			l.Printf("%v\n", err)
 		}
 		l.Printf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(ruleSet.Tests), g2pFile)
 		os.Exit(1)
@@ -58,11 +92,11 @@ func main() {
 	nTotal := 0
 	nErrs := 0
 	nTrans := 0
-	for i := 2; i < len(os.Args); i++ {
-		s := os.Args[i]
+	for i := 1; i < len(args); i++ {
+		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			if transcribe(ruleSet, strings.ToLower(s)) {
+			if transcribe(ruleSet, strings.ToLower(s), *force) {
 				nTrans = nTrans + 1
 			} else {
 				nErrs = nErrs + 1
@@ -82,7 +116,7 @@ func main() {
 				}
 				nTotal = nTotal + 1
 				line := strings.ToLower(sc.Text())
-				if transcribe(ruleSet, line) {
+				if transcribe(ruleSet, line, *force) {
 					nTrans = nTrans + 1
 				} else {
 					nErrs = nErrs + 1

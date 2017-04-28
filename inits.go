@@ -33,6 +33,8 @@ func isBlankLine(s string) bool {
 // LoadFile loads a g2p rule set from the specified file
 func LoadFile(fName string) (RuleSet, error) {
 	ruleSet := RuleSet{Vars: map[string]string{}}
+	ruleSet.FallbackSymbol = "_"
+	ruleSet.PhnDelimiter = " "
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -48,6 +50,18 @@ func LoadFile(fName string) (RuleSet, error) {
 		n++
 		l := trimComment(strings.TrimSpace(s.Text()))
 		if isBlankLine(l) || isComment(l) {
+		} else if isFallbackSymbol(l) {
+			s, err := newFallback(l)
+			if err != nil {
+				return ruleSet, err
+			}
+			ruleSet.FallbackSymbol = s
+		} else if isPhnSeparator(l) {
+			s, err := newPhnSeparator(l)
+			if err != nil {
+				return ruleSet, err
+			}
+			ruleSet.PhnDelimiter = s
 		} else if isVar(l) {
 			name, value, err := newVar(l)
 			if err != nil {
@@ -73,6 +87,46 @@ func LoadFile(fName string) (RuleSet, error) {
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
 	return ruleSet, nil
+}
+
+func isFallbackSymbol(s string) bool {
+	return strings.HasPrefix(s, "DEFAULT_PHONEME ")
+}
+
+var fallbackRe = regexp.MustCompile("^DEFAULT_PHONEME +\"(.*)\"$")
+
+func newFallback(s string) (string, error) {
+	// SET FALLBACK VALUE
+	matchRes := fallbackRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		return "", fmt.Errorf("invalid fallback definition: " + s)
+	}
+	value := matchRes[1]
+	_, err := regexp.Compile(value)
+	if err != nil {
+		return "", fmt.Errorf("invalid fallback in input (regular expression failed) for /%s/: %s", s, err)
+	}
+	return value, nil
+}
+
+func isPhnSeparator(s string) bool {
+	return strings.HasPrefix(s, "PHONEME_DELIMITER ")
+}
+
+var phnSepRe = regexp.MustCompile("^PHONEME_DELIMITER +\"(.*)\"$")
+
+func newPhnSeparator(s string) (string, error) {
+	// SET PHN DELIM VALUE
+	matchRes := phnSepRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		return "", fmt.Errorf("invalid phoneme separator definition: " + s)
+	}
+	value := matchRes[1]
+	_, err := regexp.Compile(value)
+	if err != nil {
+		return "", fmt.Errorf("invalid phoneme separator in input (regular expression failed) for /%s/: %s", s, err)
+	}
+	return value, nil
 }
 
 var varRe = regexp.MustCompile("^VAR +([^ ]+) +([^ ]+)$")

@@ -254,3 +254,45 @@ func TestApply(t *testing.T) {
 		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
 	}
 }
+
+func TestWithPhnDelim(t *testing.T) {
+	fName := "test_data/test_specs.g2p"
+	rs, err := LoadFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+	_, err = rs.Apply("hix")
+	if err == nil {
+		t.Errorf("expected error for input file %s", fName)
+		return
+	}
+
+	_, err = rs.Apply("hit")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+
+	_, err = rs.Apply("dusch")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+
+	_, err = rs.Apply("duscha")
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return
+	}
+
+	errors := rs.Test()
+	if len(errors) > 0 {
+		for _, err = range errors {
+			fmt.Printf("%v\n", err)
+		}
+		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+	}
+}

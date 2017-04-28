@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-var PhnDelimiter = " "
-
 // Trans is a container for phonemes in a transcriptions
 type Trans struct {
 	Phonemes []string
@@ -94,9 +92,11 @@ func (t1 Test) Equals(t2 Test) bool {
 
 // RuleSet is a set of g2p rules, with variables and built-in tests
 type RuleSet struct {
-	Vars  map[string]string
-	Rules []Rule
-	Tests []Test
+	PhnDelimiter   string
+	FallbackSymbol string
+	Vars           map[string]string
+	Rules          []Rule
+	Tests          []Test
 }
 
 // Test runs the built-in tests. Returns an array of errors, if any.
@@ -108,7 +108,7 @@ func (rs RuleSet) Test() []error {
 		result0, err := rs.Apply(strings.ToLower(input))
 		result := []string{}
 		for _, trans := range result0 {
-			result = append(result, strings.Join(trans.Phonemes, PhnDelimiter))
+			result = append(result, strings.Join(trans.Phonemes, rs.PhnDelimiter))
 		}
 		if err != nil {
 			errs = append(errs, fmt.Errorf("%v", err))
@@ -168,7 +168,7 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 			}
 		}
 		if !matchFound {
-			res = append(res, []string{"_"}) // TODO: default behaviour here?
+			res = append(res, []string{rs.FallbackSymbol})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}

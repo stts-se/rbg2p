@@ -1,7 +1,7 @@
-// Specs
+// Specific variables
 
 DEFAULT_PHONEME "_"
-PHONEME_DELIMITER " "
+PHONEME_DELIMITER ""
 
 
 // Variables
@@ -20,7 +20,7 @@ u -> }
 å -> o
 ä -> {
 
-skt -> (s t, s k t) / _
+skt -> (st, skt) / _
 
 sch -> (S, x) / _# 
 sch -> S
@@ -42,8 +42,8 @@ t -> t
 
 // Tests
 
-TEST dusch -> (d } S, d } x)
-TEST duscha -> d } S a
-TEST borta -> b o rt a
-TEST abt -> a p t
-TEST busktdusch -> (b } s t d } S,  b } s k t d } x,  b } s t d } S,  b } s k t d } x)
+TEST dusch -> (d}S, d}x)
+TEST duscha -> d}Sa
+TEST borta -> borta
+TEST abt -> apt
+TEST busktdusch -> (b}std}S,  b}sktd}x,  b}std}S,  b}sktd}x)
