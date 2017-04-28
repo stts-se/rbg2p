@@ -153,8 +153,8 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 		if err != nil {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}
-		left.regexp = re
-		left.input = leftS
+		left.Regexp = re
+		left.Input = leftS
 	}
 	rightS := strings.TrimSpace(matchRes[2])
 	if len(rightS) > 0 {
@@ -162,8 +162,8 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 		if err != nil {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}
-		right.regexp = re
-		right.input = rightS
+		right.Regexp = re
+		right.Input = rightS
 	}
 	return left, right, nil
 }

@@ -30,20 +30,20 @@ type Context struct {
 // Matches checks if the input string matches the context rule
 func (c Context) Matches(s string) bool {
 	if c.IsDefined() {
-		return c.regexp.MatchString(s)
+		return c.Regexp.MatchString(s)
 	}
 	return true
 }
 
 // IsDefined returns true if the contained regexp is defined
 func (c Context) IsDefined() bool {
-	return (nil != c.regexp)
+	return (nil != c.Regexp)
 }
 
 // String returns a string representation of the Context
 func (c Context) String() string {
 	if c.IsDefined() {
-		return c.input
+		return c.Input
 	}
 	return ""
 }
@@ -57,7 +57,7 @@ func (c Context) Equals(c2 Context) bool {
 	} else if !c2.IsDefined() && !c.IsDefined() {
 		return true
 	}
-	return c.input == c2.input
+	return c.Input == c2.Input
 }
 
 // Rule is a g2p rule representation
