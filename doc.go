@@ -18,12 +18,13 @@ Examples:
 
 VARIABLES
 
-Regexp variables prefixed by VAR:
+Regexp variables prefixed by VAR, that can be used in the rule context as exemplified below.
      VAR <NAME> <VALUE>
 
 Examples:
      VAR VOWEL [aeyuio]
      VAR AFFRICATE (tS|dZ)
+     VAR VOICELESS [ptksf]
 
 
 RULES
@@ -38,7 +39,7 @@ Grapheme to phoneme rules written in a format loosely based on phonotactic rules
 Context:
      <LEFT CONTEXT> _ <RIGHT CONTEXT>
 
-# is used for anchoring (marks the start/end of the input string).
+Pre-defined variables (above) can be use in the contex specs. # is used for anchoring (marks the start/end of the input string).
 
 Examples:
      a -> ? a / # _
@@ -46,6 +47,7 @@ Examples:
      e -> e
      skt -> (s t, s k t) / _
      ck -> k
+     b -> p / _ VOICELESS
 
 
 COMMENTS
