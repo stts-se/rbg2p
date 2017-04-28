@@ -1,5 +1,6 @@
 // Specific variables
 
+CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER ""
 
@@ -39,6 +40,23 @@ s -> s
 h -> h
 t -> t
 
+c -> s
+p -> p
+q -> k
+w -> v
+z -> s
+ü -> y
+
+é -> e:
+f -> f
+g -> g
+j -> j
+l -> l
+m -> m
+r -> r
+x -> k s
+y -> y:
+n -> n
 
 // Tests
 

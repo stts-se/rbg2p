@@ -2,7 +2,6 @@ package rbg2p
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/stts-se/pronlex/symbolset"
 )
@@ -22,29 +21,6 @@ func validate(input string, symbolSet symbolset.SymbolSet, usedSymbols map[strin
 	return invalid, nil
 }
 
-type CompareResult struct {
-	Errors   []string
-	Warnings []string
-}
-
-func checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, characterSet []string, validation *CompareResult) {
-	var errors = []string{}
-	for _, char := range characterSet {
-		if _, ok := coveredChars[char]; !ok {
-			errors = append(errors, char)
-		}
-	}
-	validation.Warnings = append(validation.Warnings, fmt.Sprintf("no rules exist for characters: %s", strings.Join(errors, ",")))
-
-	errors = []string{}
-	for _, char := range characterSet {
-		if _, ok := individualChars[char]; !ok {
-			errors = append(errors, char)
-		}
-	}
-	validation.Errors = append(validation.Errors, fmt.Sprintf("no default rules for characters: %s", strings.Join(errors, ",")))
-}
-
 func checkForUnusedSymbols(symbols map[string]bool, symbolSet symbolset.SymbolSet) []string {
 	warnings := []string{}
 	for _, symbol := range symbolSet.PhoneticSymbols {
@@ -56,20 +32,14 @@ func checkForUnusedSymbols(symbols map[string]bool, symbolSet symbolset.SymbolSe
 }
 
 // CompareToSymbolSet validates the phonemes in the g2p rule set against the specified symbolset. Returns an array of invalid symbols, if any; or if errors are found, this is returned instead.
-func CompareToSymbolSet(ruleSet RuleSet, symbolSet symbolset.SymbolSet) (CompareResult, error) {
-	var validation = CompareResult{}
+func CompareToSymbolSet(ruleSet RuleSet, symbolSet symbolset.SymbolSet) (TestResult, error) {
+	var validation = TestResult{}
 	var usedSymbols = map[string]bool{}
-	var coveredChars = map[string]bool{}
-	var individualChars = map[string]bool{}
 	for _, rule := range ruleSet.Rules {
-		for _, char := range strings.Split(rule.Input, "") {
-			coveredChars[char] = true
-		}
-		individualChars[rule.Input] = true
 		for _, output := range rule.Output {
 			invalid, err := validate(output, symbolSet, usedSymbols)
 			if err != nil {
-				return CompareResult{}, fmt.Errorf("found error in rule output %s : s%", output, err)
+				return TestResult{}, fmt.Errorf("found error in rule output %s : v%", output, err)
 			}
 			for _, symbol := range invalid {
 				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in rule output %s: %s", rule, symbol))
@@ -81,7 +51,7 @@ func CompareToSymbolSet(ruleSet RuleSet, symbolSet symbolset.SymbolSet) (Compare
 		for _, output := range test.Output {
 			invalid, err := validate(output, symbolSet, usedSymbols)
 			if err != nil {
-				return CompareResult{}, fmt.Errorf("found error in test output %v : s%", output, err)
+				return TestResult{}, fmt.Errorf("found error in test output %s : v%", output, err)
 			}
 			for _, symbol := range invalid {
 				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in test output %s: %s", test, symbol))
@@ -92,6 +62,5 @@ func CompareToSymbolSet(ruleSet RuleSet, symbolSet symbolset.SymbolSet) (Compare
 	for _, warn := range checkForUnusedSymbols(usedSymbols, symbolSet) {
 		validation.Warnings = append(validation.Warnings, warn)
 	}
-	checkForUnusedChars(coveredChars, individualChars, ruleSet.CharacterSet, &validation)
 	return validation, nil
 }

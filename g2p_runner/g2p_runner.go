@@ -81,6 +81,7 @@ FLAGS:
 		os.Exit(1)
 	}
 
+	haltingError := false
 	if *ssFile != "" {
 		symbolSet, err := symbolset.LoadSymbolSet(*ssFile)
 		if err != nil {
@@ -101,19 +102,34 @@ FLAGS:
 			for _, err := range validation.Errors {
 				l.Printf("SYMBOL SET ERROR: %v\n", err)
 			}
-			os.Exit(1)
+			haltingError = true
 		}
 	}
 
-	errors := ruleSet.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			l.Printf("%v\n", err)
+	result := ruleSet.Test()
+	for _, e := range result.Errors {
+		l.Printf("ERROR: %v\n", e)
+	}
+	l.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), g2pFile)
+	for _, e := range result.Warnings {
+		l.Printf("WARNING: %v\n", e)
+	}
+	l.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), g2pFile)
+	if len(result.Errors) > 0 {
+		haltingError = true
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			l.Printf("FAILED TEST: %v\n", e)
 		}
-		l.Printf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(ruleSet.Tests), g2pFile)
-		os.Exit(1)
+		l.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), g2pFile)
+		haltingError = true
 	} else {
 		l.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), g2pFile)
+	}
+
+	if haltingError && !*force {
+		os.Exit(1)
 	}
 
 	nTotal := 0

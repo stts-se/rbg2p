@@ -1,6 +1,7 @@
 // Variables
 
-VAR VOICELESS = [p|k|t|f|s|h|c]
+VAR CHARACTER_SET ""
+VAR VOICELESS [p|k|t|f|s|h|c]
 VAR VOICED [b|d|g|z]
 
 // Rules

@@ -1,4 +1,4 @@
-/*Utilities for rule based, manually written, grapheme to phoneme rules.
+/*Package rbg2p contains utilities for rule based, manually written, grapheme to phoneme rules.
 
 Each g2p rule set is defined in a .g2p file with the following content:
 

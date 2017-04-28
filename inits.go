@@ -79,6 +79,9 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
+	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {
+		return ruleSet, fmt.Errorf("No character set defined for input file %s", fName)
+	}
 	return ruleSet, nil
 }
 

@@ -175,71 +175,53 @@ func TestLoadFile2(t *testing.T) {
 	}
 }
 
-func xxxTestHun(t *testing.T) {
-	fName := "test_data/hun.g2p"
+func loadAndTest(t *testing.T, fName string) (RuleSet, error) {
 	rs, err := LoadFile(fName)
 	if err != nil {
-		t.Errorf("didn't expect error for input file %s : %s", fName, err)
-		return
+		return rs, fmt.Errorf("didn't expect error for input file %s : %s", fName, err)
 	}
 
-	errors := rs.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			fmt.Printf("%v\n", err)
+	result := rs.Test()
+	if len(result.Errors) > 0 {
+		for _, e := range result.Errors {
+			fmt.Printf("ERROR: %v\n", e)
 		}
-		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
+		fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fName)
+	}
+	if len(result.Warnings) > 0 {
+		for _, e := range result.Warnings {
+			fmt.Printf("WARNING: %v\n", e)
+		}
+		fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fName)
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			fmt.Printf("FAILED TEST: %v\n", e)
+		}
+		fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(rs.Tests), fName)
 	} else {
 		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
 	}
-}
-
-func xxxTestMkd(t *testing.T) {
-	fName := "test_data/mkd.g2p"
-	rs, err := LoadFile(fName)
-	if err != nil {
-		t.Errorf("didn't expect error for input file %s : %s", fName, err)
-		return
+	if len(result.Errors) > 0 || len(result.FailedTests) > 0 {
+		return rs, fmt.Errorf("Init/tests failed for %s", fName)
 	}
-
-	errors := rs.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			fmt.Printf("%v\n", err)
-		}
-		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
-	} else {
-		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
-	}
+	return rs, nil
 }
-
 func TestSws(t *testing.T) {
-	fName := "test_data/sws-test.g2p"
-	rs, err := LoadFile(fName)
+	_, err := loadAndTest(t, "test_data/sws-test.g2p")
 	if err != nil {
-		t.Errorf("didn't expect error for input file %s : %s", fName, err)
-		return
-	}
-
-	errors := rs.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			fmt.Printf("%v\n", err)
-		}
-		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
-	} else {
-		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+		t.Errorf("%v", err)
 	}
 }
 
 func TestApply(t *testing.T) {
 	fName := "test_data/test.g2p"
-	rs, err := LoadFile(fName)
+	rs, err := loadAndTest(t, fName)
 	if err != nil {
-		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+		t.Errorf("%v", err)
 		return
 	}
-	_, err = rs.Apply("hix")
+	_, err = rs.Apply("hiß")
 	if err == nil {
 		t.Errorf("expected error for input file %s", fName)
 		return
@@ -263,25 +245,20 @@ func TestApply(t *testing.T) {
 		return
 	}
 
-	errors := rs.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			fmt.Printf("%v\n", err)
-		}
-		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
-	} else {
-		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
-	}
 }
 
 func TestWithPhnDelim(t *testing.T) {
 	fName := "test_data/test_specs.g2p"
-	rs, err := LoadFile(fName)
+	rs, err := loadAndTest(t, fName)
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
 		return
 	}
-	_, err = rs.Apply("hix")
+	_, err = rs.Apply("hi§")
 	if err == nil {
 		t.Errorf("expected error for input file %s", fName)
 		return
@@ -305,13 +282,18 @@ func TestWithPhnDelim(t *testing.T) {
 		return
 	}
 
-	errors := rs.Test()
-	if len(errors) > 0 {
-		for _, err = range errors {
-			fmt.Printf("%v\n", err)
-		}
-		t.Errorf("%d OF %d TESTS FAILED FOR %s\n", len(errors), len(rs.Tests), fName)
-	} else {
-		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), fName)
+}
+
+func xxxTestHun(t *testing.T) {
+	_, err := loadAndTest(t, "test_data/hun.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestMkd(t *testing.T) {
+	_, err := loadAndTest(t, "test_data/mkd.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
 	}
 }

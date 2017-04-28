@@ -100,25 +100,64 @@ type RuleSet struct {
 	Tests          []Test
 }
 
-// Test runs the built-in tests. Returns an array of errors, if any.
-func (rs RuleSet) Test() []error {
-	var errs []error
+// TestResult is a container for test results (errors, warnings, and failed tests from tests speficied in the g2p rule file)
+type TestResult struct {
+	Errors      []string
+	Warnings    []string
+	FailedTests []string
+}
+
+func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
+	// var errors = []string{}
+	// for _, char := range rs.CharacterSet {
+	// 	if _, ok := coveredChars[char]; !ok {
+	// 		errors = append(errors, char)
+	// 	}
+	// }
+	// if len(errors) > 0 {
+	// 	validation.Warnings = append(validation.Warnings, fmt.Sprintf("no rules exist for characters: %s", strings.Join(errors, ",")))
+	// }
+
+	var errors = []string{}
+	for _, char := range rs.CharacterSet {
+		if _, ok := individualChars[char]; !ok {
+			errors = append(errors, char)
+		}
+	}
+	if len(errors) > 0 {
+		validation.Errors = append(validation.Errors, fmt.Sprintf("no default rules for characters: %s", strings.Join(errors, ",")))
+	}
+}
+
+// Test runs the built-in tests. Returns a test result with errors and warnings, if any.
+func (rs RuleSet) Test() TestResult {
+	var result = TestResult{}
+	var coveredChars = map[string]bool{}
+	var individualChars = map[string]bool{}
+	for _, rule := range rs.Rules {
+		for _, char := range strings.Split(rule.Input, "") {
+			coveredChars[char] = true
+		}
+		individualChars[rule.Input] = true
+	}
+	rs.checkForUnusedChars(coveredChars, individualChars, &result)
+
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		result0, err := rs.Apply(strings.ToLower(input))
-		result := []string{}
-		for _, trans := range result0 {
-			result = append(result, strings.Join(trans.Phonemes, rs.PhnDelimiter))
+		res0, err := rs.Apply(strings.ToLower(input))
+		res := []string{}
+		for _, trans := range res0 {
+			res = append(res, strings.Join(trans.Phonemes, rs.PhnDelimiter))
 		}
 		if err != nil {
-			errs = append(errs, fmt.Errorf("%v", err))
+			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
 		}
-		if !reflect.DeepEqual(expect, result) {
-			errs = append(errs, fmt.Errorf("for '%s', expected %v, got %v", input, expect, result))
+		if !reflect.DeepEqual(expect, res) {
+			result.FailedTests = append(result.Errors, fmt.Sprintf("for '%s', expected %v, got %v", input, expect, res))
 		}
 	}
-	return errs
+	return result
 }
 
 func expand(transes [][]string) []Trans {

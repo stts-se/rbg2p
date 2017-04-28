@@ -99,6 +99,12 @@ s -> s
 h -> h
 t -> t
 
+c -> s
+p -> p
+q -> k
+w -> v
+z -> s
+ü -> y
 
 // Tests
 
