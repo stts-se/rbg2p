@@ -2,7 +2,7 @@
 
 Each g2p rule set is defined in a .g2p file with the following content:
 
-* VARIABLES
+VARIABLES
 
 Regexp variables prefixed by VAR:
      VAR <NAME> <VALUE>
@@ -12,7 +12,7 @@ Examples:
      VAR AFFRICATE (tS|dZ)
 
 
-* RULES
+RULES
 
 Grapheme to phoneme rules written in a format loosely based on phonotactic rules. The rules are ordered, and typically the rule order is of great importance.
 
@@ -34,11 +34,13 @@ Examples:
      ck -> k
 
 
-* COMMENTS
+COMMENTS
+
 Comments are prefixed by //
 
 
-* TESTS
+TESTS
+
 Test examples prefixed by TEST:
      TEST <INPUT> -> <OUTPUT>
 
