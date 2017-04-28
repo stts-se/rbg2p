@@ -20,8 +20,11 @@ type Trans struct {
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
-	input  string
-	regexp *regexp.Regexp
+	// Input is the regexp as written in the input string
+	Input string
+
+	// Regexp is the input string converted to a regular expression for internal use (with variables expanded, and adapted anchoring)
+	Regexp *regexp.Regexp
 }
 
 // Matches checks if the input string matches the context rule
