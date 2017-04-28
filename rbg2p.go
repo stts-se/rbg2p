@@ -1,7 +1,6 @@
 package rbg2p
 
 // TODO:
-// * default phn separator: _ but add switch to set another (or specify full symbol set file, see below)
 // * validate against symbolset
 
 import (
