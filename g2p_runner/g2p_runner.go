@@ -33,7 +33,7 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string) bool {
 func main() {
 
 	if len(os.Args) < 3 {
-		log.Println("go run export.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>")
+		log.Println("go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>")
 		os.Exit(1)
 	}
 
@@ -62,7 +62,7 @@ func main() {
 		s := os.Args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			if transcribe(ruleSet, s) {
+			if transcribe(ruleSet, strings.ToLower(s)) {
 				nTrans = nTrans + 1
 			} else {
 				nErrs = nErrs + 1
