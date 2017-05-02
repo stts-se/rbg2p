@@ -304,3 +304,10 @@ func xxxTestCze(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 }
+
+func TestIPA(t *testing.T) {
+	_, err := loadAndTest(t, "test_data/ipa_test.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
