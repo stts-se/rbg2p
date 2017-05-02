@@ -115,7 +115,7 @@ func parseConst(s string, ruleSet *RuleSet) error {
 	return nil
 }
 
-var varRe = regexp.MustCompile("^VAR +([^ ]+) +([^ ]+)$")
+var varRe = regexp.MustCompile("^VAR +([^ \"]+) +([^ \"]+)$")
 
 func newVar(s string) (string, string, error) {
 	// VAR NAME VALUE
