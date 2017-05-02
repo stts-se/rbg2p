@@ -27,7 +27,7 @@ Available variables (* is required):
 
 Examples:
      CHARACTER_SET "abcdefghijklmnopqrstuvwxyzåäö"
-     PHONEME_SET "a o u i y e p t k b d g r s f h j l v w m n"
+     PHONEME_SET "a au o u i y e eu p t k b d g r s f h j l v w m n S tS"
      DEFAULT_PHONEME "_"
      PHONEME_DELIMITER " "
 
