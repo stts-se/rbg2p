@@ -187,18 +187,18 @@ func expand(transes [][]string) []Trans {
 }
 
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
-func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
+func (rs RuleSet) Apply(s string) ([]Trans, error) {
 	var i = 0
-	var s0 = []rune(s00)
+	var s0 = []rune(s)
 	res := [][]string{}
 	var couldntMap = []string{}
 	for i < len(s0) {
-		s := string(s0[i:len(s0)])
+		ss := string(s0[i:len(s0)])
 		thisChar := string(s0[i : i+1])
 		left := string(s0[0:i])
 		var matchFound = false
 		for _, rule := range rs.Rules {
-			if strings.HasPrefix(s, rule.Input) &&
+			if strings.HasPrefix(ss, rule.Input) &&
 				rule.LeftContext.Matches(left) {
 				ruleInputLen := len([]rune(rule.Input))
 				right := string(s0[i+ruleInputLen : len(s0)])
@@ -217,7 +217,7 @@ func (rs RuleSet) Apply(s00 string) ([]Trans, error) {
 		}
 	}
 	if len(couldntMap) > 0 {
-		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s00)
+		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
 	return expand(res), nil
 }
