@@ -1,0 +1,57 @@
+// Specs
+
+CHARACTER_SET "abcdefghijklmnoprqstuvwxyzé"
+PHONEME_SET "a b s d ɛ eː f g h ɪ j k l m n ɔ p r s t u v w ks y z ŋ t͜ʃ ʃ ɔ͜ɪ ɛ͜ɪ ə"
+PHONEME_DELIMITER ""
+DEFAULT_PHONEME "_"
+
+// Variables: none
+
+// Rules
+ng -> ŋ / _ #
+ng -> ŋg
+ch -> t͜ʃ
+sh -> ʃ
+sch -> ʃ
+ck -> k
+
+oy -> ɔ͜ɪ
+ey -> ɛ͜ɪ
+er -> ə / _#
+
+
+a -> a
+b -> b
+c -> s
+d -> d
+e -> ɛ
+é -> eː
+f -> f
+g -> g
+h -> h
+i -> ɪ
+j -> j
+k -> k
+l -> l
+m -> m
+n -> n
+o -> ɔ
+p -> p
+q -> k
+r -> r
+s -> s
+t -> t
+u -> u
+v -> v
+w -> w
+x -> ks
+y -> y
+z -> z
+
+
+// Tests
+TEST chin -> t͜ʃɪn
+TEST sick -> sɪk
+TEST long -> lɔŋ
+TEST longer -> lɔŋgə
+TEST hers -> hɛrs

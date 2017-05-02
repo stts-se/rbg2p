@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Rule based G2P / micro service API</title>
+  </head>
+  <body>
+    <h1>Rule based G2P / micro service API</h1>
+
+      <h2>List available languages</h2>
+      URL: <a href="/rbg2p/list">/rbg2p/list</a><br/>
+      Params: none
+
+      <h2>Transcribe a word</h2>
+      Transcribe an input word using the specified language's g2p rules<br/><br/>
+      URL: /rbg2p/transcribe<br/>
+      Params: lang, word (required)
+            <br/>
+            <br/>
+	    Examples:<br/>
+	    <a href="/rbg2p/transcribe?lang=ipa_test&amp;word=hit">/rbg2p/transcribe?lang=ipa_test&amp;word=hit</a><br/>
+	    <a href="/rbg2p/transcribe?lang=sws_test&amp;word=hit">/rbg2p/transcribe?lang=sws_test&amp;word=hit</a>
+    
+  </body>
+</html>

@@ -1,0 +1,115 @@
+// Specs
+
+CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
+PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j"
+DEFAULT_PHONEME "_"
+PHONEME_DELIMITER " "
+
+
+// Variables
+
+VAR VOICELESS [p|k|t|f|s|h|c]
+VAR VOICED [b|d|g|z]
+VAR CONS [wrtpsdfghjklzxcvbnm]
+VAR SHORTCONS [wrtpsdfghjklxcvbnm]
+VAR VOWEL [eéyuioåaöä]
+VAR PALAT [eéyiöä]
+
+// Rules
+
+au -> au
+eu -> eu
+
+é -> e:
+e -> e: / _ SHORTCONS #
+y -> y: / _ SHORTCONS #
+u -> }: / _ SHORTCONS #
+i -> i: / _ SHORTCONS #
+o -> u: / _ SHORTCONS #
+å -> o: / _ SHORTCONS #
+a -> A: / _ SHORTCONS #
+ö -> 2: / _ SHORTCONS #
+ä -> E: / _ SHORTCONS #
+
+e -> e
+y -> Y
+u -> u0
+i -> I
+o -> O
+å -> O
+a -> a
+ö -> 2
+ä -> E
+
+ä -> {: / _ r #
+ö -> 9: / _ r #
+ä -> { / _ r
+ö -> 9 / _ r
+
+e -> @ / _ #
+
+rt -> rt
+rd -> rd
+rs -> rs
+rl -> rl
+rn -> rn
+
+sch -> (S, x) / _ a? # 
+sch -> S
+
+gg -> g
+nn -> n
+mm -> m
+ll -> l
+ss -> s
+ck -> k
+rr -> r
+x -> k s
+
+stj -> x
+tj -> C
+k -> C / _ PALAT
+g -> g
+g -> j / _ PALAT
+ps -> s / # _
+
+m -> m
+v -> v
+f -> f
+j -> j
+
+r -> r
+d -> d
+s -> s
+l -> l
+
+v -> f / _ VOICELESS
+
+ck -> k
+k -> k
+rt -> rt
+n -> N / _ [kg]
+n -> n
+
+b -> p / _ VOICELESS
+b -> b 
+
+d -> d
+s -> s
+h -> h
+t -> t
+
+c -> s
+p -> p
+q -> k
+w -> v
+z -> s
+ü -> Y
+
+// Tests
+
+TEST dusch -> (d u0 S, d u0 x)
+TEST duscha -> (d u0 S a, d u0 x a)
+TEST borta -> b O rt a
+TEST abt -> a p t
+
