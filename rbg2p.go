@@ -126,7 +126,7 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 	}
 }
 
-func (rs RuleSet) HasPhonemeSet() bool {
+func (rs RuleSet) hasPhonemeSet() bool {
 	return len(rs.PhonemeSet.Symbols) > 0
 }
 
@@ -146,8 +146,8 @@ func (rs RuleSet) Test() TestResult {
 	}
 	rs.checkForUnusedChars(coveredChars, individualChars, &result)
 
-	if rs.HasPhonemeSet() {
-		validation, err := CompareToPhonemeSet(rs)
+	if rs.hasPhonemeSet() {
+		validation, err := compareToPhonemeSet(rs)
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
 		}
