@@ -12,8 +12,8 @@ Each g2p rule set is defined in a .g2p file with the following content:
 
 SPECIFIC VARIABLES
 
-Defines a set of constant variables, such as character set and phoneme delimiter
-     <NAME> "<VALUE>" // (quotes are required)
+Defines a set of constant variables, such as character set and phoneme delimiter. Please note that quotes are required around the value since space and the empty string can be used as a value.
+     <NAME> "<VALUE>"
 
 Available variables (* is required):
      CHARACTER_SET*     (default: none)
