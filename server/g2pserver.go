@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -31,6 +32,14 @@ func g2pMain(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./src/g2p_demo.html")
 }
 
+var wSplitRe = regexp.MustCompile(" *, *")
+
+// Word internal struct for json
+type Word struct {
+	Orth    string   `json:"orth"`
+	Transes []string `json:"transes"`
+}
+
 func transcribe(w http.ResponseWriter, r *http.Request) {
 
 	lang := r.FormValue("lang")
@@ -41,14 +50,14 @@ func transcribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	word := r.FormValue("word")
-	word = strings.ToLower(word)
-	if "" == word {
-		msg := "no value for the expected 'word' parameter"
+	words := r.FormValue("words")
+	if "" == words {
+		msg := "no value for the expected 'words' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
+	words = strings.ToLower(words)
 
 	g2p.mutex.RLock()
 	defer g2p.mutex.RUnlock()
@@ -62,16 +71,22 @@ func transcribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	transes, err := ruleSet.Apply(word)
-	if err != nil {
-		msg := fmt.Sprintf("couldn't transcribe word : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	res := []string{}
-	for _, trans := range transes {
-		res = append(res, strings.Join(trans.Phonemes, ruleSet.PhonemeDelimiter))
+	res := []Word{}
+	for _, orth := range wSplitRe.Split(words, -1) {
+		transes, err := ruleSet.Apply(orth)
+		if err != nil {
+			msg := fmt.Sprintf("couldn't transcribe word : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		tRes := []string{}
+		for _, trans := range transes {
+			tRes = append(tRes, strings.Join(trans.Phonemes, ruleSet.PhonemeDelimiter))
+		}
+		wRes := Word{orth, tRes}
+		res = append(res, wRes)
+
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	j, err := json.Marshal(res)
