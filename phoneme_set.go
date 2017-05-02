@@ -35,7 +35,7 @@ func NewPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
 }
 
 // LoadPhonemeSetFile loads a phoneme set definitionf from file (one phoneme per line, // for comments)
-func loadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
+func LoadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
 	symbols := []string{}
 	fh, err := os.Open(fName)
 	defer fh.Close()

@@ -103,7 +103,7 @@ func parseConst(s string, ruleSet *RuleSet) error {
 		if name == "CHARACTER_SET" {
 			ruleSet.CharacterSet = strings.Split(value, "")
 		} else if name == "PHONEME_SET" {
-			phonemeSet, err := NewPhonemeSet(multiSpace.Split(value, -1), ruleSet.DefaultPhoneme)
+			phonemeSet, err := NewPhonemeSet(multiSpace.Split(value, -1), ruleSet.PhonemeDelimiter)
 			if err != nil {
 				return fmt.Errorf("couldn't create phoneme set : %s", err)
 			}
