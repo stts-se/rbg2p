@@ -176,6 +176,7 @@ func main() {
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/rbg2p", g2pMain).Methods("get")
+	r.HandleFunc("/", g2pMain).Methods("get")
 	r.HandleFunc("/rbg2p/transcribe", transcribe).Methods("get", "post")
 	r.HandleFunc("/rbg2p/list", list).Methods("get", "post")
 
