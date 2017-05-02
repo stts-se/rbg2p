@@ -4,7 +4,7 @@ CHARACTER_SET "abcdefghijklmnoprqstuvwxyzé"
 PHONEME_DELIMITER ""
 DEFAULT_PHONEME "_"
 
-// Variables
+// Variables: none
 
 // Rules
 ng -> ŋ / _ #
