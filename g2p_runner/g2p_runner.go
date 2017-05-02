@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/stts-se/pronlex/symbolset"
 	"github.com/stts-se/rbg2p"
 )
 
@@ -39,14 +38,14 @@ func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
-	var ssFile = f.String("symbolset", "", "use specified symbol set for validating the symbols in the g2p rule set (default: none)")
+	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
 
 	var usage = `go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
-   -symbolset  string  use specified symbol set for validating the symbols in the g2p rule set (default: none)
+   -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
    -help       bool    print help message`
 
 	f.Usage = func() {
@@ -81,31 +80,16 @@ FLAGS:
 		os.Exit(1)
 	}
 
-	haltingError := false
 	if *ssFile != "" {
-		symbolSet, err := symbolset.LoadSymbolSet(*ssFile)
+		phonemeSet, err := rbg2p.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
 		if err != nil {
 			l.Printf("couldn't load symbol set : %s", err)
 			os.Exit(1)
 		}
-		validation, err := rbg2p.CompareToSymbolSet(ruleSet, symbolSet)
-		if err != nil {
-			l.Printf("couldn't validate against symbol set : %s", err)
-			os.Exit(1)
-		}
-		if len(validation.Warnings) > 0 {
-			for _, err := range validation.Warnings {
-				l.Printf("SYMBOL SET WARNING: %v\n", err)
-			}
-		}
-		if len(validation.Errors) > 0 {
-			for _, err := range validation.Errors {
-				l.Printf("SYMBOL SET ERROR: %v\n", err)
-			}
-			haltingError = true
-		}
+		ruleSet.PhonemeSet = phonemeSet
 	}
 
+	haltingError := false
 	result := ruleSet.Test()
 	for _, e := range result.Errors {
 		l.Printf("ERROR: %v\n", e)
@@ -131,6 +115,8 @@ FLAGS:
 	if haltingError && !*force {
 		os.Exit(1)
 	}
+
+	fmt.Println()
 
 	nTotal := 0
 	nErrs := 0

@@ -85,8 +85,10 @@ func LoadFile(fName string) (RuleSet, error) {
 	return ruleSet, nil
 }
 
-var charSetRe = regexp.MustCompile("^(CHARACTER_SET|SYMBOL_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) +\"(.*)\"$")
-var isConstRe = regexp.MustCompile("^(CHARACTER_SET|SYMBOL_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) .*")
+var constRe = regexp.MustCompile("^(CHARACTER_SET|PHONEME_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) +\"(.*)\"$")
+var isConstRe = regexp.MustCompile("^(CHARACTER_SET|PHONEME_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) .*")
+
+var multiSpace = regexp.MustCompile(" +")
 
 func isConst(s string) bool {
 	return isConstRe.MatchString(s)
@@ -94,18 +96,27 @@ func isConst(s string) bool {
 
 func parseConst(s string, ruleSet *RuleSet) error {
 	var matchRes []string
-	matchRes = charSetRe.FindStringSubmatch(s)
+	matchRes = constRe.FindStringSubmatch(s)
 	if matchRes != nil {
 		name := matchRes[1]
 		value := matchRes[2]
 		if name == "CHARACTER_SET" {
 			ruleSet.CharacterSet = strings.Split(value, "")
-		} else if name == "SYMBOL_SET" {
-			ruleSet.SymbolSet = value
+		} else if name == "PHONEME_SET" {
+			phonemeSet, err := NewPhonemeSet(multiSpace.Split(value, -1), ruleSet.DefaultPhoneme)
+			if err != nil {
+				return fmt.Errorf("couldn't create phoneme set : %s", err)
+			}
+			ruleSet.PhonemeSet = phonemeSet
 		} else if name == "DEFAULT_PHONEME" {
 			ruleSet.DefaultPhoneme = value
 		} else if name == "PHONEME_DELIMITER" {
 			ruleSet.PhonemeDelimiter = value
+			phonemeSet, err := NewPhonemeSet(ruleSet.PhonemeSet.Symbols, value)
+			if err != nil {
+				return fmt.Errorf("couldn't create phoneme set : %s", err)
+			}
+			ruleSet.PhonemeSet = phonemeSet
 		} else {
 			return fmt.Errorf("invalid const definition: " + s)
 		}

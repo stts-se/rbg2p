@@ -1,6 +1,7 @@
 // Specs
 
 CHARACTER_SET "abcdefghijklmnoprqstuvwxyzé"
+PHONEME_SET "a b s d ɛ eː f g h ɪ j k l m n ɔ p r s t u v w ks y z ŋ t͜ʃ ʃ ɔ͜ɪ ɛ͜ɪ ə"
 PHONEME_DELIMITER ""
 DEFAULT_PHONEME "_"
 

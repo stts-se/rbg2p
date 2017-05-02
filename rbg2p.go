@@ -1,8 +1,5 @@
 package rbg2p
 
-// TODO:
-// * validate against symbolset
-
 import (
 	"fmt"
 	"reflect"
@@ -92,7 +89,7 @@ func (t1 Test) equals(t2 Test) bool {
 // RuleSet is a set of g2p rules, with variables and built-in tests
 type RuleSet struct {
 	CharacterSet     []string
-	SymbolSet        string
+	PhonemeSet       PhonemeSet
 	PhonemeDelimiter string
 	DefaultPhoneme   string
 	Vars             map[string]string
@@ -129,6 +126,10 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 	}
 }
 
+func (rs RuleSet) HasPhonemeSet() bool {
+	return len(rs.PhonemeSet.Symbols) > 0
+}
+
 // Test runs the built-in tests. Returns a test result with errors and warnings, if any.
 func (rs RuleSet) Test() TestResult {
 	var result = TestResult{}
@@ -144,6 +145,19 @@ func (rs RuleSet) Test() TestResult {
 		}
 	}
 	rs.checkForUnusedChars(coveredChars, individualChars, &result)
+
+	if rs.HasPhonemeSet() {
+		validation, err := CompareToPhonemeSet(rs)
+		if err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
+		}
+		for _, w := range validation.Warnings {
+			result.Warnings = append(result.Warnings, w)
+		}
+		for _, e := range validation.Errors {
+			result.Errors = append(result.Errors, e)
+		}
+	}
 
 	for _, test := range rs.Tests {
 		input := test.Input

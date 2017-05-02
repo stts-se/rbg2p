@@ -208,7 +208,7 @@ func loadAndTest(t *testing.T, fName string) (RuleSet, error) {
 	return rs, nil
 }
 func TestSws(t *testing.T) {
-	_, err := loadAndTest(t, "test_data/sws-test.g2p")
+	_, err := loadAndTest(t, "test_data/sws_test.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -284,7 +284,14 @@ func TestWithPhnDelim(t *testing.T) {
 
 }
 
-func xTestHun(t *testing.T) {
+func TestIPA(t *testing.T) {
+	_, err := loadAndTest(t, "test_data/ipa_test.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestHun(t *testing.T) {
 	_, err := loadAndTest(t, "test_data/hun.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
@@ -300,13 +307,6 @@ func xxxTestMkd(t *testing.T) {
 
 func xxxTestCze(t *testing.T) {
 	_, err := loadAndTest(t, "test_data/czc.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
-
-func TestIPA(t *testing.T) {
-	_, err := loadAndTest(t, "test_data/ipa_test.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
