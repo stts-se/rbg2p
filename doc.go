@@ -15,7 +15,7 @@ SPECIFIC VARIABLES
 Defines a set of constant variables, such as character set and phoneme delimiter. Please note that quotes are required around the value, since space and the empty string can be used as a value.
      <NAME> "<VALUE>"
 
-Available variables (* is required):
+Available variables (* means required):
      CHARACTER_SET*     (default: none)
       - used to check that each character in the character set has at least one rule
      PHONEME_SET        (default: none)
