@@ -35,6 +35,11 @@ tt -> c
 tx -> tS
 tz -> ts`
 
+nn -> n
+mm -> m
+ss -> s
+bb -> b
+
 //default rules for letters
 a -> a
 b -> b
