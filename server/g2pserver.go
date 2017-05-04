@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -102,7 +103,18 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
-func transcribe_OnlyFirstTrans_Handler(w http.ResponseWriter, r *http.Request) {
+type XmlWords struct {
+	XMLName xml.Name `xml:"words"`
+	Words   []XmlWord
+}
+
+type XmlWord struct {
+	XMLName xml.Name `xml:"word"`
+	Orth    string   `xml:"orth,attr"`
+	Trans   string   `xml:"trans"`
+}
+
+func transcribe_OnlyFirstTrans_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	lang := vars["lang"]
 	if "" == lang {
@@ -125,8 +137,26 @@ func transcribe_OnlyFirstTrans_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%s", err), status)
 		return
 	}
+	//<words>
+	//<word orth='apa' word_lang='mk' trans_lang='mk' >" a p a</word>
+	//</words>
 
-	fmt.Fprintf(w, string(res.Transes[0]))
+	words := XmlWords{
+		Words: []XmlWord{
+			XmlWord{Orth: word, Trans: res.Transes[0]},
+		},
+	}
+
+	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+	xml, err := xml.Marshal(words)
+	if err != nil {
+		msg := fmt.Sprintf("failed xml marshalling : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, string(xml))
+	//fmt.Fprintf(w, string(res.Transes[0]))
 }
 
 func listLanguages() []string {
@@ -215,7 +245,7 @@ func main() {
 
 	// get one trans only
 	s = r.PathPrefix("/rbg2p/onetrans").Subrouter()
-	s.HandleFunc("/{lang}/{word}", transcribe_OnlyFirstTrans_Handler)
+	s.HandleFunc("/{lang}/{word}", transcribe_OnlyFirstTrans_AsXml_Handler)
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
