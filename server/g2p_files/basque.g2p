@@ -44,9 +44,17 @@ d -> d
 e -> e
 f -> f
 g -> ɡ
+
+//The letter ⟨h⟩ is silent in the Southern dialects, but pronounced (although vanishing) in the Northern ones
+//Source: https://en.wikipedia.org/wiki/Basque_language
 h -> (∅, h)
+
 i -> i
+
+//The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
+//Source: https://en.wikipedia.org/wiki/Basque_language
 j -> (j, dʒ, x, ʃ, ɟ, ʝ)
+
 k -> k
 l -> l
 m -> m
