@@ -1,0 +1,118 @@
+// Specs
+
+CHARACTER_SET "abcçdefghijklmnñopqrstuvwxyz"
+PHONEME_SET "a b s d ð e f ɡ ɣ h i i̭ j x ʝ ɟ k l ʎ m n ɲ o p r ɾ s̺ t u u̯ β ʃ s̻ t͡s̺ c ʧ͡ t͡s̻ dʒ ∅"
+PHONEME_DELIMITER " "
+DEFAULT_PHONEME "_"
+
+// Variables: none
+
+VAR VOWEL [aeiouy]
+
+// Rules
+
+b -> (b, β) / VOWEL _ VOWEL
+g -> (ɡ, ɣ) / VOWEL _ VOWEL
+d -> (d, ð) / VOWEL _ VOWEL
+r -> ɾ / VOWEL _ VOWEL
+
+i -> i̭ / VOWEL _
+u -> u̯ / VOWEL _
+
+
+n -> ɲ / i _ VOWEL
+d -> ɟ / i _ VOWEL
+t -> c / i _ VOWEL
+l -> ʎ / i _ VOWEL
+
+
+//default rules for digraphs
+dd -> ɟ
+ll -> ʎ
+rr -> r
+ts -> t͡s̺
+tt -> c
+tx -> ʧ͡
+tz -> t͡s̻
+
+//default rules for letters
+a -> a
+b -> b
+c -> s
+ç -> s
+d -> d
+e -> e
+f -> f
+g -> ɡ
+
+//The letter ⟨h⟩ is silent in the Southern dialects, but pronounced (although vanishing) in the Northern ones
+//Source: https://en.wikipedia.org/wiki/Basque_language
+h -> (∅, h)
+
+i -> i
+
+//The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
+//Source: https://en.wikipedia.org/wiki/Basque_language
+j -> (j, dʒ, x, ʃ, ɟ, ʝ)
+
+k -> k
+l -> l
+m -> m
+n -> n
+ñ -> ɲ
+o -> o
+p -> p
+q -> k
+r -> r
+s -> s̺
+t -> t
+u -> u
+v -> β
+w -> u̯
+x ->  ʃ
+y -> i
+z -> s̻
+
+
+// Tests
+
+//source: http://www.101languages.net/basque/basics.html
+
+TEST kaixo -> k a i̭ ʃ o
+TEST epa -> e p a
+TEST zer -> s̻ e r
+TEST moduz -> (m o d u s̻, m o ð u s̻)
+TEST ondo -> o n d o
+TEST eskerrik -> e s̺ k e r i k
+TEST asko -> a s̺ k o
+TEST nor -> n o r
+TEST zara -> s̻ a ɾ a
+TEST pozten -> p o s̻ t e n
+TEST naiz -> n a i̭ s̻
+TEST zu -> s̻ u
+TEST ezagutzeaz -> (e s̻ a ɡ u t͡s̻ e a s̻, e s̻ a ɣ u t͡s̻ e a s̻)
+TEST mesedez -> (m e s̺ e d e s̻, m e s̺ e ð e s̻)
+TEST ongi -> o n ɡ i
+TEST etorri -> e t o r i
+TEST bai  -> b a i̭
+TEST ez -> e s̻
+TEST aizu -> a i̭ s̻ u
+TEST barkatu -> b a r k a t u
+TEST agur -> (a ɡ u r, a ɣ u r)
+TEST aio -> a i̭ o
+TEST dakit -> d a k i t
+TEST euskaraz -> e u̯ s̺ k a ɾ a s̻
+TEST hitz -> (∅ i t͡s̻, h i t͡s̻)
+TEST egitea -> (e ɡ i c e a, e ɣ i c e a)
+TEST ingelesez -> i n ɡ e l e s̺ e s̻
+TEST egiten -> (e ɡ i c e n, e ɣ i c e n)
+TEST al -> a l
+TEST duzu -> d u s̻ u
+TEST norbaitek -> n o r b a i̭ c e k
+TEST lagundu -> (l a ɡ u n d u, l a ɣ u n d u)
+TEST egunon -> (e ɡ u n o n, e ɣ u n o n)
+
+//Source: https://en.wikipedia.org/wiki/Basque_language
+TEST egin -> (e ɡ i n, e ɣ i n)
+TEST egina -> (e ɡ i ɲ a, e ɣ i ɲ a)
+TEST egines -> (e ɡ i ɲ e s̺, e ɣ i ɲ e s̺)
