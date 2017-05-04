@@ -141,10 +141,14 @@ func transcribe_OnlyFirstTrans_AsXml_Handler(w http.ResponseWriter, r *http.Requ
 	//<word orth='apa' word_lang='mk' trans_lang='mk' >" a p a</word>
 	//</words>
 
-	words := XmlWords{
-		Words: []XmlWord{
-			XmlWord{Orth: word, Trans: res.Transes[0]},
-		},
+	// words := XmlWords{
+	// 	Words: []XmlWord{
+	// 		XmlWord{Orth: word, Trans: res.Transes[0]},
+	// 	},
+	// }
+	words := XmlWords{}
+	for _, t := range res.Transes {
+		words.Words = append(words.Words, XmlWord{Orth: word, Trans: t})
 	}
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
