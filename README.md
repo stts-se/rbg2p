@@ -12,7 +12,7 @@ Utilities for rule based, manually written, grapheme to phoneme rules
 
 ## Microservice API/server
 
-     $ go run server/g2pserver.go server/g2p_files
+     $ go run server/*.go server/g2p_files
      
  Visit http://localhost:6771/ for info on available API calls
  

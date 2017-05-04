@@ -12,6 +12,16 @@ type Trans struct {
 	Phonemes []string
 }
 
+func (t Trans) String(phnDelimiter string) string {
+	var phns []string
+	for _, p := range t.Phonemes {
+		if len(p) > 0 {
+			phns = append(phns, p)
+		}
+	}
+	return strings.Join(phns, phnDelimiter)
+}
+
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
 	// Input is the regexp as written in the input string
@@ -164,14 +174,14 @@ func (rs RuleSet) Test() TestResult {
 		expect := test.Output
 		res0, err := rs.Apply(strings.ToLower(input))
 		res := []string{}
-		for _, trans := range res0 {
-			res = append(res, strings.Join(trans.Phonemes, rs.PhonemeDelimiter))
-		}
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
 		}
+		for _, trans := range res0 {
+			res = append(res, trans.String(rs.PhonemeDelimiter))
+		}
 		if !reflect.DeepEqual(expect, res) {
-			result.FailedTests = append(result.Errors, fmt.Sprintf("for '%s', expected %v, got %v", input, expect, res))
+			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected %v, got %v", input, expect, res))
 		}
 	}
 	return result

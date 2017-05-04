@@ -76,6 +76,9 @@ func (ss PhonemeSet) ValidPhoneme(symbol string) bool {
 
 // SplitTranscription splits the input transcription into a slice of phonemes, based on the pre-defined phoneme delimiter
 func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
+	if len(trans) == 0 {
+		return []string{}, nil
+	}
 	if ss.DelimiterRe.MatchString("") {
 		splitted, unknown, err := splitIntoPhonemes(ss.Symbols, trans)
 		if err != nil {

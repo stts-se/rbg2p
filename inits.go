@@ -222,6 +222,7 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 var ruleRe = regexp.MustCompile("^([^ ]+) +-> +([^/]+)( +/.*$|$)")
 var ruleOutputReSimple = regexp.MustCompile("^([^,()]+)$")
 var ruleOutputReVariants = regexp.MustCompile("^[(](.+,.+)[)]$")
+var emptyOutput = "∅"
 
 func newRuleOutput(s string, l string) ([]string, error) {
 	s = strings.TrimSpace(s)
@@ -240,6 +241,7 @@ func newRuleOutput(s string, l string) ([]string, error) {
 	if strings.Contains(outputS, "->") {
 		return []string{}, fmt.Errorf("invalid rule output definition: " + l)
 	}
+	outputS = strings.Replace(outputS, emptyOutput, "", -1)
 	return commaSplit.Split(outputS, -1), nil
 }
 

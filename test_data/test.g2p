@@ -12,6 +12,8 @@ VAR VOICED [b|d|g|z]
 
 // Rules
 
+nn -> n
+
 a -> a
 e -> e
 i -> I
@@ -39,7 +41,7 @@ b -> b
 
 d -> d
 s -> s
-h -> h
+h -> ∅ // test mapping to empty phoneme
 t -> t
 
 c -> s
@@ -68,3 +70,4 @@ TEST duscha -> d u0 S a
 TEST borta -> b O rt a
 TEST abt -> a p t
 TEST busktdusch -> (b u0 s t d u0 S,  b u0 s k t d u0 x,  b u0 s t d u0 S,  b u0 s k t d u0 x)
+TEST hanna -> a n a

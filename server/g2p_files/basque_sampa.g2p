@@ -1,7 +1,7 @@
 // Specs
 
 CHARACTER_SET "abcçdefghijklmnñopqrstuvwxyz"
-PHONEME_SET "a e i o u j w p b t d c gj k g ts ts` tS s s` S jj f B D G x m n J l L rr r ∅" 
+PHONEME_SET "a e i o u j w p b t d c gj k g ts ts` tS s s` S jj f B D G x m n J l L rr r" 
 PHONEME_DELIMITER " "
 DEFAULT_PHONEME "_"
 
@@ -103,8 +103,8 @@ TEST agur -> (a g u rr, a G u rr)
 TEST aio -> a j o
 TEST dakit -> d a k i t
 TEST euskaraz -> e w s k a r a s`
-//TEST hitz -> (∅ i ts`, h i ts`)
-TEST hitz -> ∅ i ts`
+//TEST hitz -> (i ts`, h i ts`)
+TEST hitz -> i ts`
 TEST egitea -> (e g i c e a, e G i c e a)
 TEST ingelesez -> i n g e l e s e s`
 TEST egiten -> (e g i c e n, e G i c e n)

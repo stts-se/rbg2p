@@ -1,3 +1,3 @@
 # rbg2p/server
 
-go run g2pserver.go
+go run *.go

@@ -55,7 +55,10 @@ Grapheme to phoneme rules written in a format loosely based on phonotactic rules
 Context:
      <LEFT CONTEXT> _ <RIGHT CONTEXT>
 
-Pre-defined variables (above) can be use in the contex specs. # is used for anchoring (marks the start/end of the input string).
+
+<INPUT> is a string of one or more input characters. <OUTPUT> is a string representing the output (separated by the pre-defined phoneme delimiter, above). For empty output, i.e., when a character should not be pronounced, use the empty set symbol "∅" (U+2205).
+
+<CONTEXT> is the context in which the <INPUT> should occur for the rule to apply. Pre-defined variables (above) can be use in the context specs. # is used for anchoring (marks the start/end of the input string).
 
 Examples:
      a -> ? a / # _
@@ -64,6 +67,7 @@ Examples:
      skt -> (s t, s k t) / _
      ck -> k
      b -> p / _ VOICELESS
+     h -> ∅ / # _
 
 
 COMMENTS

@@ -7,17 +7,26 @@
 
       <h2>List available languages</h2>
       URL: <a href="/rbg2p/list">/rbg2p/list</a><br/>
-      Params: none
 
-      <h2>Transcribe one or more words</h2>
+      <h2>Transcribe a word</h2>
       Transcribe an input word using the specified language's g2p rules<br/><br/>
-      URL: /rbg2p/transcribe<br/>
-      Params: lang, words (required)
+      URL: /rbg2p/transcribe/LANG/WORD<br/>
             <br/>
             <br/>
 	    Examples:<br/>
-	    <a href="/rbg2p/transcribe?lang=ipa_test&amp;words=hot">/rbg2p/transcribe?lang=ipa_test&amp;words=hot</a><br/>
-	    <a href="/rbg2p/transcribe?lang=sws_test&amp;words=hit,dit,mitt,dusch">/rbg2p/transcribe?lang=sws_test&amp;words=hit,dit,mitt,dusch</a>
+	    <a href="/rbg2p/transcribe/ipa_test/hot">/rbg2p/transcribe/ipa_test/hot</a><br/>
+	    <a href="/rbg2p/transcribe/sws_test/hit">/rbg2p/transcribe/sws_test/hit</a><br/>
+	    <a href="/rbg2p/transcribe/sws_test/dusch">/rbg2p/transcribe/sws_test/dusch</a><br/>
+    
+      <h2>Transcribe a word and only return the first resulting transcription</h2>
+      Transcribe an input word using the specified language's g2p rules<br/><br/>
+      URL: /rbg2p/onetrans/LANG/WORD<br/>
+            <br/>
+            <br/>
+	    Examples:<br/>
+	    <a href="/rbg2p/onetrans/ipa_test/hot">/rbg2p/onetrans/ipa_test/hot</a><br/>
+	    <a href="/rbg2p/onetrans/sws_test/hit">/rbg2p/onetrans/sws_test/hit</a><br/>
+	    <a href="/rbg2p/onetrans/sws_test/dusch">/rbg2p/onetrans/sws_test/dusch</a><br/>
     
   </body>
 </html>
