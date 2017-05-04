@@ -1,7 +1,7 @@
 // Specs
 
 CHARACTER_SET "abcçdefghijklmnñopqrstuvwxyz"
-PHONEME_SET "a b s d ð e f ɡ ɣ h i i̭ j x ʝ ɟ k l ʎ m n ɲ o p r ɾ s̺ t u u̯ β ʃ s̻ t͡s̺ c ʧ͡ t͡s̻ dʒ ∅"
+PHONEME_SET "a e i o u j w p b t d c gj k g ts ts` tS s s` S jj f B D G x m n J l L rr r ∅" 
 PHONEME_DELIMITER " "
 DEFAULT_PHONEME "_"
 
@@ -11,29 +11,29 @@ VAR VOWEL [aeiouy]
 
 // Rules
 
-b -> (b, β) / VOWEL _ VOWEL
-g -> (ɡ, ɣ) / VOWEL _ VOWEL
-d -> (d, ð) / VOWEL _ VOWEL
-r -> ɾ / VOWEL _ VOWEL
+b -> (b, B) / VOWEL _ VOWEL
+g -> (g, G) / VOWEL _ VOWEL
+d -> (d, D) / VOWEL _ VOWEL
+r -> r / VOWEL _ VOWEL
 
-i -> i̭ / VOWEL _
-u -> u̯ / VOWEL _
+i -> j / VOWEL _
+u -> w / VOWEL _
 
 
-n -> ɲ / i _ VOWEL
-d -> ɟ / i _ VOWEL
+n -> J / i _ VOWEL
+d -> gj / i _ VOWEL
 t -> c / i _ VOWEL
-l -> ʎ / i _ VOWEL
+l -> L / i _ VOWEL
 
 
 //default rules for digraphs
-dd -> ɟ
-ll -> ʎ
-rr -> r
-ts -> t͡s̺
+dd -> gj
+ll -> L
+rr -> rr
+ts -> ts
 tt -> c
-tx -> ʧ͡
-tz -> t͡s̻
+tx -> tS
+tz -> ts`
 
 //default rules for letters
 a -> a
@@ -43,76 +43,78 @@ c -> s
 d -> d
 e -> e
 f -> f
-g -> ɡ
+g -> g
 
 //The letter ⟨h⟩ is silent in the Southern dialects, but pronounced (although vanishing) in the Northern ones
 //Source: https://en.wikipedia.org/wiki/Basque_language
-h -> (∅, h)
+//but h is not in the sampa
+h -> ∅
 
 i -> i
 
 //The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
 //Source: https://en.wikipedia.org/wiki/Basque_language
-j -> (j, dʒ, x, ʃ, ɟ, ʝ)
+j -> (j, x, S, gj, jj)
 
 k -> k
 l -> l
 m -> m
 n -> n
-ñ -> ɲ
+ñ -> J
 o -> o
 p -> p
 q -> k
-r -> r
-s -> s̺
+r -> rr
+s -> s
 t -> t
 u -> u
-v -> β
-w -> u̯
-x ->  ʃ
+v -> B
+w -> w
+x -> S
 y -> i
-z -> s̻
+z -> s`
 
 
 // Tests
 
 //source: http://www.101languages.net/basque/basics.html
 
-TEST kaixo -> k a i̭ ʃ o
+TEST kaixo -> k a j S o
 TEST epa -> e p a
-TEST zer -> s̻ e r
-TEST moduz -> (m o d u s̻, m o ð u s̻)
+TEST zer -> s` e rr
+TEST moduz -> (m o d u s`, m o D u s`)
 TEST ondo -> o n d o
-TEST eskerrik -> e s̺ k e r i k
-TEST asko -> a s̺ k o
-TEST nor -> n o r
-TEST zara -> s̻ a ɾ a
-TEST pozten -> p o s̻ t e n
-TEST naiz -> n a i̭ s̻
-TEST zu -> s̻ u
-TEST ezagutzeaz -> (e s̻ a ɡ u t͡s̻ e a s̻, e s̻ a ɣ u t͡s̻ e a s̻)
-TEST mesedez -> (m e s̺ e d e s̻, m e s̺ e ð e s̻)
-TEST ongi -> o n ɡ i
-TEST etorri -> e t o r i
-TEST bai  -> b a i̭
-TEST ez -> e s̻
-TEST aizu -> a i̭ s̻ u
-TEST barkatu -> b a r k a t u
-TEST agur -> (a ɡ u r, a ɣ u r)
-TEST aio -> a i̭ o
+TEST eskerrik -> e s k e rr i k
+TEST asko -> a s k o
+TEST nor -> n o rr
+TEST zara -> s` a r a
+TEST pozten -> p o s` t e n
+TEST naiz -> n a j s`
+TEST zu -> s` u
+TEST ezagutzeaz -> (e s` a g u ts` e a s`, e s` a G u ts` e a s`)
+TEST mesedez -> (m e s e d e s`, m e s e D e s`)
+TEST ongi -> o n g i
+TEST etorri -> e t o rr i
+TEST bai  -> b a j
+TEST ez -> e s`
+TEST aizu -> a j s` u
+TEST barkatu -> b a rr k a t u
+TEST agur -> (a g u rr, a G u rr)
+TEST aio -> a j o
 TEST dakit -> d a k i t
-TEST euskaraz -> e u̯ s̺ k a ɾ a s̻
-TEST hitz -> (∅ i t͡s̻, h i t͡s̻)
-TEST egitea -> (e ɡ i c e a, e ɣ i c e a)
-TEST ingelesez -> i n ɡ e l e s̺ e s̻
-TEST egiten -> (e ɡ i c e n, e ɣ i c e n)
+TEST euskaraz -> e w s k a r a s`
+//TEST hitz -> (∅ i ts`, h i ts`)
+TEST hitz -> ∅ i ts`
+TEST egitea -> (e g i c e a, e G i c e a)
+TEST ingelesez -> i n g e l e s e s`
+TEST egiten -> (e g i c e n, e G i c e n)
 TEST al -> a l
-TEST duzu -> d u s̻ u
-TEST norbaitek -> n o r b a i̭ c e k
-TEST lagundu -> (l a ɡ u n d u, l a ɣ u n d u)
-TEST egunon -> (e ɡ u n o n, e ɣ u n o n)
+TEST duzu -> d u s` u
+TEST norbaitek -> n o rr b a j c e k
+TEST lagundu -> (l a g u n d u, l a G u n d u)
+TEST egunon -> (e g u n o n, e G u n o n)
 
 //Source: https://en.wikipedia.org/wiki/Basque_language
-TEST egin -> (e ɡ i n, e ɣ i n)
-TEST egina -> (e ɡ i ɲ a, e ɣ i ɲ a)
-TEST egines -> (e ɡ i ɲ e s̺, e ɣ i ɲ e s̺)
+TEST egin -> (e g i n, e G i n)
+TEST egina -> (e g i J a, e G i J a)
+TEST egines -> (e g i J e s, e G i J e s)
