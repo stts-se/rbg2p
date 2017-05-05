@@ -65,4 +65,4 @@ TEST dusch -> (d}S, d}x)
 TEST duscha -> d}Sa
 TEST borta -> borta
 TEST abt -> apt
-TEST busktdusch -> (b}std}S,  b}sktd}x,  b}std}S,  b}sktd}x)
+TEST busktdusch -> (b}std}S,  b}std}x,  b}sktd}S,  b}sktd}x)

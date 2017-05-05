@@ -112,5 +112,4 @@ TEST dusch -> (d u0 S, d u0 x)
 TEST duscha -> (d u0 S a, d u0 x a)
 TEST borta -> (b O rt a, b O r t a)
 TEST abt -> a p t
-//TEST agada -> (a g " a d a, a G " a d a, a g " a D a, a G " a D a)
-//TEST bortadusch -> (b o rt a d u0 S, b o rt a d u0 x, b o r t a d u0 S, b o r t a d u0 x)
+TEST bortadusch -> (b O rt a d u0 S, b O rt a d u0 x, b O r t a d u0 S, b O r t a d u0 x)

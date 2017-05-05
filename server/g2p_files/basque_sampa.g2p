@@ -133,6 +133,6 @@ TEST egunon -> (e g " u n o n, e G " u n o n)
 TEST egin -> (e g " i n, e G " i n)
 TEST egina -> (e g " i J a, e G " i J a)
 TEST egines -> (e g " i J e s, e G " i J e s)
-//TEST agada -> (a g " a d a, a G " a d a, a g " a D a, a G " a D a)
+TEST agada -> (a g " a d a, a g " a D a, a G " a d a, a G " a D a)
 TEST fragráncia -> f rr a g rr " a n s i a
 TEST bárkatu -> b " a rr k a t u // constructed

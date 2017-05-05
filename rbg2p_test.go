@@ -2,6 +2,7 @@ package rbg2p
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"testing"
 )
@@ -310,4 +311,156 @@ func xxxTestCze(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+}
+
+var testDebug = false
+
+func testRecursion(head []string, tail [][]string, acc []Trans) []Trans {
+	res := []Trans{}
+	if testDebug {
+		fmt.Println("====")
+		fmt.Printf("head=%#v\n", head)
+		fmt.Printf("tail=%#v\n", tail)
+		fmt.Printf("accSize=%#v\n", len(acc))
+		fmt.Printf("acc=%#v\n", acc)
+	}
+	for i := 0; i < len(acc); i++ {
+		if testDebug {
+			fmt.Printf("acc[%d] = %v\n", i, acc[i])
+		}
+		for _, add := range head {
+			prefix := []string{}
+			for _, s := range acc[i].Phonemes {
+				prefix = append(prefix, s)
+			}
+			appendRange := append(prefix, add)
+			res = append(res, Trans{appendRange})
+			if testDebug {
+				fmt.Printf("i=%d\n", i)
+				fmt.Printf("add=%v\n", add)
+				fmt.Printf("appendRange=%v\n", appendRange)
+				fmt.Printf("res=%#v\n", res)
+				fmt.Println("")
+			}
+		}
+
+	}
+	if testDebug {
+		fmt.Printf("res=%#v\n", res)
+		fmt.Println("")
+	}
+	if len(tail) == 0 {
+		return res
+	} else {
+		return testRecursion(tail[0], tail[1:len(tail)], res)
+	}
+}
+
+func testExpand(transes [][]string) []Trans {
+	return testRecursion(transes[0], transes[1:len(transes)], []Trans{Trans{}})
+}
+
+func TestExpansionAlgorithm(t *testing.T) {
+	input := [][]string{[]string{"1a", "1b"}, []string{"2a", "2b"}}
+	expect := []Trans{
+		Trans{[]string{"1a", "2a"}},
+		Trans{[]string{"1a", "2b"}},
+		Trans{[]string{"1b", "2a"}},
+		Trans{[]string{"1b", "2b"}},
+	}
+
+	result := testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
+	input = [][]string{[]string{"1a", "1b"}, []string{"2"}, []string{"3a", "3b"}}
+	expect = []Trans{
+		Trans{[]string{"1a", "2", "3a"}},
+		Trans{[]string{"1a", "2", "3b"}},
+		Trans{[]string{"1b", "2", "3a"}},
+		Trans{[]string{"1b", "2", "3b"}},
+	}
+
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
+	input = [][]string{[]string{"1a", "1b"}, []string{"2a", "2b"}, []string{"3a", "3b"}}
+	expect = []Trans{
+		Trans{[]string{"1a", "2a", "3a"}},
+		Trans{[]string{"1a", "2a", "3b"}},
+		Trans{[]string{"1a", "2b", "3a"}},
+		Trans{[]string{"1a", "2b", "3b"}},
+		Trans{[]string{"1b", "2a", "3a"}},
+		Trans{[]string{"1b", "2a", "3b"}},
+		Trans{[]string{"1b", "2b", "3a"}},
+		Trans{[]string{"1b", "2b", "3b"}},
+	}
+
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
+	input = [][]string{[]string{"1a", "1b"}, []string{"2a", "2b", "2c"}, []string{"3a", "3b"}}
+	expect = []Trans{
+		Trans{[]string{"1a", "2a", "3a"}},
+		Trans{[]string{"1a", "2a", "3b"}},
+		Trans{[]string{"1a", "2b", "3a"}},
+		Trans{[]string{"1a", "2b", "3b"}},
+		Trans{[]string{"1a", "2c", "3a"}},
+		Trans{[]string{"1a", "2c", "3b"}},
+		Trans{[]string{"1b", "2a", "3a"}},
+		Trans{[]string{"1b", "2a", "3b"}},
+		Trans{[]string{"1b", "2b", "3a"}},
+		Trans{[]string{"1b", "2b", "3b"}},
+		Trans{[]string{"1b", "2c", "3a"}},
+		Trans{[]string{"1b", "2c", "3b"}},
+	}
+
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
+	input = [][]string{[]string{"b"}, []string{"O"}, []string{"rt", "r t"}, []string{"a"}, []string{"d"}, []string{"u0"}, []string{"S", "x"}}
+	expect = []Trans{
+		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "S"}},
+		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "x"}},
+		Trans{[]string{"b", "O", "r t", "a", "d", "u0", "S"}},
+		Trans{[]string{"b", "O", "r t", "a", "d", "u0", "x"}},
+	}
+
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %#v\nFound    %#v", expect, result)
+	}
+
+	input = [][]string{[]string{"1"}, []string{"2"}, []string{"3a", "3b"}, []string{"4"}, []string{"5"}, []string{"6"}, []string{"7a", "7b"}}
+	expect = []Trans{
+		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7a"}},
+		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7b"}},
+		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7a"}},
+		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b"}},
+	}
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
+	input = [][]string{[]string{"1"}, []string{"2"}, []string{"3a", "3b"}, []string{"4"}, []string{"5"}, []string{"6"}, []string{"7a", "7b"}, []string{"8"}}
+	expect = []Trans{
+		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7a", "8"}},
+		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7b", "8"}},
+		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7a", "8"}},
+		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b", "8"}},
+	}
+
+	result = testExpand(input)
+	if !reflect.DeepEqual(expect, result) {
+		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+	}
+
 }
