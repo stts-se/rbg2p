@@ -4,12 +4,12 @@ Each g2p rule set is defined in a .g2p file with the following content:
 
     * specific variables
       - used to define constant variables such as character set and phoneme delimiter
-    * variables (optional)
+    * variables
       - any variables for use in the context of the actual rules
     * rules - g2p rules
     * filters - transcription filters applied after the rules
     * tests - input/output tests
-    * comments (optional)
+    * comments
 
 SPECIFIC VARIABLES
 
@@ -73,7 +73,7 @@ Examples:
 
 FILTERS
 
-Regexp replacement filters for transcriptions. The filters are applied after the g2p rules. Pre-defined variables (see above) CANNOT be used in the input regexp for now.
+Regexp replacement filters for transcriptions. The filters are applied after the g2p rules. Pre-defined variables (see above) cannot be used in the filters for now.
      FILTER "<FROM RE>" -> "<TO RE>"
 
 Example:
