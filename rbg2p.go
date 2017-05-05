@@ -222,29 +222,6 @@ func expand(transes [][]string) []Trans {
 	return recursion(transes[0], transes[1:len(transes)], []Trans{Trans{}})
 }
 
-func expandOld(transes [][]string) []Trans {
-	n := 1
-	for _, arr := range transes {
-		n = n * len(arr)
-	}
-
-	res := make([]Trans, n, 2*n)
-
-	k := 0
-	for _, arr := range transes {
-		k = 0
-		for j := 0; j < n; j++ {
-			if k == len(arr) {
-				k = 0
-			}
-			res[j] = Trans{Phonemes: append(res[j].Phonemes, arr[k])}
-			k++
-
-		}
-	}
-	return res
-}
-
 func (rs RuleSet) applyFilters(t Trans) Trans {
 	res := t.String(rs.PhonemeDelimiter)
 	for _, f := range rs.Filters {
