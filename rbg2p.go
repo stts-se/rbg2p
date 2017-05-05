@@ -198,15 +198,19 @@ func (rs RuleSet) Test() TestResult {
 	return result
 }
 
-func recursion(head []string, tail [][]string, acc []Trans) []Trans {
+func (rs RuleSet) expandLoop(head []string, tail [][]string, acc []Trans) []Trans {
 	res := []Trans{}
 	for i := 0; i < len(acc); i++ {
 		for _, add := range head {
-			prefix := []string{}
+			appendRange := []string{}
+			// build prefix from previous rounds
 			for _, s := range acc[i].Phonemes {
-				prefix = append(prefix, s)
+				appendRange = append(appendRange, s)
 			}
-			appendRange := append(prefix, add)
+			// append current phonemes
+			for _, s := range strings.Split(add, rs.PhonemeDelimiter) {
+				appendRange = append(appendRange, s)
+			}
 			res = append(res, Trans{appendRange})
 		}
 
@@ -214,12 +218,12 @@ func recursion(head []string, tail [][]string, acc []Trans) []Trans {
 	if len(tail) == 0 {
 		return res
 	} else {
-		return recursion(tail[0], tail[1:len(tail)], res)
+		return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 	}
 }
 
-func expand(transes [][]string) []Trans {
-	return recursion(transes[0], transes[1:len(transes)], []Trans{Trans{}})
+func (rs RuleSet) expand(transes [][]string) []Trans {
+	return rs.expandLoop(transes[0], transes[1:len(transes)], []Trans{Trans{}})
 }
 
 func (rs RuleSet) applyFilters(t Trans) Trans {
@@ -261,9 +265,9 @@ func (rs RuleSet) Apply(s string) ([]Trans, error) {
 		}
 	}
 	if len(couldntMap) > 0 {
-		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
+		return rs.expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
-	expanded := expand(res)
+	expanded := rs.expand(res)
 	//test := expandTest(res)
 	//fmt.Printf("res=%#v\n", res)
 	//fmt.Printf("test=%#v\n", test)

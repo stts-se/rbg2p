@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -329,11 +330,13 @@ func testRecursion(head []string, tail [][]string, acc []Trans) []Trans {
 			fmt.Printf("acc[%d] = %v\n", i, acc[i])
 		}
 		for _, add := range head {
-			prefix := []string{}
+			appendRange := []string{}
 			for _, s := range acc[i].Phonemes {
-				prefix = append(prefix, s)
+				appendRange = append(appendRange, s)
 			}
-			appendRange := append(prefix, add)
+			for _, s := range strings.Split(add, " ") {
+				appendRange = append(appendRange, s)
+			}
 			res = append(res, Trans{appendRange})
 			if testDebug {
 				fmt.Printf("i=%d\n", i)
@@ -429,8 +432,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	expect = []Trans{
 		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "S"}},
 		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "x"}},
-		Trans{[]string{"b", "O", "r t", "a", "d", "u0", "S"}},
-		Trans{[]string{"b", "O", "r t", "a", "d", "u0", "x"}},
+		Trans{[]string{"b", "O", "r", "t", "a", "d", "u0", "S"}},
+		Trans{[]string{"b", "O", "r", "t", "a", "d", "u0", "x"}},
 	}
 
 	result = testExpand(input)
