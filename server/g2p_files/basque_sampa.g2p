@@ -11,8 +11,8 @@ VAR VOWEL [aeiouy]
 
 // Filters
 
-FILTER "^((?:[^aeiou ]+ )*)([aeiou]) ((?:[^aeiou ]+ )*)([aeiou])" -> "$1 $2 $3 \" $4" // simple filter to put stress on 2nd syllable
-FILTER "^((?:[^aeiou ]+ )*)([aeiou])( *(?:[^aeiou ]+)*)$" -> "$1 \" $2 $3" // simple filter to put stress on the only vowel for monosyllabic words
+FILTER "^((?:[^aeiou" ]+ )*)([aeiou]) ((?:[^aeiou" ]+ )*)([aeiou])" -> "$1 $2 $3 \" $4" // simple filter to put stress on 2nd syllable
+FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou" ]+)*)$" -> "$1 \" $2 $3" // simple filter to put stress on the only vowel for monosyllabic words
 
 // Rules
 
@@ -47,13 +47,13 @@ bb -> b
 
 //default rules for letters
 a -> a
-á -> a
+á -> " a
 b -> b
 c -> s
 ç -> s
 d -> d
 e -> e
-é -> e
+é -> " e
 f -> f
 g -> g
 
@@ -63,7 +63,7 @@ g -> g
 h -> ∅
 
 i -> i
-í -> i
+í -> " i
 
 //The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
 //Source: https://en.wikipedia.org/wiki/Basque_language
@@ -75,14 +75,14 @@ m -> m
 n -> n
 ñ -> J
 o -> o
-ó -> o
+ó -> " o
 p -> p
 q -> k
 r -> rr
 s -> s
 t -> t
 u -> u
-ú -> u
+ú -> " u
 v -> B
 w -> w
 x -> S
@@ -104,7 +104,7 @@ TEST asko -> a s k " o
 TEST nor -> n " o rr
 TEST zara -> s` a r " a
 TEST pozten -> p o s` t " e n
-TEST naiz -> n a j s`
+//TEST naiz -> n " a j s`
 TEST zu -> s` " u
 TEST ezagutzeaz -> (e s` " a g u ts` e a s`, e s` " a G u ts` e a s`)
 TEST mesedez -> (m e s " e d e s`, m e s " e D e s`)
@@ -133,3 +133,6 @@ TEST egunon -> (e g " u n o n, e G " u n o n)
 TEST egin -> (e g " i n, e G " i n)
 TEST egina -> (e g " i J a, e G " i J a)
 TEST egines -> (e g " i J e s, e G " i J e s)
+//TEST agada -> (a g " a d a, a G " a d a, a g " a D a, a G " a D a)
+TEST fragráncia -> f rr a g rr " a n s i a
+TEST bárkatu -> b " a rr k a t u // constructed
