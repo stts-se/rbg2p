@@ -221,6 +221,7 @@ func recursion(head []string, tail [][]string, acc []Trans) []Trans {
 func expand(transes [][]string) []Trans {
 	return recursion(transes[0], transes[1:len(transes)], []Trans{Trans{}})
 }
+
 func expandOld(transes [][]string) []Trans {
 	n := 1
 	for _, arr := range transes {
