@@ -64,6 +64,16 @@ func (c Context) equals(c2 Context) bool {
 	return c.Input == c2.Input
 }
 
+// Filter is a regexp filter for rules that cannot be expressed using the standard rule systme
+type Filter struct {
+	Regexp *regexp.Regexp
+	Output string
+}
+
+func (f Filter) Apply(s string) string {
+	return f.Regexp.ReplaceAllString(s, f.Output)
+}
+
 // Rule is a g2p rule representation
 type Rule struct {
 	Input        string
@@ -105,6 +115,7 @@ type RuleSet struct {
 	Vars             map[string]string
 	Rules            []Rule
 	Tests            []Test
+	Filters          []Filter
 }
 
 // TestResult is a container for test results (errors, warnings, and failed tests from tests speficied in the g2p rule file)
@@ -210,6 +221,16 @@ func expand(transes [][]string) []Trans {
 	return res
 }
 
+func (rs RuleSet) applyFilters(t Trans) Trans {
+	res := t.String(rs.PhonemeDelimiter)
+	for _, f := range rs.Filters {
+		//pre := res
+		//fmt.Printf("%s -> %s ::: /%s/ -> /%s/\n", f.Regexp, f.Output, pre, res)
+		res = f.Apply(res)
+	}
+	return Trans{strings.Split(res, rs.PhonemeDelimiter)}
+}
+
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s string) ([]Trans, error) {
 	var i = 0
@@ -243,5 +264,11 @@ func (rs RuleSet) Apply(s string) ([]Trans, error) {
 	if len(couldntMap) > 0 {
 		return expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
-	return expand(res), nil
+	expanded := expand(res)
+	var filtered []Trans
+	for _, t := range expanded {
+		fted := rs.applyFilters(t)
+		filtered = append(filtered, fted)
+	}
+	return filtered, nil
 }

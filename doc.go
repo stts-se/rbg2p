@@ -7,6 +7,7 @@ Each g2p rule set is defined in a .g2p file with the following content:
     * variables (optional)
       - any variables for use in the context of the actual rules
     * rules - g2p rules
+    * filters - transcription filters applied after the rules
     * tests - input/output tests
     * comments (optional)
 
@@ -68,6 +69,15 @@ Examples:
      ck -> k
      b -> p / _ VOICELESS
      h -> ∅ / # _
+
+
+FILTERS
+
+Regexp replacement filters for transcriptions. The filters are applied after the g2p rules. Pre-defined variables (see above) CANNOT be used in the input regexp for now.
+     FILTER "<FROM RE>" -> "<TO RE>"
+
+Example:
+     FILTER "^" -> "\" " // place stress first in transcription
 
 
 COMMENTS

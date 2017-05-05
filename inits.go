@@ -26,6 +26,10 @@ func isTest(s string) bool {
 	return strings.HasPrefix(s, "TEST ")
 }
 
+func isFilter(s string) bool {
+	return strings.HasPrefix(s, "FILTER ")
+}
+
 func isBlankLine(s string) bool {
 	return len(s) == 0
 }
@@ -61,6 +65,12 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, err
 			}
 			ruleSet.Vars[name] = value
+		} else if isFilter(l) {
+			t, err := newFilter(l)
+			if err != nil {
+				return ruleSet, err
+			}
+			ruleSet.Filters = append(ruleSet.Filters, t)
 		} else if isTest(l) {
 			t, err := newTest(l)
 			if err != nil {
@@ -166,6 +176,25 @@ func newTest(s string) (Test, error) {
 	input := matchRes[1]
 	output := commaSplit.Split(outputS, -1)
 	return Test{Input: input, Output: output}, nil
+}
+
+var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.+)\"$")
+
+func newFilter(s string) (Filter, error) {
+	matchRes := filterRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		return Filter{}, fmt.Errorf("invalid filter definition: " + s)
+	}
+	input := matchRes[1]
+	output := strings.Replace(matchRes[2], "\\\"", "\"", -1)
+	if strings.Contains(output, "->") {
+		return Filter{}, fmt.Errorf("invalid filter definition: " + s)
+	}
+	re, err := regexp.Compile(input)
+	if err != nil {
+		return Filter{}, fmt.Errorf("invalid regexp in filter definition input /%s/ : %s", s, err)
+	}
+	return Filter{Regexp: re, Output: output}, nil
 }
 
 func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp.Regexp, error) {
