@@ -1,6 +1,6 @@
 // Specs
 
-CHARACTER_SET "abcçdefghijklmnñopqrstuvwxyz"
+CHARACTER_SET "aábcçdeéfghiíjklmnñoópqrstuúvwxyz"
 PHONEME_SET "a e i o u j w p b t d c gj k g ts ts` tS s s` S jj f B D G x m n J l L rr r "" 
 PHONEME_DELIMITER " "
 DEFAULT_PHONEME "_"
@@ -47,11 +47,13 @@ bb -> b
 
 //default rules for letters
 a -> a
+á -> a
 b -> b
 c -> s
 ç -> s
 d -> d
 e -> e
+é -> e
 f -> f
 g -> g
 
@@ -61,6 +63,7 @@ g -> g
 h -> ∅
 
 i -> i
+í -> i
 
 //The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
 //Source: https://en.wikipedia.org/wiki/Basque_language
@@ -72,12 +75,14 @@ m -> m
 n -> n
 ñ -> J
 o -> o
+ó -> o
 p -> p
 q -> k
 r -> rr
 s -> s
 t -> t
 u -> u
+ú -> u
 v -> B
 w -> w
 x -> S
