@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
-	"strings"
 	"testing"
 )
 
@@ -314,56 +313,8 @@ func xxxTestCze(t *testing.T) {
 	}
 }
 
-var testDebug = false
-
-func testRecursion(head []string, tail [][]string, acc []Trans) []Trans {
-	res := []Trans{}
-	if testDebug {
-		fmt.Println("====")
-		fmt.Printf("head=%#v\n", head)
-		fmt.Printf("tail=%#v\n", tail)
-		fmt.Printf("accSize=%#v\n", len(acc))
-		fmt.Printf("acc=%#v\n", acc)
-	}
-	for i := 0; i < len(acc); i++ {
-		if testDebug {
-			fmt.Printf("acc[%d] = %v\n", i, acc[i])
-		}
-		for _, add := range head {
-			appendRange := []string{}
-			for _, s := range acc[i].Phonemes {
-				appendRange = append(appendRange, s)
-			}
-			for _, s := range strings.Split(add, " ") {
-				appendRange = append(appendRange, s)
-			}
-			res = append(res, Trans{appendRange})
-			if testDebug {
-				fmt.Printf("i=%d\n", i)
-				fmt.Printf("add=%v\n", add)
-				fmt.Printf("appendRange=%v\n", appendRange)
-				fmt.Printf("res=%#v\n", res)
-				fmt.Println("")
-			}
-		}
-
-	}
-	if testDebug {
-		fmt.Printf("res=%#v\n", res)
-		fmt.Println("")
-	}
-	if len(tail) == 0 {
-		return res
-	} else {
-		return testRecursion(tail[0], tail[1:len(tail)], res)
-	}
-}
-
-func testExpand(transes [][]string) []Trans {
-	return testRecursion(transes[0], transes[1:len(transes)], []Trans{Trans{}})
-}
-
 func TestExpansionAlgorithm(t *testing.T) {
+	rs := RuleSet{PhonemeDelimiter: " "}
 	input := [][]string{[]string{"1a", "1b"}, []string{"2a", "2b"}}
 	expect := []Trans{
 		Trans{[]string{"1a", "2a"}},
@@ -372,7 +323,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1b", "2b"}},
 	}
 
-	result := testExpand(input)
+	result := rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}
@@ -385,7 +336,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1b", "2", "3b"}},
 	}
 
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}
@@ -402,7 +353,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1b", "2b", "3b"}},
 	}
 
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}
@@ -423,7 +374,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1b", "2c", "3b"}},
 	}
 
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}
@@ -436,7 +387,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"b", "O", "r", "t", "a", "d", "u0", "x"}},
 	}
 
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %#v\nFound    %#v", expect, result)
 	}
@@ -448,7 +399,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7a"}},
 		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b"}},
 	}
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}
@@ -461,7 +412,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b", "8"}},
 	}
 
-	result = testExpand(input)
+	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
 		t.Errorf("\nExpected %v\nFound    %v", expect, result)
 	}

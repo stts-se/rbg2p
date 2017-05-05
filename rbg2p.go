@@ -70,6 +70,7 @@ type Filter struct {
 	Output string
 }
 
+// Apply is used to apply the filter to an input string
 func (f Filter) Apply(s string) string {
 	return f.Regexp.ReplaceAllString(s, f.Output)
 }
@@ -217,9 +218,8 @@ func (rs RuleSet) expandLoop(head []string, tail [][]string, acc []Trans) []Tran
 	}
 	if len(tail) == 0 {
 		return res
-	} else {
-		return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 	}
+	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 }
 
 func (rs RuleSet) expand(transes [][]string) []Trans {

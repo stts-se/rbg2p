@@ -41,7 +41,7 @@ type Word struct {
 	Transes []string `json:"transes"`
 }
 
-func transcribe(lang string, word string) (Word, error, int) {
+func transcribe(lang string, word string) (Word, int, error) {
 	g2p.mutex.RLock()
 	defer g2p.mutex.RUnlock()
 	ruleSet, ok := g2p.g2ps[lang]
@@ -49,20 +49,20 @@ func transcribe(lang string, word string) (Word, error, int) {
 		msg := "unknown 'lang': " + lang
 		langs := listLanguages()
 		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
-		return Word{}, fmt.Errorf(msg), http.StatusBadRequest
+		return Word{}, http.StatusBadRequest, fmt.Errorf(msg)
 	}
 
 	transes, err := ruleSet.Apply(word)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't transcribe word : %v", err)
-		return Word{}, fmt.Errorf(msg), http.StatusInternalServerError
+		return Word{}, http.StatusInternalServerError, fmt.Errorf(msg)
 	}
 	tRes := []string{}
 	for _, trans := range transes {
 		tRes = append(tRes, trans.String(ruleSet.PhonemeDelimiter))
 	}
 	res := Word{word, tRes}
-	return res, nil, http.StatusOK
+	return res, http.StatusOK, nil
 }
 
 func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
@@ -85,9 +85,9 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	word = strings.ToLower(word)
 
-	res, err, status := transcribe(lang, word)
+	res, status, err := transcribe(lang, word)
 	if err != nil {
-		log.Print("%s\n", err)
+		log.Printf("%s\n", err)
 		http.Error(w, fmt.Sprintf("%s", err), status)
 		return
 	}
@@ -103,12 +103,14 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
-type XmlWords struct {
+// XMLWords container go generate xml from http request
+type XMLWords struct {
 	XMLName xml.Name `xml:"words"`
-	Words   []XmlWord
+	Words   []XMLWord
 }
 
-type XmlWord struct {
+// XMLWord container go generate xml from http request
+type XMLWord struct {
 	XMLName xml.Name `xml:"word"`
 	Orth    string   `xml:"orth,attr"`
 	Trans   string   `xml:"trans"`
@@ -131,9 +133,9 @@ func transcribe_OnlyFirstTrans_AsXml_Handler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	word = strings.ToLower(word)
-	res, err, status := transcribe(lang, word)
+	res, status, err := transcribe(lang, word)
 	if err != nil {
-		log.Print("%s\n", err)
+		log.Printf("%s\n", err)
 		http.Error(w, fmt.Sprintf("%s", err), status)
 		return
 	}
@@ -141,14 +143,14 @@ func transcribe_OnlyFirstTrans_AsXml_Handler(w http.ResponseWriter, r *http.Requ
 	//<word orth='apa' word_lang='mk' trans_lang='mk' >" a p a</word>
 	//</words>
 
-	// words := XmlWords{
-	// 	Words: []XmlWord{
-	// 		XmlWord{Orth: word, Trans: res.Transes[0]},
+	// words := XMLWords{
+	// 	Words: []XMLWord{
+	// 		XMLWord{Orth: word, Trans: res.Transes[0]},
 	// 	},
 	// }
-	words := XmlWords{}
+	words := XMLWords{}
 	for _, t := range res.Transes {
-		words.Words = append(words.Words, XmlWord{Orth: word, Trans: t})
+		words.Words = append(words.Words, XMLWord{Orth: word, Trans: t})
 	}
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
