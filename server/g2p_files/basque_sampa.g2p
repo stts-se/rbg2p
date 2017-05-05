@@ -12,7 +12,7 @@ VAR VOWEL [aeiouy]
 // Filters
 
 FILTER "^((?:[^aeiou" ]+ )*)([aeiou]) ((?:[^aeiou" ]+ )*)([aeiou])" -> "$1 $2 $3 \" $4" // simple filter to put stress on 2nd syllable
-FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou" ]+)*)$" -> "$1 \" $2 $3" // simple filter to put stress on the only vowel for monosyllabic words
+FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou"]+)*)$" -> "$1 \" $2 $3" // simple filter to put stress on the only vowel for monosyllabic words
 
 // Rules
 
@@ -104,7 +104,7 @@ TEST asko -> a s k " o
 TEST nor -> n " o rr
 TEST zara -> s` a r " a
 TEST pozten -> p o s` t " e n
-//TEST naiz -> n " a j s`
+TEST naiz -> n " a j s`
 TEST zu -> s` " u
 TEST ezagutzeaz -> (e s` " a g u ts` e a s`, e s` " a G u ts` e a s`)
 TEST mesedez -> (m e s " e d e s`, m e s " e D e s`)
@@ -136,3 +136,5 @@ TEST egines -> (e g " i J e s, e G " i J e s)
 TEST agada -> (a g " a d a, a g " a D a, a G " a d a, a G " a D a)
 TEST fragráncia -> f rr a g rr " a n s i a
 TEST bárkatu -> b " a rr k a t u // constructed
+TEST test -> t " e s t
+TEST tes -> t " e s
