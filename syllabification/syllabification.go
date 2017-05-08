@@ -1,21 +1,25 @@
-package rbg2p
+package syllabification
 
-import "strings"
+import (
+	"strings"
 
-// sBound represent syllable boundaries
-type sBound struct {
-	g int
-	p int
+	"github.com/stts-se/rbg2p"
+)
+
+// Boundary represent syllable boundaries
+type Boundary struct {
+	G int
+	P int
 }
 
 // SylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
 type SylledTrans struct {
-	Trans      Trans
-	boundaries []sBound
+	Trans      rbg2p.Trans
+	Boundaries []Boundary
 }
 
-func (t SylledTrans) isBoundary(b sBound) bool {
-	for _, bound := range t.boundaries {
+func (t SylledTrans) iBoundaryary(b Boundary) bool {
+	for _, bound := range t.Boundaries {
 		if bound == b {
 			return true
 		}
@@ -27,9 +31,9 @@ func (t SylledTrans) isBoundary(b sBound) bool {
 func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	res := []string{}
 	for gi, g2p := range t.Trans.Phonemes {
-		for pi, p := range g2p.p {
-			index := sBound{g: gi, p: pi}
-			if t.isBoundary(index) {
+		for pi, p := range g2p.P {
+			index := Boundary{G: gi, P: pi}
+			if t.iBoundaryary(index) {
 				res = append(res, syllDelimiter)
 			}
 			res = append(res, p)
@@ -97,16 +101,16 @@ type Syllabifier struct {
 }
 
 // Syllabify is used to divide a transcription into syllables
-func (s Syllabifier) Syllabify(t Trans) SylledTrans {
+func (s Syllabifier) Syllabify(t rbg2p.Trans) SylledTrans {
 	res := SylledTrans{Trans: t}
 	left := []string{}
 	right := t.ListPhonemes()
 	for gi, g2p := range t.Phonemes {
-		for pi, p := range g2p.p {
+		for pi, p := range g2p.P {
 			//fmt.Printf("%s %s %v\n", left, right, s.SyllDef.validSplit(left, right))
 			if len(left) > 0 && s.SyllDef.validSplit(left, right) {
-				index := sBound{g: gi, p: pi}
-				res.boundaries = append(res.boundaries, index)
+				index := Boundary{G: gi, P: pi}
+				res.Boundaries = append(res.Boundaries, index)
 			}
 			left = append(left, p)
 			right = right[1:len(right)]

@@ -8,25 +8,26 @@
       <h2>List available languages</h2>
       URL: <a href="/rbg2p/list">/rbg2p/list</a><br/>
 
-      <h2>Transcribe a word</h2>
-      Transcribe an input word using the specified language's g2p rules<br/><br/>
+      <br/><h2>Transcribe a word (JSON)</h2>
+      Transcribe an input word using the specified language's g2p rules and return the result as json<br/><br/>
       URL: /rbg2p/transcribe/LANG/WORD<br/>
-            <br/>
             <br/>
 	    Examples:<br/>
 	    <a href="/rbg2p/transcribe/ipa_test/hot">/rbg2p/transcribe/ipa_test/hot</a><br/>
 	    <a href="/rbg2p/transcribe/sws_test/hit">/rbg2p/transcribe/sws_test/hit</a><br/>
 	    <a href="/rbg2p/transcribe/sws_test/dusch">/rbg2p/transcribe/sws_test/dusch</a><br/>
     
-      <h2>Transcribe a word and only return the first resulting transcription</h2>
-      Transcribe an input word using the specified language's g2p rules<br/><br/>
-      URL: /rbg2p/onetrans/LANG/WORD<br/>
-            <br/>
+            <br/><h2>Transcribe a word (XML)</h2>
+      Transcribe an input word using the specified language's g2p rules and return the result as xml<br/><br/>
+      URLS: /rbg2p/transcribe/LANG/WORD?format=xml, /rbg2p/xmltranscribe/LANG/WORD<br/>
             <br/>
 	    Examples:<br/>
-	    <a href="/rbg2p/onetrans/ipa_test/hot">/rbg2p/onetrans/ipa_test/hot</a><br/>
-	    <a href="/rbg2p/onetrans/sws_test/hit">/rbg2p/onetrans/sws_test/hit</a><br/>
-	    <a href="/rbg2p/onetrans/sws_test/dusch">/rbg2p/onetrans/sws_test/dusch</a><br/>
+	    <a href="/rbg2p/transcribe/ipa_test/hot?format=xml">/rbg2p/transcribe/ipa_test/hot?format=xml</a><br/>
+	    <a href="/rbg2p/transcribe/sws_test/hit?format=xml">/rbg2p/transcribe/sws_test/hit?format=xml</a><br/>
+	    <a href="/rbg2p/transcribe/sws_test/dusch?format=xml">/rbg2p/transcribe/sws_test/dusch?format=xml</a><br/>
+	    <a href="/rbg2p/xmltranscribe/ipa_test/hot">/rbg2p/xmltranscribe/ipa_test/hot</a><br/>
+	    <a href="/rbg2p/xmltranscribe/sws_test/hit">/rbg2p/xmltranscribe/sws_test/hit</a><br/>
+	    <a href="/rbg2p/xmltranscribe/sws_test/dusch">/rbg2p/xmltranscribe/sws_test/dusch</a><br/>
     
   </body>
 </html>

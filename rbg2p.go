@@ -9,19 +9,26 @@ import (
 
 // Trans is a container for phonemes in a transcription
 type Trans struct {
-	Phonemes []g2p
+	Phonemes []G2P
 }
 
-type g2p struct {
-	g string
-	p []string
+/*G2P is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Examples (IPA symbols):
+  x -> k, s
+  sch -> ʃ
+  ff -> f
+  au -> a‿u
+  rt -> ʈ
+**/
+type G2P struct {
+	G string
+	P []string
 }
 
 //ListPhonemes returns a slice of phonemes as strings
 func (t Trans) ListPhonemes() []string {
 	var phns []string
 	for _, g2p := range t.Phonemes {
-		for _, p := range g2p.p {
+		for _, p := range g2p.P {
 			phns = append(phns, p)
 		}
 	}
@@ -205,44 +212,17 @@ func (rs RuleSet) Test() TestResult {
 	return result
 }
 
-// func (rs RuleSet) expandLoopOld(head []string, tail [][]string, acc []Trans) []Trans {
-// 	res := []Trans{}
-// 	for i := 0; i < len(acc); i++ {
-// 		for _, add := range head {
-// 			appendRange := []g2p{}
-// 			// build prefix from previous rounds
-// 			for _, s := range acc[i].Phonemes {
-// 				appendRange = append(appendRange, s)
-// 			}
-// 			// append current phonemes
-// 			for _, s := range strings.Split(add, rs.PhonemeDelimiter) {
-// 				appendRange = append(appendRange, s)
-// 			}
-// 			res = append(res, Trans{appendRange})
-// 		}
-
-// 	}
-// 	if len(tail) == 0 {
-// 		return res
-// 	}
-// 	return rs.expandLoopOld(tail[0], tail[1:len(tail)], res)
-// }
-
-// func (rs RuleSet) expandOld(transes [][]string) []Trans {
-// 	return rs.expandLoopOld(transes[0], transes[1:len(transes)], []Trans{Trans{}})
-// }
-
-func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []Trans) []Trans {
+func (rs RuleSet) expandLoop(head G2P, tail []G2P, acc []Trans) []Trans {
 	res := []Trans{}
 	for i := 0; i < len(acc); i++ {
-		for _, add := range head.p {
-			appendRange := []g2p{}
+		for _, add := range head.P {
+			appendRange := []G2P{}
 			// build prefix from previous rounds
 			for _, g2p := range acc[i].Phonemes {
 				appendRange = append(appendRange, g2p)
 			}
 			// append current phonemes
-			g2p := g2p{g: head.g, p: strings.Split(add, rs.PhonemeDelimiter)}
+			g2p := G2P{G: head.G, P: strings.Split(add, rs.PhonemeDelimiter)}
 			appendRange = append(appendRange, g2p)
 			res = append(res, Trans{appendRange})
 		}
@@ -254,7 +234,7 @@ func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []Trans) []Trans {
 	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 }
 
-func (rs RuleSet) expand(phonemes []g2p) []Trans {
+func (rs RuleSet) expand(phonemes []G2P) []Trans {
 	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []Trans{Trans{}})
 }
 
@@ -270,7 +250,7 @@ func (rs RuleSet) applyFilters(t Trans) string {
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
 	var s0 = []rune(s)
-	res := []g2p{}
+	res := []G2P{}
 	var couldntMap = []string{}
 	for i < len(s0) {
 		ss := string(s0[i:len(s0)])
@@ -284,14 +264,14 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 				right := string(s0[i+ruleInputLen : len(s0)])
 				if rule.RightContext.Matches(right) {
 					i = i + ruleInputLen
-					res = append(res, g2p{g: rule.Input, p: rule.Output})
+					res = append(res, G2P{G: rule.Input, P: rule.Output})
 					matchFound = true
 					break
 				}
 			}
 		}
 		if !matchFound {
-			res = append(res, g2p{g: thisChar, p: []string{rs.DefaultPhoneme}})
+			res = append(res, G2P{G: thisChar, P: []string{rs.DefaultPhoneme}})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}

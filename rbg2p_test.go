@@ -314,13 +314,13 @@ func xxxTestCze(t *testing.T) {
 	}
 }
 
-func g2pFromSlice(variants []string) g2p {
-	return g2p{g: "", p: variants}
+func g2pFromSlice(variants []string) G2P {
+	return G2P{G: "", P: variants}
 }
 func g2pTransFromSlice(trans []string) Trans {
-	res := []g2p{}
+	res := []G2P{}
 	for _, ps := range trans {
-		res = append(res, g2p{g: "", p: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
+		res = append(res, G2P{G: "", P: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
 
 	}
 	return Trans{res}
@@ -330,8 +330,8 @@ func g2pTransFromSlice(trans []string) Trans {
 func trans2string(t Trans) string {
 	var phns []string
 	for _, g2p := range t.Phonemes {
-		if len(g2p.p) > 0 {
-			phns = append(phns, strings.Join(g2p.p, ", "))
+		if len(g2p.P) > 0 {
+			phns = append(phns, strings.Join(g2p.P, ", "))
 		}
 	}
 	return strings.Join(phns, " ")
@@ -348,7 +348,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	rs := RuleSet{PhonemeDelimiter: " "}
 
 	//
-	input := []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"})}
+	input := []G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"})}
 	expect := []Trans{
 		g2pTransFromSlice([]string{"1a", "2a"}),
 		g2pTransFromSlice([]string{"1a", "2b"}),
@@ -362,7 +362,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"})}
+	input = []G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"1a", "2", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2", "3b"}),
@@ -376,7 +376,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"}), g2pFromSlice([]string{"3a", "3b"})}
+	input = []G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
@@ -394,7 +394,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b", "2c"}), g2pFromSlice([]string{"3a", "3b"})}
+	input = []G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b", "2c"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
@@ -416,7 +416,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"b"}), g2pFromSlice([]string{"O"}), g2pFromSlice([]string{"rt", "r t"}), g2pFromSlice([]string{"a"}), g2pFromSlice([]string{"d"}), g2pFromSlice([]string{"u0"}), g2pFromSlice([]string{"S", "x"})}
+	input = []G2P{g2pFromSlice([]string{"b"}), g2pFromSlice([]string{"O"}), g2pFromSlice([]string{"rt", "r t"}), g2pFromSlice([]string{"a"}), g2pFromSlice([]string{"d"}), g2pFromSlice([]string{"u0"}), g2pFromSlice([]string{"S", "x"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "S"}),
 		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "x"}),
@@ -430,7 +430,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"})}
+	input = []G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a"}),
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b"}),
@@ -443,7 +443,7 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []g2p{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"}), g2pFromSlice([]string{"8"})}
+	input = []G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"}), g2pFromSlice([]string{"8"})}
 	expect = []Trans{
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a", "8"}),
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b", "8"}),
