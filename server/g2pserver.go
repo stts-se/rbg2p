@@ -67,6 +67,12 @@ func transcribe(lang string, word string) (Word, int, error) {
 
 func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 
+	format := r.FormValue("format")
+	if "xml" == format {
+		transcribe_AsXml_Handler(w, r)
+		return
+	}
+
 	vars := mux.Vars(r)
 	lang := vars["lang"]
 	if "" == lang {
@@ -247,12 +253,8 @@ func main() {
 
 	s := r.PathPrefix("/rbg2p").Subrouter()
 
-	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
-	s.HandleFunc("/list", list_Handler) //.Methods("get", "post")
-
-	// for legacy calls from ltool/yalt
-	s = r.PathPrefix("/rbg2p/xmltranscribe").Subrouter()
-	s.HandleFunc("/{lang}/{word}", transcribe_AsXml_Handler)
+	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
+	s.HandleFunc("/list", list_Handler)                           //.Methods("get", "post")
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
