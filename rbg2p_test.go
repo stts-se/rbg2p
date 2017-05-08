@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -313,108 +314,138 @@ func xxxTestCze(t *testing.T) {
 	}
 }
 
+func g2pFromSlice(variants []string) g2p {
+	return g2p{g: "", p: variants}
+}
+func g2pTransFromSlice(trans []string) Trans {
+	res := []g2p{}
+	for _, ps := range trans {
+		res = append(res, g2p{g: "", p: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
+
+	}
+	return Trans{res}
+}
+
+// to make it easier to compare results from unit tests
+func trans2string(t Trans) string {
+	var phns []string
+	for _, g2p := range t.Phonemes {
+		if len(g2p.p) > 0 {
+			phns = append(phns, strings.Join(g2p.p, ", "))
+		}
+	}
+	return strings.Join(phns, " ")
+}
+func transes2string(transes []Trans) []string {
+	res := []string{}
+	for _, t := range transes {
+		res = append(res, trans2string(t))
+	}
+	return res
+}
+
 func TestExpansionAlgorithm(t *testing.T) {
 	rs := RuleSet{PhonemeDelimiter: " "}
-	input := [][]string{[]string{"1a", "1b"}, []string{"2a", "2b"}}
+	input := []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"})}
 	expect := []Trans{
-		Trans{[]string{"1a", "2a"}},
-		Trans{[]string{"1a", "2b"}},
-		Trans{[]string{"1b", "2a"}},
-		Trans{[]string{"1b", "2b"}},
+		g2pTransFromSlice([]string{"1a", "2a"}),
+		g2pTransFromSlice([]string{"1a", "2b"}),
+		g2pTransFromSlice([]string{"1b", "2a"}),
+		g2pTransFromSlice([]string{"1b", "2b"}),
 	}
 
 	result := rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"1a", "1b"}, []string{"2"}, []string{"3a", "3b"}}
+	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
-		Trans{[]string{"1a", "2", "3a"}},
-		Trans{[]string{"1a", "2", "3b"}},
-		Trans{[]string{"1b", "2", "3a"}},
-		Trans{[]string{"1b", "2", "3b"}},
+		g2pTransFromSlice([]string{"1a", "2", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2", "3b"}),
 	}
 
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"1a", "1b"}, []string{"2a", "2b"}, []string{"3a", "3b"}}
+	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
-		Trans{[]string{"1a", "2a", "3a"}},
-		Trans{[]string{"1a", "2a", "3b"}},
-		Trans{[]string{"1a", "2b", "3a"}},
-		Trans{[]string{"1a", "2b", "3b"}},
-		Trans{[]string{"1b", "2a", "3a"}},
-		Trans{[]string{"1b", "2a", "3b"}},
-		Trans{[]string{"1b", "2b", "3a"}},
-		Trans{[]string{"1b", "2b", "3b"}},
+		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
+		g2pTransFromSlice([]string{"1a", "2b", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2b", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2a", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2a", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2b", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2b", "3b"}),
 	}
 
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"1a", "1b"}, []string{"2a", "2b", "2c"}, []string{"3a", "3b"}}
+	input = []g2p{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b", "2c"}), g2pFromSlice([]string{"3a", "3b"})}
 	expect = []Trans{
-		Trans{[]string{"1a", "2a", "3a"}},
-		Trans{[]string{"1a", "2a", "3b"}},
-		Trans{[]string{"1a", "2b", "3a"}},
-		Trans{[]string{"1a", "2b", "3b"}},
-		Trans{[]string{"1a", "2c", "3a"}},
-		Trans{[]string{"1a", "2c", "3b"}},
-		Trans{[]string{"1b", "2a", "3a"}},
-		Trans{[]string{"1b", "2a", "3b"}},
-		Trans{[]string{"1b", "2b", "3a"}},
-		Trans{[]string{"1b", "2b", "3b"}},
-		Trans{[]string{"1b", "2c", "3a"}},
-		Trans{[]string{"1b", "2c", "3b"}},
+		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
+		g2pTransFromSlice([]string{"1a", "2b", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2b", "3b"}),
+		g2pTransFromSlice([]string{"1a", "2c", "3a"}),
+		g2pTransFromSlice([]string{"1a", "2c", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2a", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2a", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2b", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2b", "3b"}),
+		g2pTransFromSlice([]string{"1b", "2c", "3a"}),
+		g2pTransFromSlice([]string{"1b", "2c", "3b"}),
 	}
 
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"b"}, []string{"O"}, []string{"rt", "r t"}, []string{"a"}, []string{"d"}, []string{"u0"}, []string{"S", "x"}}
+	input = []g2p{g2pFromSlice([]string{"b"}), g2pFromSlice([]string{"O"}), g2pFromSlice([]string{"rt", "r t"}), g2pFromSlice([]string{"a"}), g2pFromSlice([]string{"d"}), g2pFromSlice([]string{"u0"}), g2pFromSlice([]string{"S", "x"})}
 	expect = []Trans{
-		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "S"}},
-		Trans{[]string{"b", "O", "rt", "a", "d", "u0", "x"}},
-		Trans{[]string{"b", "O", "r", "t", "a", "d", "u0", "S"}},
-		Trans{[]string{"b", "O", "r", "t", "a", "d", "u0", "x"}},
+		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "S"}),
+		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "x"}),
+		g2pTransFromSlice([]string{"b", "O", "r, t", "a", "d", "u0", "S"}),
+		g2pTransFromSlice([]string{"b", "O", "r, t", "a", "d", "u0", "x"}),
 	}
 
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %#v\nFound    %#v", expect, result)
+		t.Errorf("\nExpected %#v\nFound    %#v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"1"}, []string{"2"}, []string{"3a", "3b"}, []string{"4"}, []string{"5"}, []string{"6"}, []string{"7a", "7b"}}
+	input = []g2p{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"})}
 	expect = []Trans{
-		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7a"}},
-		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7b"}},
-		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7a"}},
-		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b"}},
+		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a"}),
+		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b"}),
+		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7a"}),
+		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7b"}),
 	}
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
-	input = [][]string{[]string{"1"}, []string{"2"}, []string{"3a", "3b"}, []string{"4"}, []string{"5"}, []string{"6"}, []string{"7a", "7b"}, []string{"8"}}
+	input = []g2p{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"}), g2pFromSlice([]string{"8"})}
 	expect = []Trans{
-		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7a", "8"}},
-		Trans{[]string{"1", "2", "3a", "4", "5", "6", "7b", "8"}},
-		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7a", "8"}},
-		Trans{[]string{"1", "2", "3b", "4", "5", "6", "7b", "8"}},
+		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a", "8"}),
+		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b", "8"}),
+		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7a", "8"}),
+		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7b", "8"}),
 	}
 
 	result = rs.expand(input)
 	if !reflect.DeepEqual(expect, result) {
-		t.Errorf("\nExpected %v\nFound    %v", expect, result)
+		t.Errorf("\nExpected %v\nFound    %v", transes2string(expect), transes2string(result))
 	}
 
 }

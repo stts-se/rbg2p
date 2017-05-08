@@ -9,12 +9,27 @@ import (
 
 // Trans is a container for phonemes in a transcription
 type Trans struct {
-	Phonemes []string
+	Phonemes []g2p
+}
+
+type g2p struct {
+	g string
+	p []string
+}
+
+func (t Trans) ListPhonemes() []string {
+	var phns []string
+	for _, g2p := range t.Phonemes {
+		for _, p := range g2p.p {
+			phns = append(phns, p)
+		}
+	}
+	return phns
 }
 
 func (t Trans) String(phnDelimiter string) string {
 	var phns []string
-	for _, p := range t.Phonemes {
+	for _, p := range t.ListPhonemes() {
 		if len(p) > 0 {
 			phns = append(phns, p)
 		}
@@ -180,7 +195,7 @@ func (rs RuleSet) Test() TestResult {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
 		}
 		for _, trans := range res0 {
-			res = append(res, trans.String(rs.PhonemeDelimiter))
+			res = append(res, trans)
 		}
 		if !reflect.DeepEqual(expect, res) {
 			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected %#v, got %#v", input, expect, res))
@@ -189,19 +204,45 @@ func (rs RuleSet) Test() TestResult {
 	return result
 }
 
-func (rs RuleSet) expandLoop(head []string, tail [][]string, acc []Trans) []Trans {
+// func (rs RuleSet) expandLoopOld(head []string, tail [][]string, acc []Trans) []Trans {
+// 	res := []Trans{}
+// 	for i := 0; i < len(acc); i++ {
+// 		for _, add := range head {
+// 			appendRange := []g2p{}
+// 			// build prefix from previous rounds
+// 			for _, s := range acc[i].Phonemes {
+// 				appendRange = append(appendRange, s)
+// 			}
+// 			// append current phonemes
+// 			for _, s := range strings.Split(add, rs.PhonemeDelimiter) {
+// 				appendRange = append(appendRange, s)
+// 			}
+// 			res = append(res, Trans{appendRange})
+// 		}
+
+// 	}
+// 	if len(tail) == 0 {
+// 		return res
+// 	}
+// 	return rs.expandLoopOld(tail[0], tail[1:len(tail)], res)
+// }
+
+// func (rs RuleSet) expandOld(transes [][]string) []Trans {
+// 	return rs.expandLoopOld(transes[0], transes[1:len(transes)], []Trans{Trans{}})
+// }
+
+func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []Trans) []Trans {
 	res := []Trans{}
 	for i := 0; i < len(acc); i++ {
-		for _, add := range head {
-			appendRange := []string{}
+		for _, add := range head.p {
+			appendRange := []g2p{}
 			// build prefix from previous rounds
-			for _, s := range acc[i].Phonemes {
-				appendRange = append(appendRange, s)
+			for _, g2p := range acc[i].Phonemes {
+				appendRange = append(appendRange, g2p)
 			}
 			// append current phonemes
-			for _, s := range strings.Split(add, rs.PhonemeDelimiter) {
-				appendRange = append(appendRange, s)
-			}
+			g2p := g2p{g: head.g, p: strings.Split(add, rs.PhonemeDelimiter)}
+			appendRange = append(appendRange, g2p)
 			res = append(res, Trans{appendRange})
 		}
 
@@ -212,23 +253,23 @@ func (rs RuleSet) expandLoop(head []string, tail [][]string, acc []Trans) []Tran
 	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 }
 
-func (rs RuleSet) expand(transes [][]string) []Trans {
-	return rs.expandLoop(transes[0], transes[1:len(transes)], []Trans{Trans{}})
+func (rs RuleSet) expand(phonemes []g2p) []Trans {
+	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []Trans{Trans{}})
 }
 
-func (rs RuleSet) applyFilters(t Trans) Trans {
+func (rs RuleSet) applyFilters(t Trans) string {
 	res := t.String(rs.PhonemeDelimiter)
 	for _, f := range rs.Filters {
 		res = f.Apply(res)
 	}
-	return Trans{strings.Split(res, rs.PhonemeDelimiter)}
+	return res
 }
 
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
-func (rs RuleSet) Apply(s string) ([]Trans, error) {
+func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
 	var s0 = []rune(s)
-	res := [][]string{}
+	res := []g2p{}
 	var couldntMap = []string{}
 	for i < len(s0) {
 		ss := string(s0[i:len(s0)])
@@ -242,30 +283,30 @@ func (rs RuleSet) Apply(s string) ([]Trans, error) {
 				right := string(s0[i+ruleInputLen : len(s0)])
 				if rule.RightContext.Matches(right) {
 					i = i + ruleInputLen
-					res = append(res, rule.Output)
+					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
 					break
 				}
 			}
 		}
 		if !matchFound {
-			res = append(res, []string{rs.DefaultPhoneme})
+			res = append(res, g2p{g: thisChar, p: []string{rs.DefaultPhoneme}})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}
-	}
-	if len(couldntMap) > 0 {
-		return rs.expand(res), fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
 	expanded := rs.expand(res)
 	//test := expandTest(res)
 	//fmt.Printf("res=%#v\n", res)
 	//fmt.Printf("test=%#v\n", test)
 	//fmt.Printf("expanded=%#v\n", expanded)
-	var filtered []Trans
+	var filtered []string
 	for _, t := range expanded {
 		fted := rs.applyFilters(t)
 		filtered = append(filtered, fted)
+	}
+	if len(couldntMap) > 0 {
+		return filtered, fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
 	return filtered, nil
 }

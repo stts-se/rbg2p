@@ -59,7 +59,7 @@ func transcribe(lang string, word string) (Word, int, error) {
 	}
 	tRes := []string{}
 	for _, trans := range transes {
-		tRes = append(tRes, trans.String(ruleSet.PhonemeDelimiter))
+		tRes = append(tRes, trans)
 	}
 	res := Word{word, tRes}
 	return res, http.StatusOK, nil

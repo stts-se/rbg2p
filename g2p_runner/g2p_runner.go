@@ -13,12 +13,8 @@ import (
 
 var l = log.New(os.Stderr, "", 0)
 
-func print(orth string, transes []rbg2p.Trans, phnDelim string) {
-	ts := []string{}
-	for _, t := range transes {
-		ts = append(ts, t.String(phnDelim))
-	}
-	fmt.Printf("%s\t%s\n", orth, strings.Join(ts, "\t"))
+func print(orth string, transes []string) {
+	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "\t"))
 }
 
 func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
@@ -26,11 +22,11 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
 		if force {
-			print(orth, transes, ruleSet.PhonemeDelimiter)
+			print(orth, transes)
 		}
 		return false
 	}
-	print(orth, transes, ruleSet.PhonemeDelimiter)
+	print(orth, transes)
 	return true
 }
 
