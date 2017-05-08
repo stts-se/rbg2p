@@ -116,7 +116,7 @@ type XMLWord struct {
 	Trans   string   `xml:"trans"`
 }
 
-func transcribe_OnlyFirstTrans_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
+func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	lang := vars["lang"]
 	if "" == lang {
@@ -251,7 +251,7 @@ func main() {
 
 	// get one trans only
 	s = r.PathPrefix("/rbg2p/onetrans").Subrouter()
-	s.HandleFunc("/{lang}/{word}", transcribe_OnlyFirstTrans_AsXml_Handler)
+	s.HandleFunc("/{lang}/{word}", transcribe_AsXml_Handler)
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
