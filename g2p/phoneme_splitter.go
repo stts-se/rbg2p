@@ -1,11 +1,9 @@
-package rbg2p
+package g2p
 
 import (
 	"sort"
 	"strings"
 )
-
-// package internal util for splitting transcriptions where there is no explicit phoneme delimiter
 
 // Sort slice of strings according to len, longest string first
 type byLength []string
@@ -20,7 +18,8 @@ func (s byLength) Less(i, j int) bool {
 	return len(s[i]) > len(s[j])
 }
 
-func SplitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string, error error) {
+// splitIntoPhonemes is a package internal util for splitting transcriptions where there is no explicit phoneme delimiter
+func splitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string, error error) {
 
 	var known []string
 	// start by discarding any phoneme strings not substrings of transcription

@@ -66,12 +66,17 @@ type MOPSyllDef struct {
 	SyllDelim string
 }
 
+// PhonemeDelimiter is the string used to separate phonemes (required by interface)
 func (def MOPSyllDef) PhonemeDelimiter() string {
 	return def.PhnDelim
 }
+
+// SyllableDelimiter is the string used to separate syllables (required by interface)
 func (def MOPSyllDef) SyllableDelimiter() string {
 	return def.SyllDelim
 }
+
+// IsDefined is used to determine if there is a syllabifier defined or not (required by interface)
 func (def MOPSyllDef) IsDefined() bool {
 	return len(def.Onsets) > 0
 }
@@ -85,9 +90,10 @@ func (def MOPSyllDef) isSyllabic(phoneme string) bool {
 	return false
 }
 
-func (dec MOPSyllDef) ContainsSyllabic(phonemes []string) bool {
+// ContainsSyllabic tells if the input phoneme slice contains any syllabic phonemes (required by interface)
+func (def MOPSyllDef) ContainsSyllabic(phonemes []string) bool {
 	for _, p := range phonemes {
-		if dec.isSyllabic(p) {
+		if def.isSyllabic(p) {
 			return true
 		}
 	}
@@ -131,7 +137,7 @@ type Syllabifier struct {
 	SyllDef SyllDef
 }
 
-// Syllabify is used to divide a transcription into syllables
+// IsDefined is used to determine if there is a syllabifier defined or not
 func (s Syllabifier) IsDefined() bool {
 	return s.SyllDef.IsDefined()
 }

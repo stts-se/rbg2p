@@ -6,8 +6,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/stts-se/rbg2p"
 )
 
 // PhonemeSet is a package internal container for the phoneme set definition
@@ -79,7 +77,7 @@ func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 		return []string{}, nil
 	}
 	if ss.DelimiterRe.MatchString("") {
-		splitted, unknown, err := rbg2p.SplitIntoPhonemes(ss.Symbols, trans)
+		splitted, unknown, err := splitIntoPhonemes(ss.Symbols, trans)
 		if err != nil {
 			return []string{}, err
 		}

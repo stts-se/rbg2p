@@ -298,7 +298,7 @@ func g2pTransFromSlice(trans []string) rbg2p.Trans {
 		res = append(res, rbg2p.G2P{G: "", P: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
 
 	}
-	return rbg2p.Trans{res}
+	return rbg2p.Trans{Phonemes: res}
 }
 
 // to make it easier to compare results from unit tests

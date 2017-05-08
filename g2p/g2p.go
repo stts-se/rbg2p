@@ -191,7 +191,7 @@ func (rs RuleSet) expandLoop(head rbg2p.G2P, tail []rbg2p.G2P, acc []rbg2p.Trans
 			// append current phonemes
 			g2p := rbg2p.G2P{G: head.G, P: strings.Split(add, rs.PhonemeDelimiter)}
 			appendRange = append(appendRange, g2p)
-			res = append(res, rbg2p.Trans{appendRange})
+			res = append(res, rbg2p.Trans{Phonemes: appendRange})
 		}
 
 	}
