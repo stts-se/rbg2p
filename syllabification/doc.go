@@ -1,9 +1,6 @@
 /*Package syllabification contains utilities for syllabification
 
-*** WORK IN PROGRESS ***
+WORK IN PROGRESS
 
-
-
-
- */
+*/
 package syllabification
