@@ -256,6 +256,8 @@ func main() {
 	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
 	s.HandleFunc("/list", list_Handler)                           //.Methods("get", "post")
 
+	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler) //.Methods("get", "post")
+
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
 	err = http.ListenAndServe(port, r)
