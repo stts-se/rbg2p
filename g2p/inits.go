@@ -168,13 +168,18 @@ func newVar(s string) (string, string, error) {
 	return name, value, nil
 }
 
-var syllDefRe = regexp.MustCompile("^SYLLDEF +(TYPE|ONSETS|SYLLABIC|DELIMITER) +\"(.+)\"$")
+var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER) +\"(.+)\"$")
+var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
 
 func parseMOPSyllDef(s string, syllDef *syllabification.MOPSyllDef) error {
-	// SYLLDEF (TYPE|ONSETS|SYLLABIC|DELIMITER) "VALUE"
+	// SYLLDEF (ONSETS|SYLLABIC|DELIMITER) "VALUE"
+	// SYLLDEF TYPE VALUE
 	matchRes := syllDefRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return fmt.Errorf("invalid sylldef definition: " + s)
+		matchRes = syllDefTypeRe.FindStringSubmatch(s)
+		if matchRes == nil {
+			return fmt.Errorf("invalid sylldef definition: " + s)
+		}
 	}
 	name := matchRes[1]
 	value := strings.Replace(strings.TrimSpace(matchRes[2]), "\\\"", "\"", -1)

@@ -1,7 +1,7 @@
 // Specs
 
 CHARACTER_SET "abcçdefghijklmnñopqrstuvwxyz"
-PHONEME_SET "a b s d ð e f ɡ ɣ h i i̭ j x ʝ ɟ k l ʎ m n ɲ o p r ɾ s̺ t u u̯ β ʃ s̻ t͡s̺ c ʧ͡ t͡s̻ dʒ ∅"
+PHONEME_SET "a b s d ð e f ɡ ɣ h i i̭ j x ʝ ɟ k l ʎ m n ɲ o p r ɾ s̺ t u u̯ β ʃ s̻ t͡s̺ c ʧ͡ t͡s̻ dʒ"
 PHONEME_DELIMITER " "
 DEFAULT_PHONEME "_"
 
@@ -102,7 +102,7 @@ TEST agur -> (a ɡ u r, a ɣ u r)
 TEST aio -> a i̭ o
 TEST dakit -> d a k i t
 TEST euskaraz -> e u̯ s̺ k a ɾ a s̻
-TEST hitz -> (∅ i t͡s̻, h i t͡s̻)
+TEST hitz -> (i t͡s̻, h i t͡s̻)
 TEST egitea -> (e ɡ i c e a, e ɣ i c e a)
 TEST ingelesez -> i n ɡ e l e s̺ e s̻
 TEST egiten -> (e ɡ i c e n, e ɣ i c e n)
