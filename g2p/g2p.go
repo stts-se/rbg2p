@@ -1,49 +1,14 @@
-package rbg2p
+package g2p
 
 import (
 	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/syllabification"
 )
-
-// Trans is a container for phonemes in a transcription
-type Trans struct {
-	Phonemes []G2P
-}
-
-/*G2P is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Primarily package internal use. Examples (IPA symbols):
-  x -> k, s
-  sch -> ʃ
-  ff -> f
-  au -> a‿u
-  rt -> ʈ
-**/
-type G2P struct {
-	G string
-	P []string
-}
-
-//ListPhonemes returns a slice of phonemes as strings
-func (t Trans) ListPhonemes() []string {
-	var phns []string
-	for _, g2p := range t.Phonemes {
-		for _, p := range g2p.P {
-			phns = append(phns, p)
-		}
-	}
-	return phns
-}
-
-func (t Trans) String(phnDelimiter string) string {
-	var phns []string
-	for _, p := range t.ListPhonemes() {
-		if len(p) > 0 {
-			phns = append(phns, p)
-		}
-	}
-	return strings.Join(phns, phnDelimiter)
-}
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
@@ -132,14 +97,16 @@ func (t1 Test) equals(t2 Test) bool {
 
 // RuleSet is a set of g2p rules, with variables and built-in tests
 type RuleSet struct {
-	CharacterSet     []string
-	PhonemeSet       PhonemeSet
-	PhonemeDelimiter string
-	DefaultPhoneme   string
-	Vars             map[string]string
-	Rules            []Rule
-	Tests            []Test
-	Filters          []Filter
+	CharacterSet      []string
+	PhonemeSet        PhonemeSet
+	PhonemeDelimiter  string
+	SyllableDelimiter string
+	DefaultPhoneme    string
+	Vars              map[string]string
+	Rules             []Rule
+	Tests             []Test
+	Filters           []Filter
+	Syllabifier       syllabification.Syllabifier
 }
 
 // TestResult is a container for test results (errors, warnings, and failed tests from tests speficied in the g2p rule file)
@@ -212,19 +179,19 @@ func (rs RuleSet) Test() TestResult {
 	return result
 }
 
-func (rs RuleSet) expandLoop(head G2P, tail []G2P, acc []Trans) []Trans {
-	res := []Trans{}
+func (rs RuleSet) expandLoop(head rbg2p.G2P, tail []rbg2p.G2P, acc []rbg2p.Trans) []rbg2p.Trans {
+	res := []rbg2p.Trans{}
 	for i := 0; i < len(acc); i++ {
 		for _, add := range head.P {
-			appendRange := []G2P{}
+			appendRange := []rbg2p.G2P{}
 			// build prefix from previous rounds
 			for _, g2p := range acc[i].Phonemes {
 				appendRange = append(appendRange, g2p)
 			}
 			// append current phonemes
-			g2p := G2P{G: head.G, P: strings.Split(add, rs.PhonemeDelimiter)}
+			g2p := rbg2p.G2P{G: head.G, P: strings.Split(add, rs.PhonemeDelimiter)}
 			appendRange = append(appendRange, g2p)
-			res = append(res, Trans{appendRange})
+			res = append(res, rbg2p.Trans{appendRange})
 		}
 
 	}
@@ -234,12 +201,12 @@ func (rs RuleSet) expandLoop(head G2P, tail []G2P, acc []Trans) []Trans {
 	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 }
 
-func (rs RuleSet) expand(phonemes []G2P) []Trans {
-	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []Trans{Trans{}})
+func (rs RuleSet) expand(phonemes []rbg2p.G2P) []rbg2p.Trans {
+	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []rbg2p.Trans{rbg2p.Trans{}})
 }
 
-func (rs RuleSet) applyFilters(t Trans) string {
-	res := t.String(rs.PhonemeDelimiter)
+func (rs RuleSet) applyFilters(trans string) string {
+	res := trans
 	for _, f := range rs.Filters {
 		res = f.Apply(res)
 	}
@@ -250,7 +217,7 @@ func (rs RuleSet) applyFilters(t Trans) string {
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
 	var s0 = []rune(s)
-	res := []G2P{}
+	res := []rbg2p.G2P{}
 	var couldntMap = []string{}
 	for i < len(s0) {
 		ss := string(s0[i:len(s0)])
@@ -264,21 +231,31 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 				right := string(s0[i+ruleInputLen : len(s0)])
 				if rule.RightContext.Matches(right) {
 					i = i + ruleInputLen
-					res = append(res, G2P{G: rule.Input, P: rule.Output})
+					res = append(res, rbg2p.G2P{G: rule.Input, P: rule.Output})
 					matchFound = true
 					break
 				}
 			}
 		}
 		if !matchFound {
-			res = append(res, G2P{G: thisChar, P: []string{rs.DefaultPhoneme}})
+			res = append(res, rbg2p.G2P{G: thisChar, P: []string{rs.DefaultPhoneme}})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}
 	}
 	expanded := rs.expand(res)
-	var filtered []string
+
+	transes := []string{}
 	for _, t := range expanded {
+		if rs.Syllabifier.IsDefined() {
+			s := rs.Syllabifier.Syllabify(t)
+			transes = append(transes, s.String(rs.PhonemeDelimiter, rs.SyllableDelimiter))
+		} else {
+			transes = append(transes, t.String(rs.PhonemeDelimiter))
+		}
+	}
+	var filtered []string
+	for _, t := range transes {
 		fted := rs.applyFilters(t)
 		filtered = append(filtered, fted)
 	}

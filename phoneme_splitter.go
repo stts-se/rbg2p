@@ -20,7 +20,7 @@ func (s byLength) Less(i, j int) bool {
 	return len(s[i]) > len(s[j])
 }
 
-func splitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string, error error) {
+func SplitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes []string, unknown []string, error error) {
 
 	var known []string
 	// start by discarding any phoneme strings not substrings of transcription

@@ -18,7 +18,7 @@ func testMOPValidSplit(t *testing.T, syller Syllabifier, left string, right stri
 
 func TestMOPValidSplit(t *testing.T) {
 	def := MOPSyllDef{
-		onsets: []string{
+		Onsets: []string{
 			"p",
 			"t",
 			"k",
@@ -26,8 +26,9 @@ func TestMOPValidSplit(t *testing.T) {
 			"p r",
 			"p r O",
 		},
-		phonemeDelimiter: " ",
-		syllabic:         []string{"O"},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"O"},
 	}
 	syller := Syllabifier{def}
 
@@ -39,6 +40,32 @@ func TestMOPValidSplit(t *testing.T) {
 
 	testMOPValidSplit(t, syller, "k", "p r O", true)
 	testMOPValidSplit(t, syller, "k", "p r A", false) // since /A/ is not defined as syllabic here
+}
+
+func testMOPValidOnset(t *testing.T, def MOPSyllDef, onset string, expect bool) {
+	var fsExpGot = "/%s/. Expected: %v got: %v"
+	res := def.validOnset(onset)
+	if res != expect {
+		t.Errorf(fsExpGot, onset, expect, res)
+	}
+}
+
+func TestMOPValidOnset(t *testing.T) {
+	def := MOPSyllDef{
+		Onsets: []string{
+			"p",
+			"t",
+			"k",
+			"r",
+			"p r",
+			"p r O",
+		},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"O"},
+	}
+	testMOPValidOnset(t, def, "p r", true)
+	testMOPValidOnset(t, def, "", true)
 }
 
 func TestSylledTransString(t *testing.T) {
@@ -102,7 +129,7 @@ func testSyllabify(t *testing.T, syller Syllabifier, input string, expect string
 
 func TestSyllabify1(t *testing.T) {
 	def := MOPSyllDef{
-		onsets: []string{
+		Onsets: []string{
 			"p",
 			"t",
 			"k",
@@ -110,8 +137,9 @@ func TestSyllabify1(t *testing.T) {
 			"p r",
 			"p r O",
 		},
-		phonemeDelimiter: " ",
-		syllabic:         []string{"O", "e", "a"},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"O", "e", "a"},
 	}
 	syller := Syllabifier{def}
 
@@ -123,14 +151,15 @@ func TestSyllabify2(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	def := MOPSyllDef{
-		onsets: []string{
+		Onsets: []string{
 			"p",
 			"t",
 			"k",
 			"s",
 		},
-		phonemeDelimiter: " ",
-		syllabic:         []string{"O", "e", "a", "@"},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"O", "e", "a", "@", "u0"},
 	}
 	syller := Syllabifier{def}
 
@@ -170,19 +199,39 @@ func TestSyllabify2(t *testing.T) {
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
 	}
+
+	//
+	inputT = rbg2p.Trans{
+		Phonemes: []rbg2p.G2P{
+			rbg2p.G2P{G: "t", P: []string{"t"}},
+			rbg2p.G2P{G: "u", P: []string{"u0"}},
+			rbg2p.G2P{G: "ng", P: []string{"N"}},
+			rbg2p.G2P{G: "a", P: []string{"a"}},
+			rbg2p.G2P{G: "n", P: []string{"n"}},
+		},
+	}
+
+	inputS = inputT.String(" ")
+	res0 = syller.Syllabify(inputT)
+	res = res0.String(" ", ".")
+	expect = "t u0 N . a n"
+	if res != expect {
+		t.Errorf(fsExpGot, inputS, expect, res)
+	}
 }
 
 func TestSyllabify3(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	def := MOPSyllDef{
-		onsets: []string{
+		Onsets: []string{
 			"b",
 			"d",
 			"t r",
 		},
-		phonemeDelimiter: " ",
-		syllabic:         []string{"a", "@", "{:"},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"a", "@", "{:"},
 	}
 	syller := Syllabifier{def}
 
@@ -205,6 +254,39 @@ func TestSyllabify3(t *testing.T) {
 	res0 := syller.Syllabify(inputT)
 	res := res0.String(" ", ".")
 	expect := "b a rr . t r {: . d @ n"
+	if res != expect {
+		t.Errorf(fsExpGot, inputS, expect, res)
+	}
+}
+
+func TestSyllabify4(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	def := MOPSyllDef{
+		Onsets:    strings.Split("p b t rt m n d rd k g N rn f v C rs r l s x S h rl j", " "),
+		Syllabic:  strings.Split("i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu", " "),
+		PhnDelim:  " ",
+		SyllDelim: ".",
+	}
+	syller := Syllabifier{def}
+
+	//
+	inputT := rbg2p.Trans{
+		Phonemes: []rbg2p.G2P{
+			rbg2p.G2P{G: "b", P: []string{"b"}},
+			rbg2p.G2P{G: "o", P: []string{"O"}},
+			rbg2p.G2P{G: "rt", P: []string{"rt"}},
+			rbg2p.G2P{G: "a", P: []string{"a"}},
+			rbg2p.G2P{G: "d", P: []string{"d"}},
+			rbg2p.G2P{G: "u", P: []string{"u0"}},
+			rbg2p.G2P{G: "sch", P: []string{"S"}},
+		},
+	}
+
+	inputS := inputT.String(" ")
+	res0 := syller.Syllabify(inputT)
+	res := res0.String(" ", ".")
+	expect := "b O . rt a . d u0 S"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
 	}

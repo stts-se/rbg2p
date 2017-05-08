@@ -1,4 +1,4 @@
-package rbg2p
+package g2p
 
 import (
 	"bufio"
@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/stts-se/rbg2p/syllabification"
 )
 
 var commentAtEndRe = regexp.MustCompile("^(.*[^/]+)//+.*$")
@@ -26,6 +28,10 @@ func isTest(s string) bool {
 	return strings.HasPrefix(s, "TEST ")
 }
 
+func isSyllDef(s string) bool {
+	return strings.HasPrefix(s, "SYLLDEF ")
+}
+
 func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
 }
@@ -39,6 +45,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	ruleSet := RuleSet{Vars: map[string]string{}}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
+	syllDef := syllabification.MOPSyllDef{} // TODO: Handle other sylldefs too?
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -65,6 +72,11 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, err
 			}
 			ruleSet.Vars[name] = value
+		} else if isSyllDef(l) {
+			err := parseMOPSyllDef(l, &syllDef)
+			if err != nil {
+				return ruleSet, err
+			}
 		} else if isFilter(l) {
 			t, err := newFilter(l)
 			if err != nil {
@@ -82,6 +94,9 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 
 	}
+	syllDef.PhnDelim = ruleSet.PhonemeDelimiter
+	ruleSet.SyllableDelimiter = syllDef.SyllDelim
+	ruleSet.Syllabifier = syllabification.Syllabifier{SyllDef: syllDef}
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
 		if err != nil {
@@ -151,6 +166,36 @@ func newVar(s string) (string, string, error) {
 		return "", "", fmt.Errorf("invalid var in input (regular expression failed) for /%s/: %s", s, err)
 	}
 	return name, value, nil
+}
+
+var syllDefRe = regexp.MustCompile("^SYLLDEF +(TYPE|ONSETS|SYLLABIC|DELIMITER) +\"(.+)\"$")
+
+func parseMOPSyllDef(s string, syllDef *syllabification.MOPSyllDef) error {
+	// SYLLDEF (TYPE|ONSETS|SYLLABIC|DELIMITER) "VALUE"
+	matchRes := syllDefRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		return fmt.Errorf("invalid sylldef definition: " + s)
+	}
+	name := matchRes[1]
+	value := strings.Replace(matchRes[2], "\\\"", "\"", -1)
+	_, err := regexp.Compile(value)
+	if err != nil {
+		return fmt.Errorf("invalid sylldef input (regular expression failed) for /%s/: %s", s, err)
+	}
+	if name == "TYPE" {
+		if value != "MOP" {
+			return fmt.Errorf("invalid sylldef type %s", value)
+		}
+	} else if name == "ONSETS" {
+		syllDef.Onsets = commaSplit.Split(value, -1)
+	} else if name == "SYLLABIC" {
+		syllDef.Syllabic = multiSpace.Split(value, -1)
+	} else if name == "DELIMITER" {
+		syllDef.SyllDelim = value
+	} else {
+		return fmt.Errorf("invalid sylldef variable : %s", s)
+	}
+	return nil
 }
 
 var testReSimple = regexp.MustCompile("^TEST +([^ ]+) +-> +([^,()]+)$")

@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/g2p"
 )
 
 var l = log.New(os.Stderr, "", 0)
@@ -17,7 +17,7 @@ func print(orth string, transes []string) {
 	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "\t"))
 }
 
-func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
+func transcribe(ruleSet g2p.RuleSet, orth string, force bool) bool {
 	transes, err := ruleSet.Apply(orth)
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
@@ -70,14 +70,14 @@ FLAGS:
 	}
 
 	g2pFile := args[0]
-	ruleSet, err := rbg2p.LoadFile(g2pFile)
+	ruleSet, err := g2p.LoadFile(g2pFile)
 	if err != nil {
 		l.Printf("couldn't load file %s : %s", g2pFile, err)
 		os.Exit(1)
 	}
 
 	if *ssFile != "" {
-		phonemeSet, err := rbg2p.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
+		phonemeSet, err := g2p.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
 		if err != nil {
 			l.Printf("couldn't load symbol set : %s", err)
 			os.Exit(1)

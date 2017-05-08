@@ -1,4 +1,4 @@
-package rbg2p
+package g2p
 
 import (
 	"bufio"
@@ -6,10 +6,9 @@ import (
 	"os"
 	"regexp"
 	"strings"
-)
 
-type xyz struct {
-}
+	"github.com/stts-se/rbg2p"
+)
 
 // PhonemeSet is a package internal container for the phoneme set definition
 type PhonemeSet struct {
@@ -80,7 +79,7 @@ func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 		return []string{}, nil
 	}
 	if ss.DelimiterRe.MatchString("") {
-		splitted, unknown, err := splitIntoPhonemes(ss.Symbols, trans)
+		splitted, unknown, err := rbg2p.SplitIntoPhonemes(ss.Symbols, trans)
 		if err != nil {
 			return []string{}, err
 		}

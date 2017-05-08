@@ -50,17 +50,32 @@ func (t SylledTrans) ListPhonemes() []string {
 // SyllDef is an interface for implementing custom made syllabification strategies
 type SyllDef interface {
 	ValidSplit(left []string, right []string) bool
+	ContainsSyllabic(phonemes []string) bool
+	IsDefined() bool
+	PhonemeDelimiter() string
+	SyllableDelimiter() string
 }
 
 // MOPSyllDef is a Maximum Onset Principle implementation of the SyllDef interface
 type MOPSyllDef struct {
-	onsets           []string
-	syllabic         []string
-	phonemeDelimiter string
+	Onsets    []string
+	Syllabic  []string
+	PhnDelim  string
+	SyllDelim string
+}
+
+func (def MOPSyllDef) PhonemeDelimiter() string {
+	return def.PhnDelim
+}
+func (def MOPSyllDef) SyllableDelimiter() string {
+	return def.SyllDelim
+}
+func (def MOPSyllDef) IsDefined() bool {
+	return len(def.Onsets) > 0
 }
 
 func (def MOPSyllDef) isSyllabic(phoneme string) bool {
-	for _, s := range def.syllabic {
+	for _, s := range def.Syllabic {
 		if s == phoneme {
 			return true
 		}
@@ -68,8 +83,21 @@ func (def MOPSyllDef) isSyllabic(phoneme string) bool {
 	return false
 }
 
+func (dec MOPSyllDef) ContainsSyllabic(phonemes []string) bool {
+	for _, p := range phonemes {
+		if dec.isSyllabic(p) {
+			return true
+		}
+	}
+	return false
+
+}
+
 func (def MOPSyllDef) validOnset(onset string) bool {
-	for _, s := range def.onsets {
+	if len(onset) == 0 {
+		return true
+	}
+	for _, s := range def.Onsets {
 		if s == onset {
 			return true
 		}
@@ -83,13 +111,13 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 	for i := 0; i < len(right) && !def.isSyllabic(right[i]); i++ {
 		onset = append(onset, right[i])
 	}
-	if !def.validOnset(strings.Join(onset, def.phonemeDelimiter)) {
+	if !def.validOnset(strings.Join(onset, def.PhonemeDelimiter())) {
 		return false
 	}
 	test := onset
 	for i := len(left) - 1; i >= 0 && !def.isSyllabic(left[i]); i-- {
 		test = append([]string{left[i]}, test...)
-		if def.validOnset(strings.Join(test, def.phonemeDelimiter)) {
+		if def.validOnset(strings.Join(test, def.PhonemeDelimiter())) {
 			return false
 		}
 	}
@@ -102,17 +130,22 @@ type Syllabifier struct {
 }
 
 // Syllabify is used to divide a transcription into syllables
+func (s Syllabifier) IsDefined() bool {
+	return s.SyllDef.IsDefined()
+}
+
+// Syllabify is used to divide a transcription into syllables
 func (s Syllabifier) Syllabify(t rbg2p.Trans) SylledTrans {
 	res := SylledTrans{Trans: t}
 	left := []string{}
 	right := t.ListPhonemes()
 	for gi, g2p := range t.Phonemes {
 		for pi, p := range g2p.P {
-			//fmt.Printf("%s %s %v\n", left, right, s.SyllDef.ValidSplit(left, right))
-			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) {
+			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
 				index := Boundary{G: gi, P: pi}
 				res.Boundaries = append(res.Boundaries, index)
 			}
+			//fmt.Printf("Syllabify.debug\t%s %s %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), res.Boundaries)
 			left = append(left, p)
 			right = right[1:len(right)]
 		}

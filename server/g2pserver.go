@@ -15,16 +15,16 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
-	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/g2p"
 )
 
 type g2pMutex struct {
-	g2ps  map[string]rbg2p.RuleSet
+	g2ps  map[string]g2p.RuleSet
 	mutex *sync.RWMutex
 }
 
-var g2p = g2pMutex{
-	g2ps:  make(map[string]rbg2p.RuleSet),
+var g2pM = g2pMutex{
+	g2ps:  make(map[string]g2p.RuleSet),
 	mutex: &sync.RWMutex{},
 }
 
@@ -42,9 +42,9 @@ type Word struct {
 }
 
 func transcribe(lang string, word string) (Word, int, error) {
-	g2p.mutex.RLock()
-	defer g2p.mutex.RUnlock()
-	ruleSet, ok := g2p.g2ps[lang]
+	g2pM.mutex.RLock()
+	defer g2pM.mutex.RUnlock()
+	ruleSet, ok := g2pM.g2ps[lang]
 	if !ok {
 		msg := "unknown 'lang': " + lang
 		langs := listLanguages()
@@ -174,16 +174,16 @@ func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 
 func listLanguages() []string {
 	var res []string
-	for name := range g2p.g2ps {
+	for name := range g2pM.g2ps {
 		res = append(res, name)
 	}
 	return res
 }
 
 func list_Handler(w http.ResponseWriter, r *http.Request) {
-	g2p.mutex.RLock()
+	g2pM.mutex.RLock()
 	res := listLanguages()
-	g2p.mutex.RUnlock()
+	g2pM.mutex.RUnlock()
 
 	sort.Strings(res)
 	j, err := json.Marshal(res)
@@ -232,7 +232,7 @@ func main() {
 			continue
 		}
 
-		ruleSet, err := rbg2p.LoadFile(fn)
+		ruleSet, err := g2p.LoadFile(fn)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			fmt.Fprintf(os.Stderr, "g2pserver: skipping file: '%s'\n", fn)
@@ -240,9 +240,9 @@ func main() {
 		}
 
 		lang := langFromFilePath(fn)
-		g2p.mutex.Lock()
-		g2p.g2ps[lang] = ruleSet
-		g2p.mutex.Unlock()
+		g2pM.mutex.Lock()
+		g2pM.g2ps[lang] = ruleSet
+		g2pM.mutex.Unlock()
 		fmt.Fprintf(os.Stderr, "g2pserver: loaded file '%s'\n", fn)
 	}
 

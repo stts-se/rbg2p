@@ -6,6 +6,7 @@ Each g2p rule set is defined in a .g2p file with the following content:
       - used to define constant variables such as character set and phoneme delimiter
     * variables
       - any variables for use in the context of the actual rules
+    * sylldef - definitions for dividing transcriptions into syllables
     * rules - g2p rules
     * filters - transcription filters applied after the rules
     * tests - input/output tests
@@ -42,6 +43,30 @@ Examples:
      VAR VOWEL [aeyuio]
      VAR AFFRICATE (tS|dZ)
      VAR VOICELESS [ptksf]
+
+
+SYLLDEF
+
+An set of variables prefixed by SYLLDEF, used for syllabification (not required).
+     SYLLDEF <NAME> "<VALUE>"
+
+Currently, only maximum onset (MOP) syllabification can be used.
+Variables currently available:
+
+     TYPE    (default: MOP)
+      - currently, the only value allowed here is MOP
+     ONSETS
+      - a comma separated list of valid syllable onsets (typically consonant clusters)
+     SYLLABIC
+      - a space separated list of syllabic phonemes (typically vowels)
+     DELIMITER
+      - syllable delimiter symbol
+
+Examples:
+     SYLLDEF TYPE "MOP"
+     SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j"
+     SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"
+     SYLLDEF DELIMITER "."
 
 
 RULES
