@@ -8,13 +8,10 @@ type sBound struct {
 	p int
 }
 
+// SylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
 type SylledTrans struct {
 	Trans      Trans
 	boundaries []sBound
-}
-
-func (t SylledTrans) Phonemes() []g2p {
-	return t.Trans.Phonemes
 }
 
 func (t SylledTrans) isBoundary(b sBound) bool {
@@ -26,9 +23,10 @@ func (t SylledTrans) isBoundary(b sBound) bool {
 	return false
 }
 
+// String returns a string representation of the SylledTrans, given the specified delimiters for phonemes and syllables
 func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	res := []string{}
-	for gi, g2p := range t.Phonemes() {
+	for gi, g2p := range t.Trans.Phonemes {
 		for pi, p := range g2p.p {
 			index := sBound{g: gi, p: pi}
 			if t.isBoundary(index) {
@@ -40,14 +38,17 @@ func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	return strings.Join(res, phnDelimiter)
 }
 
+//ListPhonemes returns a slice of phonemes as strings
 func (t SylledTrans) ListPhonemes() []string {
 	return t.Trans.ListPhonemes()
 }
 
+// SyllDef is an interface for implementing custom made syllabification strategies
 type SyllDef interface {
 	validSplit(left []string, right []string) bool
 }
 
+// MOPSyllDef is a Maximum Onset Principle implementation of the SyllDef interface
 type MOPSyllDef struct {
 	onsets           []string
 	syllabic         []string
@@ -90,10 +91,12 @@ func (def MOPSyllDef) validSplit(left []string, right []string) bool {
 	return true
 }
 
+// Syllabifier is a module to divide a transcription into syllables
 type Syllabifier struct {
 	SyllDef SyllDef
 }
 
+// Syllabify is used to divide a transcription into syllables
 func (s Syllabifier) Syllabify(t Trans) SylledTrans {
 	res := SylledTrans{Trans: t}
 	left := []string{}

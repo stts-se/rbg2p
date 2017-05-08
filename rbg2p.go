@@ -17,6 +17,7 @@ type g2p struct {
 	p []string
 }
 
+//ListPhonemes returns a slice of phonemes as strings
 func (t Trans) ListPhonemes() []string {
 	var phns []string
 	for _, g2p := range t.Phonemes {
