@@ -254,9 +254,10 @@ func main() {
 	s := r.PathPrefix("/rbg2p").Subrouter()
 
 	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
-	s.HandleFunc("/list", list_Handler)                           //.Methods("get", "post")
+	s.HandleFunc("/list", list_Handler)                           //.Methods("get")
 
-	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler) //.Methods("get", "post")
+	// for legacy calls from ltool/yalt
+	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
