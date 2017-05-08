@@ -6,7 +6,7 @@ import (
 	"github.com/stts-se/rbg2p"
 )
 
-// Boundary represent syllable boundaries
+// Boundary represents syllable boundaries. Primarily for package internal use.
 type Boundary struct {
 	G int
 	P int
