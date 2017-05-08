@@ -249,8 +249,7 @@ func main() {
 	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
 	s.HandleFunc("/list", list_Handler) //.Methods("get", "post")
 
-	// get one trans only
-	s = r.PathPrefix("/rbg2p/onetrans").Subrouter()
+	s = r.PathPrefix("/rbg2p/xmltranscribe").Subrouter()
 	s.HandleFunc("/{lang}/{word}", transcribe_AsXml_Handler)
 
 	port := ":6771"
