@@ -83,10 +83,10 @@ rr -> r
 x -> k s
 
 stj -> x
-tj -> C
 k -> C / _ PALAT
-g -> g
+tj -> C
 g -> j / _ PALAT
+g -> g
 ps -> s / # _
 
 m -> m
@@ -133,3 +133,7 @@ TEST filifjonka -> f " I . l I . f j O N . k a
 TEST unga -> " u0 N . a
 TEST 'unga -> " u0 N . a
 TEST a'a -> " a . a
+TEST get -> j " e: t
+TEST gäst -> j " E s t
+TEST gap -> g " A: p
+TEST där -> d " {: r
