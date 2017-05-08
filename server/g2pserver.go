@@ -236,7 +236,7 @@ func main() {
 		g2p.mutex.Lock()
 		g2p.g2ps[lang] = ruleSet
 		g2p.mutex.Unlock()
-		fmt.Fprintf(os.Stderr, "g2p server: loaded file '%s'\n", fn)
+		fmt.Fprintf(os.Stderr, "g2pserver: loaded file '%s'\n", fn)
 	}
 
 	r := mux.NewRouter().StrictSlash(true)
