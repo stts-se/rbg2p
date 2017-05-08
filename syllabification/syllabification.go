@@ -49,7 +49,7 @@ func (t SylledTrans) ListPhonemes() []string {
 
 // SyllDef is an interface for implementing custom made syllabification strategies
 type SyllDef interface {
-	validSplit(left []string, right []string) bool
+	ValidSplit(left []string, right []string) bool
 }
 
 // MOPSyllDef is a Maximum Onset Principle implementation of the SyllDef interface
@@ -77,7 +77,8 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 	return false
 }
 
-func (def MOPSyllDef) validSplit(left []string, right []string) bool {
+// ValidSplit is called by Syllabifier.Syllabify to test where to put the boundaries
+func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 	onset := []string{}
 	for i := 0; i < len(right) && !def.isSyllabic(right[i]); i++ {
 		onset = append(onset, right[i])
@@ -107,8 +108,8 @@ func (s Syllabifier) Syllabify(t rbg2p.Trans) SylledTrans {
 	right := t.ListPhonemes()
 	for gi, g2p := range t.Phonemes {
 		for pi, p := range g2p.P {
-			//fmt.Printf("%s %s %v\n", left, right, s.SyllDef.validSplit(left, right))
-			if len(left) > 0 && s.SyllDef.validSplit(left, right) {
+			//fmt.Printf("%s %s %v\n", left, right, s.SyllDef.ValidSplit(left, right))
+			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) {
 				index := Boundary{G: gi, P: pi}
 				res.Boundaries = append(res.Boundaries, index)
 			}
