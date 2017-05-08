@@ -7,7 +7,7 @@ type Trans struct {
 	Phonemes []G2P
 }
 
-/*G2P is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Primarily package internal use. Examples (IPA symbols):
+/*G2P is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Primarily for package internal use. Examples (IPA symbols):
   x -> k, s
   sch -> ʃ
   ff -> f
