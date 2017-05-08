@@ -103,19 +103,20 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
-// XMLWords container go generate xml from http request
+// XMLWords container go generate xml from http request, for legacy calls from ltool/yalt
 type XMLWords struct {
 	XMLName xml.Name `xml:"words"`
 	Words   []XMLWord
 }
 
-// XMLWord container go generate xml from http request
+// XMLWord container go generate xml from http request, for legacy calls from ltool/yalt
 type XMLWord struct {
 	XMLName xml.Name `xml:"word"`
 	Orth    string   `xml:"orth,attr"`
 	Trans   string   `xml:"trans"`
 }
 
+// for legacy calls from ltool/yalt
 func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	lang := vars["lang"]
@@ -249,6 +250,7 @@ func main() {
 	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
 	s.HandleFunc("/list", list_Handler) //.Methods("get", "post")
 
+	// for legacy calls from ltool/yalt
 	s = r.PathPrefix("/rbg2p/xmltranscribe").Subrouter()
 	s.HandleFunc("/{lang}/{word}", transcribe_AsXml_Handler)
 
