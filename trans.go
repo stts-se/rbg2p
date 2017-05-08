@@ -13,7 +13,7 @@ type Trans struct {
   ff -> f
   au -> a‿u
   rt -> ʈ
-**/
+*/
 type G2P struct {
 	G string
 	P []string
