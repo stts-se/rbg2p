@@ -296,10 +296,6 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 		}
 	}
 	expanded := rs.expand(res)
-	//test := expandTest(res)
-	//fmt.Printf("res=%#v\n", res)
-	//fmt.Printf("test=%#v\n", test)
-	//fmt.Printf("expanded=%#v\n", expanded)
 	var filtered []string
 	for _, t := range expanded {
 		fted := rs.applyFilters(t)
