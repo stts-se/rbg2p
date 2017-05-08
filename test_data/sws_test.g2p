@@ -1,9 +1,16 @@
 // Specs
 
 CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
-PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j ."
+PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j . ""
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
+
+
+
+// Filters
+
+FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))" -> "$1\" $2" // simple filter to put stress on first syllable
+
 
 // Syllabification
 SYLLDEF TYPE "MOP"
@@ -21,6 +28,8 @@ VAR VOWEL [eéyuioåaöä]
 VAR PALAT [eéyiöä]
 
 // Rules
+
+' -> ∅
 
 au -> au
 eu -> eu
@@ -115,10 +124,12 @@ z -> s
 
 // Tests
 
-TEST dusch -> (d u0 S, d u0 x)
-TEST duscha -> (d u0 . S a, d u0 . x a)
-TEST borta -> (b O . rt a, b O r . t a)
-TEST abt -> a p t
-TEST bortadusch -> (b O . rt a . d u0 S, b O . rt a . d u0 x, b O r . t a . d u0 S, b O r . t a . d u0 x)
-TEST filifjonka -> f I . l I . f j O N . k a
-TEST unga -> u0 N . a
+TEST dusch -> (d " u0 S, d " u0 x)
+TEST duscha -> (d " u0 . S a, d " u0 . x a)
+TEST borta -> (b " O . rt a, b " O r . t a)
+TEST abt -> " a p t
+TEST bortadusch -> (b " O . rt a . d u0 S, b " O . rt a . d u0 x, b " O r . t a . d u0 S, b " O r . t a . d u0 x)
+TEST filifjonka -> f " I . l I . f j O N . k a
+TEST unga -> " u0 N . a
+TEST 'unga -> " u0 N . a
+TEST a'a -> " a . a

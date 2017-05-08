@@ -18,7 +18,7 @@ type SylledTrans struct {
 	Boundaries []Boundary
 }
 
-func (t SylledTrans) iBoundaryary(b Boundary) bool {
+func (t SylledTrans) isBoundary(b Boundary) bool {
 	for _, bound := range t.Boundaries {
 		if bound == b {
 			return true
@@ -33,10 +33,12 @@ func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	for gi, g2p := range t.Trans.Phonemes {
 		for pi, p := range g2p.P {
 			index := Boundary{G: gi, P: pi}
-			if t.iBoundaryary(index) {
+			if t.isBoundary(index) {
 				res = append(res, syllDelimiter)
 			}
-			res = append(res, p)
+			if len(p) > 0 {
+				res = append(res, p)
+			}
 		}
 	}
 	return strings.Join(res, phnDelimiter)

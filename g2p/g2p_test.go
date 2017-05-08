@@ -289,34 +289,6 @@ func TestWithPhnDelim(t *testing.T) {
 
 }
 
-func TestIPA(t *testing.T) {
-	_, err := loadAndTest(t, "../test_data/ipa_test.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
-
-func xxxTestHun(t *testing.T) {
-	_, err := loadAndTest(t, "../test_data/hun.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
-
-func xxxTestMkd(t *testing.T) {
-	_, err := loadAndTest(t, "../test_data/mkd.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
-
-func xxxTestCze(t *testing.T) {
-	_, err := loadAndTest(t, "../test_data/czc.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
-
 func g2pFromSlice(variants []string) rbg2p.G2P {
 	return rbg2p.G2P{G: "", P: variants}
 }
@@ -490,5 +462,40 @@ func TestSyllabifySwsTestFile(t *testing.T) {
 	expect := "b O . rt a . d u0 S"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
+	}
+}
+
+func TestIPA(t *testing.T) {
+	_, err := loadAndTest(t, "../test_data/ipa_test.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestHun(t *testing.T) {
+	_, err := loadAndTest(t, "../test_data/hun.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestMkd(t *testing.T) {
+	_, err := loadAndTest(t, "../test_data/mkd.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestCze(t *testing.T) {
+	_, err := loadAndTest(t, "../test_data/czc.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func xxxTestBaq(t *testing.T) {
+	_, err := loadAndTest(t, "../server/g2p_files/basque_sampa.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
 	}
 }
