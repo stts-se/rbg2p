@@ -127,16 +127,6 @@ type TestResult struct {
 }
 
 func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
-	// var errors = []string{}
-	// for _, char := range rs.CharacterSet {
-	// 	if _, ok := coveredChars[char]; !ok {
-	// 		errors = append(errors, char)
-	// 	}
-	// }
-	// if len(errors) > 0 {
-	// 	validation.Warnings = append(validation.Warnings, fmt.Sprintf("no rules exist for character(s): %s", strings.Join(errors, ",")))
-	// }
-
 	var errors = []string{}
 	for _, char := range rs.CharacterSet {
 		if _, ok := individualChars[char]; !ok {
