@@ -136,7 +136,9 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 
 	onset := []string{}
 	for i := 0; i < len(right) && !def.isSyllabic(right[i]); i++ {
-		onset = append(onset, right[i])
+		if !def.isStress(right[i]) {
+			onset = append(onset, right[i])
+		}
 	}
 	if !def.validOnset(strings.Join(onset, def.PhonemeDelimiter())) {
 		return false

@@ -1,6 +1,7 @@
 package syllabification
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -292,11 +293,46 @@ func TestSyllabify4(t *testing.T) {
 	}
 }
 
-func TestInputWithStress(t *testing.T) {
+func TestBaqSyller(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	lines := []string{"SYLLDEF TYPE MOP",
-		`SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j"`,
+		"SYLLDEF ONSETS \"p, b, t, d, k, g, c, gj, ts, ts`, tS, f, s, s`, S, x, jj, m, n, J, l, L, r, rr, j, w, B, D, G, T\"",
+		`SYLLDEF SYLLABIC "a e i o u"`,
+		`SYLLDEF STRESS "\" %"`,
+		`SYLLDEF DELIMITER "."`,
+	}
+	def, err := LoadSyllDef(lines, " ")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	syll := Syllabifier{def}
+
+	input := strings.Split("f rr a g rr \" a n s i a", " ")
+	expect := "f rr a g . rr \" a n . s i . a"
+	result := syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr a g rr a n s i a", " ")
+	expect = "f rr a g . rr a n . s i . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+}
+
+func TestSwsInputWithStress(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	lines := []string{"SYLLDEF TYPE MOP",
+		`SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j, rr"`,
 		`SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"`,
 		`SYLLDEF STRESS "\" \"\" %"`,
 		`SYLLDEF DELIMITER "."`,
@@ -325,16 +361,42 @@ func TestInputWithStress(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
-	expect = "p a . \" r A: d . \"\" g r e: n"
+	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	expect = "p a . \" r A: d . % g r e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)
 
 	}
 
-	input = strings.Split("p a \" r A: d % g r e: n", " ")
-	expect = "p a . \" r A: d . % g r e: n"
+	input = strings.Split("f r \" a g r a n s I a", " ")
+	expect = "f r \" a . g r a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr \" a g rr a n s I a", " ")
+	expect = "f rr \" a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	fmt.Println("\n\n")
+
+	input = strings.Split("f rr a g rr a n s I a", " ")
+	expect = "f rr a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	expect = "p a . \" r A: d . \"\" g r e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)

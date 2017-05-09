@@ -1,7 +1,7 @@
 // Specs
 
 CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
-PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j . ""
+PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j . " """
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
@@ -48,6 +48,7 @@ i -> i: / _ SHORTCONS #
 o -> u: / _ SHORTCONS #
 å -> o: / _ SHORTCONS #
 a -> A: / _ SHORTCONS #
+á -> A: / _ SHORTCONS #
 ö -> 2: / _ SHORTCONS #
 ä -> E: / _ SHORTCONS #
 
@@ -58,6 +59,7 @@ i -> I
 o -> O
 å -> O
 a -> a
+á -> a
 ö -> 2
 ä -> E
 
@@ -149,3 +151,7 @@ TEST gäst -> j " E s t
 TEST gap -> g " A: p
 TEST där -> d " {: r
 TEST pizza -> p " I t . s a
+TEST pilätta -> p " I . l E . t a
+TEST fragráncia -> f r " a . g r a n . s I . a
+TEST fragrancia -> f r " a . g r a n . s I . a
+TEST fragéncia -> f r " a . j e: n . s I . a
