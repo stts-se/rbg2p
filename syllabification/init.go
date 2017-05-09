@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func IsSyllDefLine(s string) bool {
+	return strings.HasPrefix(s, "SYLLDEF ")
+}
+
 func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, error) {
 	def := MOPSyllDef{} // TODO: Handle other sylldefs too?
 	def.PhnDelim = phnDelim
