@@ -45,7 +45,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	ruleSet := RuleSet{Vars: map[string]string{}}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
-	syllDef := syllabification.MOPSyllDef{} // TODO: Handle other sylldefs too?
+	syllDefLines := []string{}
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
@@ -73,10 +73,7 @@ func LoadFile(fName string) (RuleSet, error) {
 			}
 			ruleSet.Vars[name] = value
 		} else if isSyllDef(l) {
-			err := parseMOPSyllDef(l, &syllDef)
-			if err != nil {
-				return ruleSet, err
-			}
+			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
 			t, err := newFilter(l)
 			if err != nil {
@@ -94,8 +91,8 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 
 	}
-	syllDef.PhnDelim = ruleSet.PhonemeDelimiter
-	ruleSet.SyllableDelimiter = syllDef.SyllDelim
+	syllDef, err := syllabification.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
+	ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
 	ruleSet.Syllabifier = syllabification.Syllabifier{SyllDef: syllDef}
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
@@ -166,41 +163,6 @@ func newVar(s string) (string, string, error) {
 		return "", "", fmt.Errorf("invalid var in input (regular expression failed) for /%s/: %s", s, err)
 	}
 	return name, value, nil
-}
-
-var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER) +\"(.+)\"$")
-var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
-
-func parseMOPSyllDef(s string, syllDef *syllabification.MOPSyllDef) error {
-	// SYLLDEF (ONSETS|SYLLABIC|DELIMITER) "VALUE"
-	// SYLLDEF TYPE VALUE
-	matchRes := syllDefRe.FindStringSubmatch(s)
-	if matchRes == nil {
-		matchRes = syllDefTypeRe.FindStringSubmatch(s)
-		if matchRes == nil {
-			return fmt.Errorf("invalid sylldef definition: " + s)
-		}
-	}
-	name := matchRes[1]
-	value := strings.Replace(strings.TrimSpace(matchRes[2]), "\\\"", "\"", -1)
-	_, err := regexp.Compile(value)
-	if err != nil {
-		return fmt.Errorf("invalid sylldef input (regular expression failed) for /%s/: %s", s, err)
-	}
-	if name == "TYPE" {
-		if value != "MOP" {
-			return fmt.Errorf("invalid sylldef type %s", value)
-		}
-	} else if name == "ONSETS" {
-		syllDef.Onsets = commaSplit.Split(value, -1)
-	} else if name == "SYLLABIC" {
-		syllDef.Syllabic = multiSpace.Split(value, -1)
-	} else if name == "DELIMITER" {
-		syllDef.SyllDelim = value
-	} else {
-		return fmt.Errorf("invalid sylldef variable : %s", s)
-	}
-	return nil
 }
 
 var testReSimple = regexp.MustCompile("^TEST +([^ ]+) +-> +([^,()]+)$")
