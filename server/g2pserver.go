@@ -91,15 +91,16 @@ func syllabify_Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	j, err := json.Marshal(res)
-	if err != nil {
-		msg := fmt.Sprintf("failed json marshalling : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintf(w, string(j))
+	//w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	// j, err := json.Marshal(res)
+	// if err != nil {
+	// 	msg := fmt.Sprintf("failed json marshalling : %v", err)
+	// 	log.Println(msg)
+	// 	http.Error(w, msg, http.StatusInternalServerError)
+	// 	return
+	// }
+	// fmt.Fprintf(w, string(j))
+	fmt.Fprintf(w, string(res))
 }
 
 func transcribe(lang string, word string) (Word, int, error) {
