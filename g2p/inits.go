@@ -28,10 +28,6 @@ func isTest(s string) bool {
 	return strings.HasPrefix(s, "TEST ")
 }
 
-func isSyllDef(s string) bool {
-	return strings.HasPrefix(s, "SYLLDEF ")
-}
-
 func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
 }
@@ -72,7 +68,7 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, err
 			}
 			ruleSet.Vars[name] = value
-		} else if isSyllDef(l) {
+		} else if syllabification.IsSyllDefLine(l) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
 			t, err := newFilter(l)

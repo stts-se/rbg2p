@@ -74,13 +74,23 @@ sch -> S
 
 ng -> N
 
+bb -> b
+dd -> d
+ff -> f
 gg -> g
-nn -> n
-mm -> m
-ll -> l
-ss -> s
+jj -> j
+kk -> k
 ck -> k
+ll -> l
+mm -> m
+nn -> n
+pp -> p
+qq -> k
 rr -> r
+ss -> s
+tt -> t
+vv -> v
+zz -> t s
 x -> k s
 
 stj -> x
@@ -138,3 +148,4 @@ TEST get -> j " e: t
 TEST gäst -> j " E s t
 TEST gap -> g " A: p
 TEST där -> d " {: r
+TEST pizza -> p " I t . s a
