@@ -13,6 +13,7 @@ VAR VOWEL [aeiouy]
 // SYLLDEF TYPE MOP
 // SYLLDEF ONSETS "p, b, t, d, k, g, c, gj, ts, ts`, tS, f, s, s`, S, x, jj, m, n, J, l, L, r, rr, j, w, B, D, G, T"
 // SYLLDEF SYLLABIC "a e i o u"
+// SYLLDEF STRESS "\" %"
 // SYLLDEF DELIMITER "."
 
 // Filters

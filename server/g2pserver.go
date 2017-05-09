@@ -15,7 +15,6 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
-	"github.com/stts-se/rbg2p"
 	"github.com/stts-se/rbg2p/g2p"
 )
 
@@ -63,12 +62,7 @@ func syllabify(lang string, trans string) (string, int, error) {
 		msg := fmt.Sprintf("couldn't split input transcription /%s/ : %s", trans, err)
 		return "", http.StatusInternalServerError, fmt.Errorf(msg)
 	}
-	t := rbg2p.Trans{}
-	for _, phn := range phns {
-		t.Phonemes = append(t.Phonemes, rbg2p.G2P{G: "", P: []string{phn}})
-	}
-
-	sylled := ruleSet.Syllabifier.SyllabifyToString(t)
+	sylled := ruleSet.Syllabifier.SyllabifyFromPhonemes(phns)
 	return sylled, http.StatusOK, nil
 }
 

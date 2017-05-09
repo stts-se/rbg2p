@@ -64,6 +64,7 @@ type MOPSyllDef struct {
 	Syllabic  []string
 	PhnDelim  string
 	SyllDelim string
+	Stress    []string
 }
 
 // PhonemeDelimiter is the string used to separate phonemes (required by interface)
@@ -79,6 +80,15 @@ func (def MOPSyllDef) SyllableDelimiter() string {
 // IsDefined is used to determine if there is a syllabifier defined or not (required by interface)
 func (def MOPSyllDef) IsDefined() bool {
 	return len(def.Onsets) > 0
+}
+
+func (def MOPSyllDef) isStress(symbol string) bool {
+	for _, s := range def.Stress {
+		if s == symbol {
+			return true
+		}
+	}
+	return false
 }
 
 func (def MOPSyllDef) isSyllabic(phoneme string) bool {
@@ -115,6 +125,15 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 
 // ValidSplit is called by Syllabifier.Syllabify to test where to put the boundaries
 func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
+
+	if len(left) > 0 && def.isStress(left[len(left)-1]) {
+		return false
+	}
+
+	if len(right) > 0 && def.isStress(right[0]) {
+		right = right[1:len(right)]
+	}
+
 	onset := []string{}
 	for i := 0; i < len(right) && !def.isSyllabic(right[i]); i++ {
 		onset = append(onset, right[i])
@@ -140,6 +159,15 @@ type Syllabifier struct {
 // IsDefined is used to determine if there is a syllabifier defined or not
 func (s Syllabifier) IsDefined() bool {
 	return s.SyllDef.IsDefined()
+}
+
+// SyllabifyFromPhonemes is used to divide a range of phonemes into syllables and create an output string
+func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
+	t := rbg2p.Trans{}
+	for _, phn := range phns {
+		t.Phonemes = append(t.Phonemes, rbg2p.G2P{G: "", P: []string{phn}})
+	}
+	return s.SyllabifyToString(t)
 }
 
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
