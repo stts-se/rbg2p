@@ -2,7 +2,7 @@
 Utilities for rule based, manually written, grapheme to phoneme rules
 
 ## Command line
-    $ go run g2p_runner/g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)>
+    $ go run g2p_runner/g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
     
     FLAGS:
        -force      bool    print transcriptions even if errors are found (default: false)
