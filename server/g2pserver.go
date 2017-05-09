@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
+	"github.com/stts-se/rbg2p"
 	"github.com/stts-se/rbg2p/g2p"
 )
 
@@ -39,6 +40,72 @@ var wSplitRe = regexp.MustCompile(" *, *")
 type Word struct {
 	Orth    string   `json:"orth"`
 	Transes []string `json:"transes"`
+}
+
+func syllabify(lang string, trans string) (string, int, error) {
+	g2pM.mutex.RLock()
+	defer g2pM.mutex.RUnlock()
+	ruleSet, ok := g2pM.g2ps[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		langs := listLanguages()
+		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
+		return "", http.StatusBadRequest, fmt.Errorf(msg)
+	}
+
+	if !ruleSet.Syllabifier.IsDefined() {
+		msg := fmt.Sprintf("no syllabifier defined for language %s", lang)
+		return "", http.StatusInternalServerError, fmt.Errorf(msg)
+	}
+
+	phns, err := ruleSet.PhonemeSet.SplitTranscription(trans)
+	if err != nil {
+		msg := fmt.Sprintf("couldn't split input transcription /%s/ : %s", trans, err)
+		return "", http.StatusInternalServerError, fmt.Errorf(msg)
+	}
+	t := rbg2p.Trans{}
+	for _, phn := range phns {
+		t.Phonemes = append(t.Phonemes, rbg2p.G2P{G: "", P: []string{phn}})
+	}
+
+	sylled := ruleSet.Syllabifier.SyllabifyToString(t)
+	return sylled, http.StatusOK, nil
+}
+
+func syllabify_Handler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	lang := vars["lang"]
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	trans := vars["trans"]
+	if "" == trans {
+		msg := "no value for the expected 'trans' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+	res, status, err := syllabify(lang, trans)
+	if err != nil {
+		log.Printf("%s\n", err)
+		http.Error(w, fmt.Sprintf("%s", err), status)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	j, err := json.Marshal(res)
+	if err != nil {
+		msg := fmt.Sprintf("failed json marshalling : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, string(j))
 }
 
 func transcribe(lang string, word string) (Word, int, error) {
@@ -255,6 +322,8 @@ func main() {
 
 	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
 	s.HandleFunc("/list", list_Handler)                           //.Methods("get")
+
+	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler) //.Methods("get", "post")
 
 	// for legacy calls from ltool/yalt
 	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)

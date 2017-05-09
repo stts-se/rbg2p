@@ -142,6 +142,12 @@ func (s Syllabifier) IsDefined() bool {
 	return s.SyllDef.IsDefined()
 }
 
+// SyllabifyToString is used to divide a transcription into syllables and create an output string
+func (s Syllabifier) SyllabifyToString(t rbg2p.Trans) string {
+	res := s.Syllabify(t)
+	return res.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
+}
+
 // Syllabify is used to divide a transcription into syllables
 func (s Syllabifier) Syllabify(t rbg2p.Trans) SylledTrans {
 	res := SylledTrans{Trans: t}
