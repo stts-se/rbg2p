@@ -1,13 +1,58 @@
-package syllabification
+package syll
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
+
+	"github.com/stts-se/rbg2p/util"
 )
 
-func IsSyllDefLine(s string) bool {
-	return strings.HasPrefix(s, "SYLLDEF ")
+// LoadFile loads a syllabifier from the specified file
+func LoadFile(fName string) (Syllabifier, util.PhonemeSet, error) {
+	syllDefLines := []string{}
+	phonemeDelimiter := " "
+	fh, err := os.Open(fName)
+	defer fh.Close()
+	if err != nil {
+		return Syllabifier{}, util.PhonemeSet{}, err
+	}
+	n := 0
+	var phonemeSetLine string
+	s := bufio.NewScanner(fh)
+	for s.Scan() {
+		if err := s.Err(); err != nil {
+			return Syllabifier{}, util.PhonemeSet{}, err
+		}
+		n++
+		l := util.TrimComment(strings.TrimSpace(s.Text()))
+		if util.IsBlankLine(l) || util.IsComment(l) {
+		} else if util.IsSyllDefLine(l) {
+			syllDefLines = append(syllDefLines, l)
+		} else if util.IsPhonemeDelimiter(l) {
+			phonemeDelimiter, err = util.ParsePhonemeDelimiter(l)
+		} else if util.IsPhonemeSet(l) {
+			phonemeSetLine = l
+		} else {
+			return Syllabifier{}, util.PhonemeSet{}, fmt.Errorf("unknown input line: %s", l)
+		}
+
+	}
+	if len(phonemeSetLine) == 0 {
+		return Syllabifier{}, util.PhonemeSet{}, fmt.Errorf("missing required phoneme set definition")
+	}
+
+	phnSet, err := util.ParsePhonemeSet(phonemeSetLine, phonemeDelimiter)
+	if err != nil {
+		return Syllabifier{}, util.PhonemeSet{}, err
+	}
+	syllDef, err := LoadSyllDef(syllDefLines, phonemeDelimiter)
+	if err != nil {
+		return Syllabifier{}, util.PhonemeSet{}, err
+	}
+	return Syllabifier{SyllDef: syllDef}, phnSet, nil
 }
 
 func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, error) {

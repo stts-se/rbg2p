@@ -1,4 +1,4 @@
-package g2p
+package util
 
 import (
 	"sort"

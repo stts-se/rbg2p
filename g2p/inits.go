@@ -7,18 +7,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/stts-se/rbg2p/syllabification"
+	"github.com/stts-se/rbg2p/syll"
+	"github.com/stts-se/rbg2p/util"
 )
-
-var commentAtEndRe = regexp.MustCompile("^(.*[^/]+)//+.*$")
-
-func trimComment(s string) string {
-	return strings.TrimSpace(commentAtEndRe.ReplaceAllString(s, "$1"))
-}
-
-func isComment(s string) bool {
-	return strings.HasPrefix(s, "//")
-}
 
 func isVar(s string) bool {
 	return strings.HasPrefix(s, "VAR ")
@@ -30,10 +21,6 @@ func isTest(s string) bool {
 
 func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
-}
-
-func isBlankLine(s string) bool {
-	return len(s) == 0
 }
 
 // LoadFile loads a g2p rule set from the specified file
@@ -50,13 +37,22 @@ func LoadFile(fName string) (RuleSet, error) {
 	n := 0
 	s := bufio.NewScanner(fh)
 	var ruleLines []string
+	var phonemeSetLine string
 	for s.Scan() {
 		if err := s.Err(); err != nil {
 			return ruleSet, err
 		}
 		n++
-		l := trimComment(strings.TrimSpace(s.Text()))
-		if isBlankLine(l) || isComment(l) {
+		l := util.TrimComment(strings.TrimSpace(s.Text()))
+		if util.IsBlankLine(l) || util.IsComment(l) {
+		} else if util.IsPhonemeDelimiter(l) {
+			delim, err := util.ParsePhonemeDelimiter(l)
+			if err != nil {
+				return ruleSet, err
+			}
+			ruleSet.PhonemeDelimiter = delim
+		} else if util.IsPhonemeSet(l) {
+			phonemeSetLine = l
 		} else if isConst(l) {
 			err := parseConst(l, &ruleSet)
 			if err != nil {
@@ -68,7 +64,7 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, err
 			}
 			ruleSet.Vars[name] = value
-		} else if syllabification.IsSyllDefLine(l) {
+		} else if util.IsSyllDefLine(l) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
 			t, err := newFilter(l)
@@ -87,9 +83,17 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 
 	}
-	syllDef, err := syllabification.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
+	if len(phonemeSetLine) > 0 {
+		phnSet, err := util.ParsePhonemeSet(phonemeSetLine, ruleSet.PhonemeDelimiter)
+		if err != nil {
+			return ruleSet, err
+		}
+		ruleSet.PhonemeSet = phnSet
+	}
+	syllDef, err := syll.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
 	ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
-	ruleSet.Syllabifier = syllabification.Syllabifier{SyllDef: syllDef}
+	ruleSet.Syllabifier = syll.Syllabifier{SyllDef: syllDef}
+
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
 		if err != nil {
@@ -103,10 +107,8 @@ func LoadFile(fName string) (RuleSet, error) {
 	return ruleSet, nil
 }
 
-var constRe = regexp.MustCompile("^(CHARACTER_SET|PHONEME_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) +\"(.*)\"$")
-var isConstRe = regexp.MustCompile("^(CHARACTER_SET|PHONEME_SET|DEFAULT_PHONEME|PHONEME_DELIMITER) .*")
-
-var multiSpace = regexp.MustCompile(" +")
+var constRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME) +\"(.*)\"$")
+var isConstRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME) .*")
 
 func isConst(s string) bool {
 	return isConstRe.MatchString(s)
@@ -120,21 +122,8 @@ func parseConst(s string, ruleSet *RuleSet) error {
 		value := matchRes[2]
 		if name == "CHARACTER_SET" {
 			ruleSet.CharacterSet = strings.Split(value, "")
-		} else if name == "PHONEME_SET" {
-			phonemeSet, err := NewPhonemeSet(multiSpace.Split(value, -1), ruleSet.PhonemeDelimiter)
-			if err != nil {
-				return fmt.Errorf("couldn't create phoneme set : %s", err)
-			}
-			ruleSet.PhonemeSet = phonemeSet
 		} else if name == "DEFAULT_PHONEME" {
 			ruleSet.DefaultPhoneme = value
-		} else if name == "PHONEME_DELIMITER" {
-			ruleSet.PhonemeDelimiter = value
-			phonemeSet, err := NewPhonemeSet(ruleSet.PhonemeSet.Symbols, value)
-			if err != nil {
-				return fmt.Errorf("couldn't create phoneme set : %s", err)
-			}
-			ruleSet.PhonemeSet = phonemeSet
 		} else {
 			return fmt.Errorf("invalid const definition: " + s)
 		}

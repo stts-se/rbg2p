@@ -1,4 +1,4 @@
-package g2p
+package util
 
 import (
 	"bufio"
@@ -89,7 +89,7 @@ func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 	return ss.DelimiterRe.Split(trans, -1), nil
 }
 
-func validate(input string, phonemeSet PhonemeSet, usedSymbols map[string]bool) ([]string, error) {
+func Validate(input string, phonemeSet PhonemeSet, usedSymbols map[string]bool) ([]string, error) {
 	var invalid = []string{}
 	splitted, err := phonemeSet.SplitTranscription(input)
 	if err != nil {
@@ -104,7 +104,7 @@ func validate(input string, phonemeSet PhonemeSet, usedSymbols map[string]bool) 
 	return invalid, nil
 }
 
-func checkForUnusedSymbols(symbols map[string]bool, phonemeSet PhonemeSet) []string {
+func CheckForUnusedSymbols(symbols map[string]bool, phonemeSet PhonemeSet) []string {
 	warnings := []string{}
 	for _, symbol := range phonemeSet.Symbols {
 		if _, ok := symbols[symbol]; !ok {
@@ -112,38 +112,4 @@ func checkForUnusedSymbols(symbols map[string]bool, phonemeSet PhonemeSet) []str
 		}
 	}
 	return warnings
-}
-
-// compareToPhonemeSet validates the phonemes in the g2p rule set against the specified phonemeset. Returns an array of invalid phonemes, if any; or if errors are found, this is returned instead.
-func compareToPhonemeSet(ruleSet RuleSet) (TestResult, error) {
-	var validation = TestResult{}
-	var usedSymbols = map[string]bool{}
-	for _, rule := range ruleSet.Rules {
-		for _, output := range rule.Output {
-			invalid, err := validate(output, ruleSet.PhonemeSet, usedSymbols)
-			if err != nil {
-				return TestResult{}, fmt.Errorf("found error in rule output /%s/ : %s", output, err)
-			}
-			for _, symbol := range invalid {
-				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in rule output %s: %s", rule, symbol))
-				usedSymbols[symbol] = true
-			}
-		}
-	}
-	for _, test := range ruleSet.Tests {
-		for _, output := range test.Output {
-			invalid, err := validate(output, ruleSet.PhonemeSet, usedSymbols)
-			if err != nil {
-				return TestResult{}, fmt.Errorf("found error in test output /%s/ : %s", output, err)
-			}
-			for _, symbol := range invalid {
-				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in test output %s: %s", test, symbol))
-			}
-
-		}
-	}
-	for _, warn := range checkForUnusedSymbols(usedSymbols, ruleSet.PhonemeSet) {
-		validation.Warnings = append(validation.Warnings, warn)
-	}
-	return validation, nil
 }

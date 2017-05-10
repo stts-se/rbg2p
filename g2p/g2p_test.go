@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/util"
 )
 
 var fsExpGot = "Expected: %v got: %v"
@@ -289,20 +289,20 @@ func TestWithPhnDelim(t *testing.T) {
 
 }
 
-func g2pFromSlice(variants []string) rbg2p.G2P {
-	return rbg2p.G2P{G: "", P: variants}
+func g2pFromSlice(variants []string) util.G2P {
+	return util.G2P{G: "", P: variants}
 }
-func g2pTransFromSlice(trans []string) rbg2p.Trans {
-	res := []rbg2p.G2P{}
+func g2pTransFromSlice(trans []string) util.Trans {
+	res := []util.G2P{}
 	for _, ps := range trans {
-		res = append(res, rbg2p.G2P{G: "", P: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
+		res = append(res, util.G2P{G: "", P: strings.Split(ps, ", ")}) // split on comma to make it easier to create transcriptions for unit tests
 
 	}
-	return rbg2p.Trans{Phonemes: res}
+	return util.Trans{Phonemes: res}
 }
 
 // to make it easier to compare results from unit tests
-func trans2string(t rbg2p.Trans) string {
+func trans2string(t util.Trans) string {
 	var phns []string
 	for _, g2p := range t.Phonemes {
 		if len(g2p.P) > 0 {
@@ -311,7 +311,7 @@ func trans2string(t rbg2p.Trans) string {
 	}
 	return strings.Join(phns, " ")
 }
-func transes2string(transes []rbg2p.Trans) []string {
+func transes2string(transes []util.Trans) []string {
 	res := []string{}
 	for _, t := range transes {
 		res = append(res, trans2string(t))
@@ -323,8 +323,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	rs := RuleSet{PhonemeDelimiter: " "}
 
 	//
-	input := []rbg2p.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"})}
-	expect := []rbg2p.Trans{
+	input := []util.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"})}
+	expect := []util.Trans{
 		g2pTransFromSlice([]string{"1a", "2a"}),
 		g2pTransFromSlice([]string{"1a", "2b"}),
 		g2pTransFromSlice([]string{"1b", "2a"}),
@@ -337,8 +337,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"1a", "2", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2", "3b"}),
 		g2pTransFromSlice([]string{"1b", "2", "3a"}),
@@ -351,8 +351,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"}), g2pFromSlice([]string{"3a", "3b"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b"}), g2pFromSlice([]string{"3a", "3b"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
 		g2pTransFromSlice([]string{"1a", "2b", "3a"}),
@@ -369,8 +369,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b", "2c"}), g2pFromSlice([]string{"3a", "3b"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"1a", "1b"}), g2pFromSlice([]string{"2a", "2b", "2c"}), g2pFromSlice([]string{"3a", "3b"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"1a", "2a", "3a"}),
 		g2pTransFromSlice([]string{"1a", "2a", "3b"}),
 		g2pTransFromSlice([]string{"1a", "2b", "3a"}),
@@ -391,8 +391,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"b"}), g2pFromSlice([]string{"O"}), g2pFromSlice([]string{"rt", "r t"}), g2pFromSlice([]string{"a"}), g2pFromSlice([]string{"d"}), g2pFromSlice([]string{"u0"}), g2pFromSlice([]string{"S", "x"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"b"}), g2pFromSlice([]string{"O"}), g2pFromSlice([]string{"rt", "r t"}), g2pFromSlice([]string{"a"}), g2pFromSlice([]string{"d"}), g2pFromSlice([]string{"u0"}), g2pFromSlice([]string{"S", "x"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "S"}),
 		g2pTransFromSlice([]string{"b", "O", "rt", "a", "d", "u0", "x"}),
 		g2pTransFromSlice([]string{"b", "O", "r, t", "a", "d", "u0", "S"}),
@@ -405,8 +405,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a"}),
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b"}),
 		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7a"}),
@@ -418,8 +418,8 @@ func TestExpansionAlgorithm(t *testing.T) {
 	}
 
 	//
-	input = []rbg2p.G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"}), g2pFromSlice([]string{"8"})}
-	expect = []rbg2p.Trans{
+	input = []util.G2P{g2pFromSlice([]string{"1"}), g2pFromSlice([]string{"2"}), g2pFromSlice([]string{"3a", "3b"}), g2pFromSlice([]string{"4"}), g2pFromSlice([]string{"5"}), g2pFromSlice([]string{"6"}), g2pFromSlice([]string{"7a", "7b"}), g2pFromSlice([]string{"8"})}
+	expect = []util.Trans{
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7a", "8"}),
 		g2pTransFromSlice([]string{"1", "2", "3a", "4", "5", "6", "7b", "8"}),
 		g2pTransFromSlice([]string{"1", "2", "3b", "4", "5", "6", "7a", "8"}),
@@ -444,15 +444,15 @@ func TestSyllabifySwsTestFile(t *testing.T) {
 	syller := rs.Syllabifier
 
 	//
-	inputT := rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "b", P: []string{"b"}},
-			rbg2p.G2P{G: "o", P: []string{"O"}},
-			rbg2p.G2P{G: "rt", P: []string{"rt"}},
-			rbg2p.G2P{G: "a", P: []string{"a"}},
-			rbg2p.G2P{G: "d", P: []string{"d"}},
-			rbg2p.G2P{G: "u", P: []string{"u0"}},
-			rbg2p.G2P{G: "sch", P: []string{"S"}},
+	inputT := util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "b", P: []string{"b"}},
+			util.G2P{G: "o", P: []string{"O"}},
+			util.G2P{G: "rt", P: []string{"rt"}},
+			util.G2P{G: "a", P: []string{"a"}},
+			util.G2P{G: "d", P: []string{"d"}},
+			util.G2P{G: "u", P: []string{"u0"}},
+			util.G2P{G: "sch", P: []string{"S"}},
 		},
 	}
 

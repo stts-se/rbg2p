@@ -1,0 +1,16 @@
+// Specs
+
+PHONEME_SET "p t k b d g tS dZ f v T D s z S Z h l m n N r w j A O u i { V E I U @ r= aU OI @U EI AI ' %"
+PHONEME_DELIMITER " "
+
+
+
+// Filters
+
+
+// Syllabification
+SYLLDEF TYPE MOP
+SYLLDEF ONSETS "p, t, k, b, d, g, tS, dZ, f, v, T, D, s, z, S, Z, h, l, m, n, N, r, w, j, p r, t r, b r, g r, s t r, s p r, s k r, p l, t l, b l, g l, s t l, s p l, s k l, s p , s t, s k"
+SYLLDEF SYLLABIC "A O u i { V E I U @ r= aU OI @U EI AI"
+SYLLDEF STRESS "'  %"
+SYLLDEF DELIMITER "."

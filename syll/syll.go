@@ -1,9 +1,9 @@
-package syllabification
+package syll
 
 import (
 	"strings"
 
-	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/util"
 )
 
 // Boundary represents syllable boundaries. Primarily for package internal use.
@@ -14,7 +14,7 @@ type Boundary struct {
 
 // SylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
 type SylledTrans struct {
-	Trans      rbg2p.Trans
+	Trans      util.Trans
 	Boundaries []Boundary
 }
 
@@ -165,21 +165,21 @@ func (s Syllabifier) IsDefined() bool {
 
 // SyllabifyFromPhonemes is used to divide a range of phonemes into syllables and create an output string
 func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
-	t := rbg2p.Trans{}
+	t := util.Trans{}
 	for _, phn := range phns {
-		t.Phonemes = append(t.Phonemes, rbg2p.G2P{G: "", P: []string{phn}})
+		t.Phonemes = append(t.Phonemes, util.G2P{G: "", P: []string{phn}})
 	}
 	return s.SyllabifyToString(t)
 }
 
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
-func (s Syllabifier) SyllabifyToString(t rbg2p.Trans) string {
+func (s Syllabifier) SyllabifyToString(t util.Trans) string {
 	res := s.Syllabify(t)
 	return res.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
 }
 
 // Syllabify is used to divide a transcription into syllables
-func (s Syllabifier) Syllabify(t rbg2p.Trans) SylledTrans {
+func (s Syllabifier) Syllabify(t util.Trans) SylledTrans {
 	res := SylledTrans{Trans: t}
 	left := []string{}
 	right := t.ListPhonemes()

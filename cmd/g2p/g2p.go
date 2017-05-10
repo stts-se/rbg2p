@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/stts-se/rbg2p/g2p"
+	"github.com/stts-se/rbg2p/util"
 )
 
 var l = log.New(os.Stderr, "", 0)
@@ -37,7 +38,7 @@ func main() {
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
 
-	var usage = `go run g2p_runner.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+	var usage = `go run g2p.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
@@ -49,7 +50,7 @@ FLAGS:
 	}
 
 	var args = os.Args
-	if strings.HasSuffix(args[0], "g2p_runner") {
+	if strings.HasSuffix(args[0], "g2p") {
 		args = args[1:] // remove first argument if it's the program name
 	}
 	err := f.Parse(args)
@@ -72,12 +73,12 @@ FLAGS:
 	g2pFile := args[0]
 	ruleSet, err := g2p.LoadFile(g2pFile)
 	if err != nil {
-		l.Printf("couldn't load file %s : %s", g2pFile, err)
+		l.Printf("couldn't load rule file %s : %s", g2pFile, err)
 		os.Exit(1)
 	}
 
 	if *ssFile != "" {
-		phonemeSet, err := g2p.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
+		phonemeSet, err := util.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
 		if err != nil {
 			l.Printf("couldn't load symbol set : %s", err)
 			os.Exit(1)

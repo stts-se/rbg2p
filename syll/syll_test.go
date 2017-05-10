@@ -1,12 +1,11 @@
-package syllabification
+package syll
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/stts-se/rbg2p"
+	"github.com/stts-se/rbg2p/util"
 )
 
 func testMOPValidSplit(t *testing.T, syller Syllabifier, left string, right string, expect bool) {
@@ -74,13 +73,13 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input := SylledTrans{
-		Trans: rbg2p.Trans{
-			Phonemes: []rbg2p.G2P{
-				rbg2p.G2P{G: "t", P: []string{"t"}},
-				rbg2p.G2P{G: "o", P: []string{"O"}},
-				rbg2p.G2P{G: "ff", P: []string{"f"}},
-				rbg2p.G2P{G: "e", P: []string{"@"}},
-				rbg2p.G2P{G: "l", P: []string{"l"}},
+		Trans: util.Trans{
+			Phonemes: []util.G2P{
+				util.G2P{G: "t", P: []string{"t"}},
+				util.G2P{G: "o", P: []string{"O"}},
+				util.G2P{G: "ff", P: []string{"f"}},
+				util.G2P{G: "e", P: []string{"@"}},
+				util.G2P{G: "l", P: []string{"l"}},
 			},
 		},
 		Boundaries: []Boundary{
@@ -95,13 +94,13 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input = SylledTrans{
-		Trans: rbg2p.Trans{
-			Phonemes: []rbg2p.G2P{
-				rbg2p.G2P{G: "t", P: []string{"t"}},
-				rbg2p.G2P{G: "o", P: []string{"O"}},
-				rbg2p.G2P{G: "x", P: []string{"k", "s"}},
-				rbg2p.G2P{G: "e", P: []string{"@"}},
-				rbg2p.G2P{G: "l", P: []string{"l"}},
+		Trans: util.Trans{
+			Phonemes: []util.G2P{
+				util.G2P{G: "t", P: []string{"t"}},
+				util.G2P{G: "o", P: []string{"O"}},
+				util.G2P{G: "x", P: []string{"k", "s"}},
+				util.G2P{G: "e", P: []string{"@"}},
+				util.G2P{G: "l", P: []string{"l"}},
 			},
 		},
 		Boundaries: []Boundary{
@@ -117,9 +116,9 @@ func TestSylledTransString(t *testing.T) {
 
 func testSyllabify(t *testing.T, syller Syllabifier, input string, expect string) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
-	inputT := rbg2p.Trans{}
+	inputT := util.Trans{}
 	for _, p := range strings.Split(input, " ") {
-		inputT.Phonemes = append(inputT.Phonemes, rbg2p.G2P{"", []string{p}})
+		inputT.Phonemes = append(inputT.Phonemes, util.G2P{"", []string{p}})
 	}
 	resT := syller.Syllabify(inputT)
 	res := resT.String(" ", ".")
@@ -165,12 +164,12 @@ func TestSyllabify2(t *testing.T) {
 	syller := Syllabifier{def}
 
 	//
-	inputT := rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "t", P: []string{"t"}},
-			rbg2p.G2P{G: "o", P: []string{"O"}},
-			rbg2p.G2P{G: "x", P: []string{"k", "s"}},
-			rbg2p.G2P{G: "el", P: []string{"@", "l"}},
+	inputT := util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "t", P: []string{"t"}},
+			util.G2P{G: "o", P: []string{"O"}},
+			util.G2P{G: "x", P: []string{"k", "s"}},
+			util.G2P{G: "el", P: []string{"@", "l"}},
 		},
 	}
 
@@ -183,13 +182,13 @@ func TestSyllabify2(t *testing.T) {
 	}
 
 	//
-	inputT = rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "t", P: []string{"t"}},
-			rbg2p.G2P{G: "o", P: []string{"O"}},
-			rbg2p.G2P{G: "x", P: []string{"k", "s"}},
-			rbg2p.G2P{G: "e", P: []string{"@"}},
-			rbg2p.G2P{G: "l", P: []string{"l"}},
+	inputT = util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "t", P: []string{"t"}},
+			util.G2P{G: "o", P: []string{"O"}},
+			util.G2P{G: "x", P: []string{"k", "s"}},
+			util.G2P{G: "e", P: []string{"@"}},
+			util.G2P{G: "l", P: []string{"l"}},
 		},
 	}
 
@@ -202,13 +201,13 @@ func TestSyllabify2(t *testing.T) {
 	}
 
 	//
-	inputT = rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "t", P: []string{"t"}},
-			rbg2p.G2P{G: "u", P: []string{"u0"}},
-			rbg2p.G2P{G: "ng", P: []string{"N"}},
-			rbg2p.G2P{G: "a", P: []string{"a"}},
-			rbg2p.G2P{G: "n", P: []string{"n"}},
+	inputT = util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "t", P: []string{"t"}},
+			util.G2P{G: "u", P: []string{"u0"}},
+			util.G2P{G: "ng", P: []string{"N"}},
+			util.G2P{G: "a", P: []string{"a"}},
+			util.G2P{G: "n", P: []string{"n"}},
 		},
 	}
 
@@ -237,17 +236,17 @@ func TestSyllabify3(t *testing.T) {
 	syller := Syllabifier{def}
 
 	//
-	inputT := rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "b", P: []string{"b"}},
-			rbg2p.G2P{G: "a", P: []string{"a"}},
-			rbg2p.G2P{G: "rr", P: []string{"rr"}},
-			rbg2p.G2P{G: "t", P: []string{"t"}},
-			rbg2p.G2P{G: "r", P: []string{"r"}},
-			rbg2p.G2P{G: "ä", P: []string{"{:"}},
-			rbg2p.G2P{G: "d", P: []string{"d"}},
-			rbg2p.G2P{G: "e", P: []string{"@"}},
-			rbg2p.G2P{G: "n", P: []string{"n"}},
+	inputT := util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "b", P: []string{"b"}},
+			util.G2P{G: "a", P: []string{"a"}},
+			util.G2P{G: "rr", P: []string{"rr"}},
+			util.G2P{G: "t", P: []string{"t"}},
+			util.G2P{G: "r", P: []string{"r"}},
+			util.G2P{G: "ä", P: []string{"{:"}},
+			util.G2P{G: "d", P: []string{"d"}},
+			util.G2P{G: "e", P: []string{"@"}},
+			util.G2P{G: "n", P: []string{"n"}},
 		},
 	}
 
@@ -272,15 +271,15 @@ func TestSyllabify4(t *testing.T) {
 	syller := Syllabifier{def}
 
 	//
-	inputT := rbg2p.Trans{
-		Phonemes: []rbg2p.G2P{
-			rbg2p.G2P{G: "b", P: []string{"b"}},
-			rbg2p.G2P{G: "o", P: []string{"O"}},
-			rbg2p.G2P{G: "rt", P: []string{"rt"}},
-			rbg2p.G2P{G: "a", P: []string{"a"}},
-			rbg2p.G2P{G: "d", P: []string{"d"}},
-			rbg2p.G2P{G: "u", P: []string{"u0"}},
-			rbg2p.G2P{G: "sch", P: []string{"S"}},
+	inputT := util.Trans{
+		Phonemes: []util.G2P{
+			util.G2P{G: "b", P: []string{"b"}},
+			util.G2P{G: "o", P: []string{"O"}},
+			util.G2P{G: "rt", P: []string{"rt"}},
+			util.G2P{G: "a", P: []string{"a"}},
+			util.G2P{G: "d", P: []string{"d"}},
+			util.G2P{G: "u", P: []string{"u0"}},
+			util.G2P{G: "sch", P: []string{"S"}},
 		},
 	}
 
@@ -384,8 +383,6 @@ func TestSwsInputWithStress(t *testing.T) {
 		t.Errorf(fsExpGot, input, expect, result)
 
 	}
-
-	fmt.Println("\n\n")
 
 	input = strings.Split("f rr a g rr a n s I a", " ")
 	expect = "f rr a g . rr a n . s I . a"
