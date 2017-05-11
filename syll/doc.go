@@ -14,5 +14,7 @@ Example (for the CMU lexicon):
    SYLLDEF DELIMITER "$"
 
 
+For details on the .g2p file format, check docs for the root folder of this package.
+
 */
 package syll
