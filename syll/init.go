@@ -111,6 +111,23 @@ func newTest(s string) (Test, error) {
 	return Test{Input: input, Output: output}, nil
 }
 
+var stressPlacementRe = regexp.MustCompile("^SYLLDEF +STRESS_PLACEMENT +(FirstInSyllable|BeforeSyllabic|AfterSyllabic)$")
+
+func isStressPlacement(s string) bool {
+	return strings.HasPrefix(s, "SYLLDEF STRESS_PLACEMENT ")
+}
+func newStressPlacement(s string) (StressPlacement, error) {
+	matchRes := syllDefRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		matchRes = syllDefTypeRe.FindStringSubmatch(s)
+		if matchRes == nil {
+			return FirstInSyllable, fmt.Errorf("invalid stress placement definition: " + s)
+		}
+	}
+	//value := matchRes[1]
+	return FirstInSyllable, nil
+}
+
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")
 var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
 var commaSplit = regexp.MustCompile(" *, *")

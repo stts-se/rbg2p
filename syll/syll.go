@@ -162,8 +162,9 @@ type Test struct {
 
 // Syllabifier is a module to divide a transcription into syllables
 type Syllabifier struct {
-	SyllDef SyllDef
-	Tests   []Test
+	SyllDef         SyllDef
+	Tests           []Test
+	StressPlacement StressPlacement
 }
 
 // IsDefined is used to determine if there is a syllabifier defined or not
