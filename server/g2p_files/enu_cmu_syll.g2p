@@ -1,6 +1,6 @@
 // Specs
 
-PHONEME_SET "p t k b d g tS dZ f v T D s z S Z h l m n N r w j A O u i { V E I U @ r= aU OI @U EI AI ' %"
+PHONEME_SET "AA AE AH AX AO AW AY B CH D DH EH ER EY F G HH IH IY JH K L M N NG OW OY P R S SH T TH UH UW V W Y Z ZH 1 2"
 PHONEME_DELIMITER " "
 
 
@@ -10,7 +10,7 @@ PHONEME_DELIMITER " "
 
 // Syllabification
 SYLLDEF TYPE MOP
-SYLLDEF ONSETS "p, t, k, b, d, g, tS, dZ, f, v, T, D, s, z, S, Z, h, l, m, n, N, r, w, j, p r, t r, b r, g r, s t r, s p r, s k r, p l, t l, b l, g l, s t l, s p l, s k l, s p , s t, s k"
-SYLLDEF SYLLABIC "A O u i { V E I U @ r= aU OI @U EI AI"
-SYLLDEF STRESS "'  %"
-SYLLDEF DELIMITER "."
+SYLLDEF ONSETS "P, T, K, B, D, G, CH, JH, F, V, T, D, S, Z, S, Z, H, L, M, N, N, R, W, J, P R, T R, B R, G R, S T R, S P R, S K R, P L, T L, B L, G L, S T L, S P L, S K L, S P, S T, S K"
+SYLLDEF SYLLABIC "AA AE AH AX AO AW AY EH ER EY IH IY OW OY UH UW"
+SYLLDEF STRESS "1 2"
+SYLLDEF DELIMITER "$"

@@ -89,7 +89,8 @@ func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 	return ss.DelimiterRe.Split(trans, -1), nil
 }
 
-func Validate(input string, phonemeSet PhonemeSet, usedSymbols map[string]bool) ([]string, error) {
+// Validate an input string using a specified phoneme set
+func Validate(input string, phonemeSet PhonemeSet) ([]string, error) {
 	var invalid = []string{}
 	splitted, err := phonemeSet.SplitTranscription(input)
 	if err != nil {
@@ -99,15 +100,15 @@ func Validate(input string, phonemeSet PhonemeSet, usedSymbols map[string]bool) 
 		if !phonemeSet.ValidPhoneme(symbol) {
 			invalid = append(invalid, symbol)
 		}
-		usedSymbols[symbol] = true
 	}
 	return invalid, nil
 }
 
-func CheckForUnusedSymbols(symbols map[string]bool, phonemeSet PhonemeSet) []string {
+// CheckForUnusedSymbols compares the phoneme set to a map of used symbols, to tell what symbols in the phoneme set hasn't been used. Mainly for package internal use.
+func CheckForUnusedSymbols(usedSymbols map[string]bool, phonemeSet PhonemeSet) []string {
 	warnings := []string{}
 	for _, symbol := range phonemeSet.Symbols {
-		if _, ok := symbols[symbol]; !ok {
+		if _, ok := usedSymbols[symbol]; !ok {
 			warnings = append(warnings, fmt.Sprintf("symbol /%s/ not used in g2p rule file", symbol))
 		}
 	}

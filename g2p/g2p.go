@@ -266,21 +266,35 @@ func compareToPhonemeSet(ruleSet RuleSet) (util.TestResult, error) {
 	var usedSymbols = map[string]bool{}
 	for _, rule := range ruleSet.Rules {
 		for _, output := range rule.Output {
-			invalid, err := util.Validate(output, ruleSet.PhonemeSet, usedSymbols)
+			invalid, err := util.Validate(output, ruleSet.PhonemeSet)
 			if err != nil {
 				return util.TestResult{}, fmt.Errorf("found error in rule output /%s/ : %s", output, err)
 			}
+			splitted, err := ruleSet.PhonemeSet.SplitTranscription(output)
+			if err != nil {
+				return util.TestResult{}, err
+			}
+			for _, symbol := range splitted {
+				usedSymbols[symbol] = true
+			}
+
 			for _, symbol := range invalid {
 				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in rule output %s: %s", rule, symbol))
-				usedSymbols[symbol] = true
 			}
 		}
 	}
 	for _, test := range ruleSet.Tests {
 		for _, output := range test.Output {
-			invalid, err := util.Validate(output, ruleSet.PhonemeSet, usedSymbols)
+			invalid, err := util.Validate(output, ruleSet.PhonemeSet)
 			if err != nil {
 				return util.TestResult{}, fmt.Errorf("found error in test output /%s/ : %s", output, err)
+			}
+			splitted, err := ruleSet.PhonemeSet.SplitTranscription(output)
+			if err != nil {
+				return util.TestResult{}, err
+			}
+			for _, symbol := range splitted {
+				usedSymbols[symbol] = true
 			}
 			for _, symbol := range invalid {
 				validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in test output %s: %s", test, symbol))

@@ -55,6 +55,7 @@ func LoadFile(fName string) (Syllabifier, util.PhonemeSet, error) {
 	return Syllabifier{SyllDef: syllDef}, phnSet, nil
 }
 
+// LoadSyllDef loads a syllable definition from a set of input lines, and an explicitly specified phoneme delimiter
 func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, error) {
 	def := MOPSyllDef{} // TODO: Handle other sylldefs too?
 	def.PhnDelim = phnDelim

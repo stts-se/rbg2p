@@ -189,7 +189,7 @@ func (s Syllabifier) Syllabify(t util.Trans) SylledTrans {
 				index := Boundary{G: gi, P: pi}
 				res.Boundaries = append(res.Boundaries, index)
 			}
-			//fmt.Printf("Syllabify.debug\t%s %s %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), res.Boundaries)
+			//fmt.Printf("Syllabify.debug\t%s %s %v %v %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right), res.Boundaries)
 			left = append(left, p)
 			right = right[1:len(right)]
 		}
