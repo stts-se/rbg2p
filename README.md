@@ -14,7 +14,7 @@ Utilities for rule based, manually written, grapheme to phoneme rules
        -help       bool    print help message
 
 
-### Syllabification (coming soon)
+### Syllabification
 
     $ go run cmd/syll/syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
