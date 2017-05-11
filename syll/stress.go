@@ -1,11 +1,19 @@
 package syll
 
+// StressPlacement is used to define where in a syllable the stress should be put in an output string
 type StressPlacement int
 
 const (
+	// Undefined - position not defined
 	Undefined StressPlacement = iota
+
+	// FirstInSyllable -- before the syllable's first phoneme
 	FirstInSyllable
+
+	// BeforeSyllabic -- before the first syllabic phoneme
 	BeforeSyllabic
+
+	// AfterSyllabic -- after the first syllabic phoneme
 	AfterSyllabic
 )
 

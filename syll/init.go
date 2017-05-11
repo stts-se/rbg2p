@@ -144,9 +144,8 @@ func newStressPlacement(s string) (StressPlacement, error) {
 		return BeforeSyllabic, nil
 	} else if strings.ToLower(value) == "aftersyllabic" {
 		return AfterSyllabic, nil
-	} else {
-		return FirstInSyllable, fmt.Errorf("invalid stress placement: " + s)
 	}
+	return Undefined, fmt.Errorf("invalid stress placement: " + s)
 }
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")

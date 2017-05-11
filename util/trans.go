@@ -2,7 +2,7 @@ package util
 
 import "strings"
 
-// Trans is a container for phonemes in a transcription
+// Trans is a container for phonemes in a transcription. Primarily for package internal use.
 type Trans struct {
 	Phonemes []G2P
 }

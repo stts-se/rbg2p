@@ -106,6 +106,7 @@ func (def MOPSyllDef) IsDefined() bool {
 	return len(def.Onsets) > 0
 }
 
+// IsStress is used to check if the input symbol is a stress symbol
 func (def MOPSyllDef) IsStress(symbol string) bool {
 	for _, s := range def.Stress {
 		if s == symbol {
@@ -115,6 +116,7 @@ func (def MOPSyllDef) IsStress(symbol string) bool {
 	return false
 }
 
+// IsSyllabic is used to check if the input phoneme is syllabic
 func (def MOPSyllDef) IsSyllabic(phoneme string) bool {
 	for _, s := range def.Syllabic {
 		if s == phoneme {
@@ -204,7 +206,7 @@ func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
 	return s.SyllabifyToString(t)
 }
 
-// SyllabifyFromStromg is used to divide a transcription string into syllables and create an output string
+// SyllabifyFromString is used to divide a transcription string into syllables and create an output string
 func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (string, error) {
 	phns, err := phnSet.SplitTranscription(trans)
 	if err != nil {
@@ -216,7 +218,7 @@ func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
 func (s Syllabifier) SyllabifyToString(t util.Trans) string {
 	res := s.Syllabify(t)
-	return s.StringWithStressPlacement(res)
+	return s.stringWithStressPlacement(res)
 }
 
 // Syllabify is used to divide a transcription into syllables
@@ -238,6 +240,7 @@ func (s Syllabifier) Syllabify(t util.Trans) sylledTrans {
 	return res
 }
 
+//Test to test the input syllabifier definition using tests in the input data or file
 func (s Syllabifier) Test(phnSet util.PhonemeSet) util.TestResult {
 	var result = util.TestResult{}
 	for _, test := range s.Tests {
@@ -253,7 +256,7 @@ func (s Syllabifier) Test(phnSet util.PhonemeSet) util.TestResult {
 	return result
 }
 
-func (s Syllabifier) StringWithStressPlacement(t sylledTrans) string {
+func (s Syllabifier) stringWithStressPlacement(t sylledTrans) string {
 	if s.StressPlacement == Undefined {
 		return t.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
 	}

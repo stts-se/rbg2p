@@ -68,7 +68,7 @@ func TestMOPValidOnset(t *testing.T) {
 	testMOPValidOnset(t, def, "", true)
 }
 
-func TestsylledTransString(t *testing.T) {
+func TestSylledTransString(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	//
