@@ -55,40 +55,51 @@ func LoadFile(fName string) (Syllabifier, util.PhonemeSet, error) {
 	if err != nil {
 		return res, util.PhonemeSet{}, err
 	}
-	syllDef, err := LoadSyllDef(syllDefLines, phonemeDelimiter)
+	syllDef, stressPlacement, err := LoadSyllDef(syllDefLines, phonemeDelimiter)
 	if err != nil {
 		return res, util.PhonemeSet{}, err
 	}
 	res.SyllDef = syllDef
+	res.StressPlacement = stressPlacement
+
 	return res, phnSet, nil
 }
 
 // LoadSyllDef loads a syllable definition from a set of input lines, and an explicitly specified phoneme delimiter
-func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, error) {
+func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlacement, error) {
 	def := MOPSyllDef{} // TODO: Handle other sylldefs too?
 	def.PhnDelim = phnDelim
+	stressPlacement := Undefined
 
 	for _, l := range syllDefLines {
+		if isStressPlacement(l) {
+			stress, err := newStressPlacement(l)
+			if err != nil {
+				return def, stressPlacement, err
+			}
+			stressPlacement = stress
+			continue
+		}
 		err := parseMOPSyllDef(l, &def)
 		if err != nil {
-			return def, err
+			return def, stressPlacement, err
 		}
 	}
 
 	if len(def.Stress) == 0 {
-		return def, fmt.Errorf("STRESS is required for the syllable definition")
+		return def, stressPlacement, fmt.Errorf("STRESS is required for the syllable definition")
 	}
 	if len(def.Onsets) == 0 {
-		return def, fmt.Errorf("ONSETS is required for the syllable definition")
+		return def, stressPlacement, fmt.Errorf("ONSETS is required for the syllable definition")
 	}
 	if len(def.Syllabic) == 0 {
-		return def, fmt.Errorf("SYLLABIC is required for the syllable definition")
+		return def, stressPlacement, fmt.Errorf("SYLLABIC is required for the syllable definition")
 	}
 	if len(def.SyllDelim) == 0 {
-		return def, fmt.Errorf("DELIMITER is required for the syllable definition")
+		return def, stressPlacement, fmt.Errorf("DELIMITER is required for the syllable definition")
 	}
 
-	return def, nil
+	return def, stressPlacement, nil
 }
 
 func isTest(s string) bool {
@@ -117,15 +128,25 @@ func isStressPlacement(s string) bool {
 	return strings.HasPrefix(s, "SYLLDEF STRESS_PLACEMENT ")
 }
 func newStressPlacement(s string) (StressPlacement, error) {
-	matchRes := syllDefRe.FindStringSubmatch(s)
+	matchRes := stressPlacementRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		matchRes = syllDefTypeRe.FindStringSubmatch(s)
 		if matchRes == nil {
-			return FirstInSyllable, fmt.Errorf("invalid stress placement definition: " + s)
+			return Undefined, fmt.Errorf("invalid stress placement definition: " + s)
 		}
 	}
-	//value := matchRes[1]
-	return FirstInSyllable, nil
+	value := matchRes[1]
+
+	// TODO: generate _strings.go using 'stringer -type=StressPlacement' but this doesn't work right now for some reason (tried two different computers)
+	if strings.ToLower(value) == "firstinsyllable" {
+		return FirstInSyllable, nil
+	} else if strings.ToLower(value) == "beforesyllabic" {
+		return BeforeSyllabic, nil
+	} else if strings.ToLower(value) == "aftersyllabic" {
+		return AfterSyllabic, nil
+	} else {
+		return FirstInSyllable, fmt.Errorf("invalid stress placement: " + s)
+	}
 }
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")

@@ -68,11 +68,11 @@ func TestMOPValidOnset(t *testing.T) {
 	testMOPValidOnset(t, def, "", true)
 }
 
-func TestSylledTransString(t *testing.T) {
+func TestsylledTransString(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	//
-	input := SylledTrans{
+	input := sylledTrans{
 		Trans: util.Trans{
 			Phonemes: []util.G2P{
 				util.G2P{G: "t", P: []string{"t"}},
@@ -82,8 +82,8 @@ func TestSylledTransString(t *testing.T) {
 				util.G2P{G: "l", P: []string{"l"}},
 			},
 		},
-		Boundaries: []Boundary{
-			Boundary{G: 2, P: 0},
+		boundaries: []boundary{
+			boundary{G: 2, P: 0},
 		},
 	}
 	res := input.String(" ", ".")
@@ -93,7 +93,7 @@ func TestSylledTransString(t *testing.T) {
 	}
 
 	//
-	input = SylledTrans{
+	input = sylledTrans{
 		Trans: util.Trans{
 			Phonemes: []util.G2P{
 				util.G2P{G: "t", P: []string{"t"}},
@@ -103,8 +103,8 @@ func TestSylledTransString(t *testing.T) {
 				util.G2P{G: "l", P: []string{"l"}},
 			},
 		},
-		Boundaries: []Boundary{
-			Boundary{G: 2, P: 1},
+		boundaries: []boundary{
+			boundary{G: 2, P: 1},
 		},
 	}
 	res = input.String(" ", ".")
@@ -301,13 +301,13 @@ func TestBaqSyller(t *testing.T) {
 		`SYLLDEF STRESS "\" %"`,
 		`SYLLDEF DELIMITER "."`,
 	}
-	def, err := LoadSyllDef(lines, " ")
+	def, stressP, err := LoadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
 	}
 
-	syll := Syllabifier{SyllDef: def}
+	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
 
 	input := strings.Split("f rr a g rr \" a n s i a", " ")
 	expect := "f rr a g . rr \" a n . s i . a"
@@ -336,13 +336,13 @@ func TestSwsInputWithStress(t *testing.T) {
 		`SYLLDEF STRESS "\" \"\" %"`,
 		`SYLLDEF DELIMITER "."`,
 	}
-	def, err := LoadSyllDef(lines, " ")
+	def, stressP, err := LoadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
 	}
 
-	syll := Syllabifier{SyllDef: def}
+	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
 
 	input := strings.Split("\" d u0 S a", " ")
 	expect := "\" d u0 . S a"
@@ -394,6 +394,234 @@ func TestSwsInputWithStress(t *testing.T) {
 
 	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
 	expect = "p a . \" r A: d . \"\" g r e: n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+}
+
+func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	lines := []string{"SYLLDEF TYPE MOP",
+		`SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j, rr"`,
+		`SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"`,
+		`SYLLDEF STRESS "\" \"\" %"`,
+		`SYLLDEF DELIMITER "."`,
+		`SYLLDEF STRESS_PLACEMENT FirstInSyllable`,
+	}
+	def, stressP, err := LoadSyllDef(lines, " ")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	input := strings.Split("\" d u0 S a", " ")
+	expect := "\" d u0 . S a"
+	result := syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d", " ")
+	expect = "p a . \" r A: d"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	expect = "p a . \" r A: d . % g r e: n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f r \" a g r a n s I a", " ")
+	expect = "\" f r a . g r a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr \" a g rr a n s I a", " ")
+	expect = "\" f rr a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr a g rr a n s I a", " ")
+	expect = "f rr a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	expect = "p a . \" r A: d . \"\" g r e: n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+}
+
+func TestSwsInputWithStressPlacement_AfterSyllabic(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	lines := []string{"SYLLDEF TYPE MOP",
+		`SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j, rr"`,
+		`SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"`,
+		`SYLLDEF STRESS "\" \"\" %"`,
+		`SYLLDEF DELIMITER "."`,
+		`SYLLDEF STRESS_PLACEMENT AfterSyllabic`,
+	}
+	def, stressP, err := LoadSyllDef(lines, " ")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	input := strings.Split("\" d u0 S a", " ")
+	expect := "d u0 \" . S a"
+	result := syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d", " ")
+	expect = "p a . r A: \" d"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	expect = "p a . r A: \" d . g r e: % n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f r \" a g r a n s I a", " ")
+	expect = "f r a \" . g r a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr \" a g rr a n s I a", " ")
+	expect = "f rr a \" g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr a g rr a n s I a", " ")
+	expect = "f rr a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	expect = "p a . r A: \" d . g r e: \"\" n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+}
+
+func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	lines := []string{"SYLLDEF TYPE MOP",
+		`SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, h, rl, j, s, p, r, rs p r, s p l, rs p l, s p j, rs p j, s t r, rs rt r, s k r, rs k r, s k v, rs k v, p r, p j, p l, b r, b j, b l, t r, rt r, t v, rt v, d r, rd r, d v, rd v, k r, k l, k v, k n, g r, g l, g n, f r, f l, f j, f n, v r, s p, s t, s k, s v, s l, s m, s n, n j, rs p, rs rt, rs k, rs v, rs rl, rs m, rs rn, rn j, m j, rr"`,
+		`SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"`,
+		`SYLLDEF STRESS "\" \"\" %"`,
+		`SYLLDEF DELIMITER "."`,
+		`SYLLDEF STRESS_PLACEMENT BeforeSyllabic`,
+	}
+	def, stressP, err := LoadSyllDef(lines, " ")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+
+	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	input := strings.Split("\" d u0 S a", " ")
+	expect := "d \" u0 . S a"
+	result := syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d", " ")
+	expect = "p a . r \" A: d"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	expect = "p a . r \" A: d . g r % e: n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f r \" a g r a n s I a", " ")
+	expect = "f r \" a . g r a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr \" a g rr a n s I a", " ")
+	expect = "f rr \" a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("f rr a g rr a n s I a", " ")
+	expect = "f rr a g . rr a n . s I . a"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
+	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	expect = "p a . r \" A: d . g r \"\" e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)

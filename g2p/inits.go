@@ -90,9 +90,9 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 		ruleSet.PhonemeSet = phnSet
 	}
-	syllDef, err := syll.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
+	syllDef, stressPlacement, err := syll.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
 	ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
-	ruleSet.Syllabifier = syll.Syllabifier{SyllDef: syllDef}
+	ruleSet.Syllabifier = syll.Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement}
 
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)

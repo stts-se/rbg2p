@@ -7,20 +7,21 @@ import (
 	"github.com/stts-se/rbg2p/util"
 )
 
-// Boundary represents syllable boundaries. Primarily for package internal use.
-type Boundary struct {
+// boundary represents syllable boundaries. Primarily for package internal use.
+type boundary struct {
 	G int
 	P int
 }
 
-// SylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
-type SylledTrans struct {
+// sylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
+type sylledTrans struct {
 	Trans      util.Trans
-	Boundaries []Boundary
+	boundaries []boundary
+	Stress     []string
 }
 
-func (t SylledTrans) isBoundary(b Boundary) bool {
-	for _, bound := range t.Boundaries {
+func (t sylledTrans) isboundary(b boundary) bool {
+	for _, bound := range t.boundaries {
 		if bound == b {
 			return true
 		}
@@ -28,13 +29,13 @@ func (t SylledTrans) isBoundary(b Boundary) bool {
 	return false
 }
 
-// String returns a string representation of the SylledTrans, given the specified delimiters for phonemes and syllables
-func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
+// String returns a string representation of the sylledTrans, given the specified delimiters for phonemes and syllables
+func (t sylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	res := []string{}
 	for gi, g2p := range t.Trans.Phonemes {
 		for pi, p := range g2p.P {
-			index := Boundary{G: gi, P: pi}
-			if t.isBoundary(index) {
+			index := boundary{G: gi, P: pi}
+			if t.isboundary(index) {
 				res = append(res, syllDelimiter)
 			}
 			if len(p) > 0 {
@@ -45,8 +46,28 @@ func (t SylledTrans) String(phnDelimiter string, syllDelimiter string) string {
 	return strings.Join(res, phnDelimiter)
 }
 
+// Syllables returns a slice of syllables consisting of (a slice of) phonemes
+func (t sylledTrans) syllables() [][]string {
+	res := [][]string{}
+	thisSyllable := []string{}
+	for gi, g2p := range t.Trans.Phonemes {
+		for pi, p := range g2p.P {
+			index := boundary{G: gi, P: pi}
+			if t.isboundary(index) {
+				res = append(res, thisSyllable)
+				thisSyllable = []string{}
+			}
+			if len(p) > 0 {
+				thisSyllable = append(thisSyllable, p)
+			}
+		}
+	}
+	res = append(res, thisSyllable)
+	return res
+}
+
 //ListPhonemes returns a slice of phonemes as strings
-func (t SylledTrans) ListPhonemes() []string {
+func (t sylledTrans) ListPhonemes() []string {
 	return t.Trans.ListPhonemes()
 }
 
@@ -55,6 +76,8 @@ type SyllDef interface {
 	ValidSplit(left []string, right []string) bool
 	ContainsSyllabic(phonemes []string) bool
 	IsDefined() bool
+	IsStress(symbol string) bool
+	IsSyllabic(symbol string) bool
 	PhonemeDelimiter() string
 	SyllableDelimiter() string
 }
@@ -83,7 +106,7 @@ func (def MOPSyllDef) IsDefined() bool {
 	return len(def.Onsets) > 0
 }
 
-func (def MOPSyllDef) isStress(symbol string) bool {
+func (def MOPSyllDef) IsStress(symbol string) bool {
 	for _, s := range def.Stress {
 		if s == symbol {
 			return true
@@ -92,7 +115,7 @@ func (def MOPSyllDef) isStress(symbol string) bool {
 	return false
 }
 
-func (def MOPSyllDef) isSyllabic(phoneme string) bool {
+func (def MOPSyllDef) IsSyllabic(phoneme string) bool {
 	for _, s := range def.Syllabic {
 		if s == phoneme {
 			return true
@@ -104,7 +127,7 @@ func (def MOPSyllDef) isSyllabic(phoneme string) bool {
 // ContainsSyllabic tells if the input phoneme slice contains any syllabic phonemes (required by interface)
 func (def MOPSyllDef) ContainsSyllabic(phonemes []string) bool {
 	for _, p := range phonemes {
-		if def.isSyllabic(p) {
+		if def.IsSyllabic(p) {
 			return true
 		}
 	}
@@ -127,17 +150,17 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 // ValidSplit is called by Syllabifier.Syllabify to test where to put the boundaries
 func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 
-	if len(left) > 0 && def.isStress(left[len(left)-1]) {
+	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
 		return false
 	}
 
-	if len(right) > 0 && def.isStress(right[0]) {
+	if len(right) > 0 && def.IsStress(right[0]) {
 		right = right[1:len(right)]
 	}
 
 	onset := []string{}
-	for i := 0; i < len(right) && !def.isSyllabic(right[i]); i++ {
-		if !def.isStress(right[i]) {
+	for i := 0; i < len(right) && !def.IsSyllabic(right[i]); i++ {
+		if !def.IsStress(right[i]) {
 			onset = append(onset, right[i])
 		}
 	}
@@ -145,7 +168,7 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 		return false
 	}
 	test := onset
-	for i := len(left) - 1; i >= 0 && !def.isSyllabic(left[i]); i-- {
+	for i := len(left) - 1; i >= 0 && !def.IsSyllabic(left[i]); i-- {
 		test = append([]string{left[i]}, test...)
 		if def.validOnset(strings.Join(test, def.PhonemeDelimiter())) {
 			return false
@@ -193,21 +216,21 @@ func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
 func (s Syllabifier) SyllabifyToString(t util.Trans) string {
 	res := s.Syllabify(t)
-	return res.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
+	return s.StringWithStressPlacement(res)
 }
 
 // Syllabify is used to divide a transcription into syllables
-func (s Syllabifier) Syllabify(t util.Trans) SylledTrans {
-	res := SylledTrans{Trans: t}
+func (s Syllabifier) Syllabify(t util.Trans) sylledTrans {
+	res := sylledTrans{Trans: t}
 	left := []string{}
 	right := t.ListPhonemes()
 	for gi, g2p := range t.Phonemes {
 		for pi, p := range g2p.P {
 			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
-				index := Boundary{G: gi, P: pi}
-				res.Boundaries = append(res.Boundaries, index)
+				index := boundary{G: gi, P: pi}
+				res.boundaries = append(res.boundaries, index)
 			}
-			//fmt.Printf("Syllabify.debug\t%s %s %v %v %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right), res.Boundaries)
+			//fmt.Printf("Syllabify.debug\t%s %s %v %v %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right), res.boundaries)
 			left = append(left, p)
 			right = right[1:len(right)]
 		}
@@ -225,24 +248,32 @@ func (s Syllabifier) Test(phnSet util.PhonemeSet) util.TestResult {
 		if res != test.Output {
 			result.Errors = append(result.Errors, fmt.Sprintf("from /%s/ expected /%s/, found /%s/", test.Input, test.Output, res))
 		}
-
-		// invalid, err := util.Validate(test.Output, ruleSet.PhonemeSet)
-		// 	if err != nil {
-		// 		return util.TestResult{}, fmt.Errorf("found error in test output /%s/ : %s", output, err)
-		// 	}
-		// 	splitted, err := ruleSet.PhonemeSet.SplitTranscription(output)
-		// 	if err != nil {
-		// 		return util.TestResult{}, err
-		// 	}
-		// 	for _, symbol := range splitted {
-		// 		usedSymbols[symbol] = true
-		// 	}
-		// 	for _, symbol := range invalid {
-		// 		validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in test output %s: %s", test, symbol))
-		// 	}
-
-		// }
 	}
 
 	return result
+}
+
+func (s Syllabifier) StringWithStressPlacement(t sylledTrans) string {
+	if s.StressPlacement == Undefined {
+		return t.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
+	}
+	syllables := s.parse(t)
+	res := []string{}
+	for _, syll := range syllables {
+		newSyll := []string{}
+		if (s.StressPlacement == FirstInSyllable) && syll.stress != "" {
+			newSyll = append(newSyll, syll.stress)
+		}
+		for _, phn := range syll.phonemes {
+			if s.SyllDef.IsSyllabic(phn) && syll.stress != "" && s.StressPlacement == BeforeSyllabic {
+				newSyll = append(newSyll, syll.stress)
+			}
+			newSyll = append(newSyll, phn)
+			if s.SyllDef.IsSyllabic(phn) && syll.stress != "" && s.StressPlacement == AfterSyllabic {
+				newSyll = append(newSyll, syll.stress)
+			}
+		}
+		res = append(res, strings.Join(newSyll, s.SyllDef.PhonemeDelimiter()))
+	}
+	return strings.Join(res, s.SyllDef.PhonemeDelimiter()+s.SyllDef.SyllableDelimiter()+s.SyllDef.PhonemeDelimiter())
 }
