@@ -13,6 +13,9 @@ Example (for the CMU lexicon):
    SYLLDEF STRESS "1 2"
    SYLLDEF DELIMITER "$"
 
+   SYLLDEF TEST AX P R 1 AA K S AX M AX T -> AX $ P R 1 AA K $ S AX $ M AX T
+   SYLLDEF TEST W 1 UH D S T R 2 IY M -> W 1 UH D $ S T R 2 IY M
+
 
 For details on the .g2p file format, check docs for the root folder of this package.
 

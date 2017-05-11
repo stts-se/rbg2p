@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -25,11 +26,34 @@ func syllabify(syller syll.Syllabifier, phnSet util.PhonemeSet, trans string) bo
 var l = log.New(os.Stderr, "", 0)
 
 func main() {
-	var usage = `go run syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)`
+	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var help = f.Bool("help", false, "print help message")
+
+	var usage = `go run syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+
+FLAGS:
+   -force      bool    print transcriptions even if errors are found (default: false)
+   -help       bool    print help message`
+
+	f.Usage = func() {
+		l.Printf(usage)
+	}
 
 	var args = os.Args
 	if strings.HasSuffix(args[0], "syll") {
 		args = args[1:] // remove first argument if it's the program name
+	}
+
+	err := f.Parse(args)
+	if err != nil {
+		os.Exit(1)
+	}
+	args = f.Args()
+
+	if *help {
+		l.Println(usage)
+		os.Exit(1)
 	}
 
 	if len(args) < 1 {
@@ -44,6 +68,34 @@ func main() {
 		os.Exit(1)
 	}
 
+	haltingError := false
+	result := syller.Test(phnSet)
+	for _, e := range result.Errors {
+		l.Printf("ERROR: %v\n", e)
+	}
+	l.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), ruleFile)
+	for _, e := range result.Warnings {
+		l.Printf("WARNING: %v\n", e)
+	}
+	l.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), ruleFile)
+	if len(result.Errors) > 0 {
+		haltingError = true
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			l.Printf("FAILED TEST: %v\n", e)
+		}
+		l.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(syller.Tests), ruleFile)
+		haltingError = true
+	} else {
+		l.Printf("ALL %d TESTS PASSED FOR %s\n", len(syller.Tests), ruleFile)
+	}
+
+	if haltingError && !*force {
+		os.Exit(1)
+	}
+
+	fmt.Println()
 	nTotal := 0
 	nErrs := 0
 	nOK := 0

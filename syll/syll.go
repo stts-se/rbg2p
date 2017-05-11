@@ -1,6 +1,7 @@
 package syll
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/stts-se/rbg2p/util"
@@ -153,9 +154,16 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 	return true
 }
 
+// Test defines a rule test (input -> output)
+type Test struct {
+	Input  string
+	Output string
+}
+
 // Syllabifier is a module to divide a transcription into syllables
 type Syllabifier struct {
 	SyllDef SyllDef
+	Tests   []Test
 }
 
 // IsDefined is used to determine if there is a syllabifier defined or not
@@ -170,6 +178,15 @@ func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
 		t.Phonemes = append(t.Phonemes, util.G2P{G: "", P: []string{phn}})
 	}
 	return s.SyllabifyToString(t)
+}
+
+// SyllabifyFromStromg is used to divide a transcription string into syllables and create an output string
+func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (string, error) {
+	phns, err := phnSet.SplitTranscription(trans)
+	if err != nil {
+		return "", err
+	}
+	return s.SyllabifyFromPhonemes(phns), nil
 }
 
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
@@ -195,4 +212,36 @@ func (s Syllabifier) Syllabify(t util.Trans) SylledTrans {
 		}
 	}
 	return res
+}
+
+func (s Syllabifier) Test(phnSet util.PhonemeSet) util.TestResult {
+	var result = util.TestResult{}
+	for _, test := range s.Tests {
+		res, err := s.SyllabifyFromString(phnSet, test.Input)
+		if err != nil {
+			result.Errors = append(result.Errors, fmt.Sprintf("found error in test input (couldn't split) /%s/ : %s", test.Input, err))
+		}
+		if res != test.Output {
+			result.Errors = append(result.Errors, fmt.Sprintf("from /%s/ expected /%s/, found /%s/", test.Input, test.Output, res))
+		}
+
+		// invalid, err := util.Validate(test.Output, ruleSet.PhonemeSet)
+		// 	if err != nil {
+		// 		return util.TestResult{}, fmt.Errorf("found error in test output /%s/ : %s", output, err)
+		// 	}
+		// 	splitted, err := ruleSet.PhonemeSet.SplitTranscription(output)
+		// 	if err != nil {
+		// 		return util.TestResult{}, err
+		// 	}
+		// 	for _, symbol := range splitted {
+		// 		usedSymbols[symbol] = true
+		// 	}
+		// 	for _, symbol := range invalid {
+		// 		validation.Errors = append(validation.Errors, fmt.Sprintf("invalid symbol in test output %s: %s", test, symbol))
+		// 	}
+
+		// }
+	}
+
+	return result
 }

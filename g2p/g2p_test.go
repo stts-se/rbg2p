@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stts-se/rbg2p/syll"
 	"github.com/stts-se/rbg2p/util"
 )
 
@@ -497,5 +498,51 @@ func xxxTestBaq(t *testing.T) {
 	_, err := loadAndTest(t, "../server/g2p_files/basque_sampa.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
+	}
+}
+func loadAndTestSyll(t *testing.T, fName string) (syll.Syllabifier, util.PhonemeSet, error) {
+	syller, pSet, err := syll.LoadFile(fName)
+	if err != nil {
+		return syller, pSet, fmt.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+
+	result := syller.Test(pSet)
+	if len(result.Errors) > 0 {
+		for _, e := range result.Errors {
+			fmt.Printf("ERROR: %v\n", e)
+		}
+		fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fName)
+	}
+	if len(result.Warnings) > 0 {
+		for _, e := range result.Warnings {
+			fmt.Printf("WARNING: %v\n", e)
+		}
+		fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fName)
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			fmt.Printf("FAILED TEST: %v\n", e)
+		}
+		fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(syller.Tests), fName)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(syller.Tests), fName)
+	}
+	if len(result.Errors) > 0 || len(result.FailedTests) > 0 {
+		return syller, pSet, fmt.Errorf("Init/tests failed for %s", fName)
+	}
+	return syller, pSet, nil
+}
+
+func TestSwsSyll(t *testing.T) {
+	_, _, err := loadAndTestSyll(t, "../test_data/sws_test_syll.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func TestSwsSyllFail(t *testing.T) {
+	_, _, err := loadAndTestSyll(t, "../test_data/sws_test_syll_fail.g2p")
+	if err == nil {
+		t.Errorf("expected error here")
 	}
 }

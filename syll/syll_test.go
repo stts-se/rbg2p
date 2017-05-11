@@ -30,7 +30,7 @@ func TestMOPValidSplit(t *testing.T) {
 		SyllDelim: ".",
 		Syllabic:  []string{"O"},
 	}
-	syller := Syllabifier{def}
+	syller := Syllabifier{SyllDef: def}
 
 	testMOPValidSplit(t, syller, "p", "k", true)
 
@@ -141,7 +141,7 @@ func TestSyllabify1(t *testing.T) {
 		SyllDelim: ".",
 		Syllabic:  []string{"O", "e", "a"},
 	}
-	syller := Syllabifier{def}
+	syller := Syllabifier{SyllDef: def}
 
 	testSyllabify(t, syller, "k O t e", "k O . t e")
 	testSyllabify(t, syller, "k O t e p r O g r a m", "k O . t e . p r O g . r a m")
@@ -161,7 +161,7 @@ func TestSyllabify2(t *testing.T) {
 		SyllDelim: ".",
 		Syllabic:  []string{"O", "e", "a", "@", "u0"},
 	}
-	syller := Syllabifier{def}
+	syller := Syllabifier{SyllDef: def}
 
 	//
 	inputT := util.Trans{
@@ -233,7 +233,7 @@ func TestSyllabify3(t *testing.T) {
 		SyllDelim: ".",
 		Syllabic:  []string{"a", "@", "{:"},
 	}
-	syller := Syllabifier{def}
+	syller := Syllabifier{SyllDef: def}
 
 	//
 	inputT := util.Trans{
@@ -268,7 +268,7 @@ func TestSyllabify4(t *testing.T) {
 		PhnDelim:  " ",
 		SyllDelim: ".",
 	}
-	syller := Syllabifier{def}
+	syller := Syllabifier{SyllDef: def}
 
 	//
 	inputT := util.Trans{
@@ -307,7 +307,7 @@ func TestBaqSyller(t *testing.T) {
 		return
 	}
 
-	syll := Syllabifier{def}
+	syll := Syllabifier{SyllDef: def}
 
 	input := strings.Split("f rr a g rr \" a n s i a", " ")
 	expect := "f rr a g . rr \" a n . s i . a"
@@ -342,7 +342,7 @@ func TestSwsInputWithStress(t *testing.T) {
 		return
 	}
 
-	syll := Syllabifier{def}
+	syll := Syllabifier{SyllDef: def}
 
 	input := strings.Split("\" d u0 S a", " ")
 	expect := "\" d u0 . S a"
