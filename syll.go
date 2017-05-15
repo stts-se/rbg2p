@@ -137,7 +137,7 @@ func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
 	for _, phn := range phns {
 		t.phonemes = append(t.phonemes, g2p{g: "", p: []string{phn}})
 	}
-	return s.SyllabifyToString(t)
+	return s.syllabifyToString(t)
 }
 
 // SyllabifyFromString is used to divide a transcription string into syllables and create an output string
@@ -149,8 +149,8 @@ func (s Syllabifier) SyllabifyFromString(phnSet PhonemeSet, trans string) (strin
 	return s.SyllabifyFromPhonemes(phns), nil
 }
 
-// SyllabifyToString is used to divide a transcription into syllables and create an output string
-func (s Syllabifier) SyllabifyToString(t trans) string {
+// syllabifyToString is used to divide a transcription into syllables and create an output string
+func (s Syllabifier) syllabifyToString(t trans) string {
 	res := s.syllabify(t)
 	return s.stringWithStressPlacement(res)
 }
