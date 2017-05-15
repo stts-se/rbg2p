@@ -62,7 +62,7 @@ func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
 	}
 	value := matchRes[2]
 	phonemes := multiSpace.Split(value, -1)
-	phonemeSet, err := newPhonemeSet(phonemes, phnDelim)
+	phonemeSet, err := NewPhonemeSet(phonemes, phnDelim)
 	if err != nil {
 		return PhonemeSet{}, fmt.Errorf("couldn't create phoneme set : %s", err)
 	}

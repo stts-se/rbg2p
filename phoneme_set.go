@@ -15,7 +15,7 @@ type PhonemeSet struct {
 }
 
 // NewPhonemeSet creates a phoneme set from a slice of symbols, and a phoneme delimiter string
-func newPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
+func NewPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
 	reString := delimiter
 	if len(delimiter) > 0 {
 		reString = delimiter + "+"
@@ -61,8 +61,8 @@ func LoadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
 	}, nil
 }
 
-// ValidPhoneme returns true if the input symbol is a valid phoneme, otherwise false
-func (ps PhonemeSet) ValidPhoneme(symbol string) bool {
+// validPhoneme returns true if the input symbol is a valid phoneme, otherwise false
+func (ps PhonemeSet) validPhoneme(symbol string) bool {
 	for _, s := range ps.Symbols {
 		if s == symbol {
 			return true
@@ -96,7 +96,7 @@ func (ps PhonemeSet) validate(input string) ([]string, error) {
 		return nil, err
 	}
 	for _, symbol := range splitted {
-		if !ps.ValidPhoneme(symbol) {
+		if !ps.validPhoneme(symbol) {
 			invalid = append(invalid, symbol)
 		}
 	}
