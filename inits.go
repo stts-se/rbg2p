@@ -1,4 +1,4 @@
-package g2p
+package rbg2p
 
 import (
 	"bufio"
@@ -6,9 +6,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/stts-se/rbg2p/syll"
-	"github.com/stts-se/rbg2p/util"
 )
 
 func isVar(s string) bool {
@@ -43,15 +40,15 @@ func LoadFile(fName string) (RuleSet, error) {
 			return ruleSet, err
 		}
 		n++
-		l := util.TrimComment(strings.TrimSpace(s.Text()))
-		if util.IsBlankLine(l) || util.IsComment(l) {
-		} else if util.IsPhonemeDelimiter(l) {
-			delim, err := util.ParsePhonemeDelimiter(l)
+		l := trimComment(strings.TrimSpace(s.Text()))
+		if isBlankLine(l) || isComment(l) {
+		} else if isPhonemeDelimiter(l) {
+			delim, err := parsePhonemeDelimiter(l)
 			if err != nil {
 				return ruleSet, err
 			}
 			ruleSet.PhonemeDelimiter = delim
-		} else if util.IsPhonemeSet(l) {
+		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
 		} else if isConst(l) {
 			err := parseConst(l, &ruleSet)
@@ -64,7 +61,7 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, err
 			}
 			ruleSet.Vars[name] = value
-		} else if util.IsSyllDefLine(l) {
+		} else if isSyllDefLine(l) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
 			t, err := newFilter(l)
@@ -84,15 +81,15 @@ func LoadFile(fName string) (RuleSet, error) {
 
 	}
 	if len(phonemeSetLine) > 0 {
-		phnSet, err := util.ParsePhonemeSet(phonemeSetLine, ruleSet.PhonemeDelimiter)
+		phnSet, err := parsePhonemeSet(phonemeSetLine, ruleSet.PhonemeDelimiter)
 		if err != nil {
 			return ruleSet, err
 		}
 		ruleSet.PhonemeSet = phnSet
 	}
-	syllDef, stressPlacement, err := syll.LoadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
+	syllDef, stressPlacement, err := loadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
 	ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
-	ruleSet.Syllabifier = syll.Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement}
+	ruleSet.Syllabifier = Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement}
 
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
@@ -152,7 +149,6 @@ func newVar(s string) (string, string, error) {
 
 var testReSimple = regexp.MustCompile("^TEST +([^ ]+) +-> +([^,()]+)$")
 var testReVariants = regexp.MustCompile("^TEST +([^ ]+) +-> +[(](.+,.+)[)]$")
-var commaSplit = regexp.MustCompile(" *, *")
 
 func newTest(s string) (Test, error) {
 	var outputS string

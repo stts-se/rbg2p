@@ -1,6 +1,4 @@
-/*Package syll contains utilities for syllabification
-
-A .g2p file for syllabification contains a subset of the items used for a proper g2p.
+/*A .g2p file for syllabification contains a subset of the items used for a proper g2p.
 
 Example (for the CMU lexicon):
 
@@ -20,4 +18,4 @@ Example (for the CMU lexicon):
 For details on the .g2p file format, check docs for the root folder of this package.
 
 */
-package syll
+package rbg2p

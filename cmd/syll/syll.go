@@ -8,11 +8,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/stts-se/rbg2p/syll"
-	"github.com/stts-se/rbg2p/util"
+	"github.com/stts-se/rbg2p"
 )
 
-func syllabify(syller syll.Syllabifier, phnSet util.PhonemeSet, trans string) bool {
+func syllabify(syller rbg2p.Syllabifier, phnSet rbg2p.PhonemeSet, trans string) bool {
 	phonemes, err := phnSet.SplitTranscription(trans)
 	if err != nil {
 		l.Printf("%s", err)
@@ -62,7 +61,7 @@ FLAGS:
 	}
 
 	ruleFile := args[0]
-	syller, phnSet, err := syll.LoadFile(ruleFile)
+	syller, phnSet, err := rbg2p.LoadSyllFile(ruleFile)
 	if err != nil {
 		l.Printf("couldn't load rule file %s : %s", ruleFile, err)
 		os.Exit(1)

@@ -1,10 +1,8 @@
-package syll
+package rbg2p
 
 import (
 	"fmt"
 	"strings"
-
-	"github.com/stts-se/rbg2p/util"
 )
 
 // boundary represents syllable boundaries. Primarily for package internal use.
@@ -15,7 +13,7 @@ type boundary struct {
 
 // sylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
 type sylledTrans struct {
-	Trans      util.Trans
+	Trans      Trans
 	boundaries []boundary
 	Stress     []string
 }
@@ -179,8 +177,8 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 	return true
 }
 
-// Test defines a rule test (input -> output)
-type Test struct {
+// SyllTest defines a rule test (input -> output)
+type SyllTest struct {
 	Input  string
 	Output string
 }
@@ -188,7 +186,7 @@ type Test struct {
 // Syllabifier is a module to divide a transcription into syllables
 type Syllabifier struct {
 	SyllDef         SyllDef
-	Tests           []Test
+	Tests           []SyllTest
 	StressPlacement StressPlacement
 }
 
@@ -199,15 +197,15 @@ func (s Syllabifier) IsDefined() bool {
 
 // SyllabifyFromPhonemes is used to divide a range of phonemes into syllables and create an output string
 func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
-	t := util.Trans{}
+	t := Trans{}
 	for _, phn := range phns {
-		t.Phonemes = append(t.Phonemes, util.G2P{G: "", P: []string{phn}})
+		t.Phonemes = append(t.Phonemes, G2P{G: "", P: []string{phn}})
 	}
 	return s.SyllabifyToString(t)
 }
 
 // SyllabifyFromString is used to divide a transcription string into syllables and create an output string
-func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (string, error) {
+func (s Syllabifier) SyllabifyFromString(phnSet PhonemeSet, trans string) (string, error) {
 	phns, err := phnSet.SplitTranscription(trans)
 	if err != nil {
 		return "", err
@@ -216,13 +214,13 @@ func (s Syllabifier) SyllabifyFromString(phnSet util.PhonemeSet, trans string) (
 }
 
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
-func (s Syllabifier) SyllabifyToString(t util.Trans) string {
+func (s Syllabifier) SyllabifyToString(t Trans) string {
 	res := s.Syllabify(t)
 	return s.stringWithStressPlacement(res)
 }
 
 // Syllabify is used to divide a transcription into syllables
-func (s Syllabifier) Syllabify(t util.Trans) sylledTrans {
+func (s Syllabifier) Syllabify(t Trans) sylledTrans {
 	res := sylledTrans{Trans: t}
 	left := []string{}
 	right := t.ListPhonemes()
@@ -241,8 +239,8 @@ func (s Syllabifier) Syllabify(t util.Trans) sylledTrans {
 }
 
 //Test to test the input syllabifier definition using tests in the input data or file
-func (s Syllabifier) Test(phnSet util.PhonemeSet) util.TestResult {
-	var result = util.TestResult{}
+func (s Syllabifier) Test(phnSet PhonemeSet) TestResult {
+	var result = TestResult{}
 	for _, test := range s.Tests {
 		res, err := s.SyllabifyFromString(phnSet, test.Input)
 		if err != nil {

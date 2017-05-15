@@ -1,4 +1,4 @@
-package syll
+package rbg2p
 
 // StressPlacement is used to define where in a syllable the stress should be put in an output string
 type StressPlacement int

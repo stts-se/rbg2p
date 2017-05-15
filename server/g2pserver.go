@@ -15,16 +15,16 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
-	"github.com/stts-se/rbg2p/g2p"
+	"github.com/stts-se/rbg2p"
 )
 
 type g2pMutex struct {
-	g2ps  map[string]g2p.RuleSet
+	g2ps  map[string]rbg2p.RuleSet
 	mutex *sync.RWMutex
 }
 
 var g2pM = g2pMutex{
-	g2ps:  make(map[string]g2p.RuleSet),
+	g2ps:  make(map[string]rbg2p.RuleSet),
 	mutex: &sync.RWMutex{},
 }
 
@@ -294,7 +294,7 @@ func main() {
 			continue
 		}
 
-		ruleSet, err := g2p.LoadFile(fn)
+		ruleSet, err := rbg2p.LoadFile(fn)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			fmt.Fprintf(os.Stderr, "g2pserver: skipping file: '%s'\n", fn)

@@ -1,4 +1,4 @@
-package syll
+package rbg2p
 
 import (
 	"bufio"
@@ -6,58 +6,56 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/stts-se/rbg2p/util"
 )
 
-// LoadFile loads a syllabifier from the specified file
-func LoadFile(fName string) (Syllabifier, util.PhonemeSet, error) {
+// LoadSyllFile loads a syllabifier from the specified file
+func LoadSyllFile(fName string) (Syllabifier, PhonemeSet, error) {
 	syllDefLines := []string{}
 	res := Syllabifier{}
 	phonemeDelimiter := " "
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
-		return res, util.PhonemeSet{}, err
+		return res, PhonemeSet{}, err
 	}
 	n := 0
 	var phonemeSetLine string
 	s := bufio.NewScanner(fh)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
-			return res, util.PhonemeSet{}, err
+			return res, PhonemeSet{}, err
 		}
 		n++
-		l := util.TrimComment(strings.TrimSpace(s.Text()))
-		if util.IsBlankLine(l) || util.IsComment(l) {
-		} else if isTest(l) {
-			t, err := newTest(l)
+		l := trimComment(strings.TrimSpace(s.Text()))
+		if isBlankLine(l) || isComment(l) {
+		} else if isSyllTest(l) {
+			t, err := newSyllTest(l)
 			if err != nil {
-				return res, util.PhonemeSet{}, err
+				return res, PhonemeSet{}, err
 			}
 			res.Tests = append(res.Tests, t)
-		} else if util.IsSyllDefLine(l) {
+		} else if isSyllDefLine(l) {
 			syllDefLines = append(syllDefLines, l)
-		} else if util.IsPhonemeDelimiter(l) {
-			phonemeDelimiter, err = util.ParsePhonemeDelimiter(l)
-		} else if util.IsPhonemeSet(l) {
+		} else if isPhonemeDelimiter(l) {
+			phonemeDelimiter, err = parsePhonemeDelimiter(l)
+		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
 		} else {
-			return res, util.PhonemeSet{}, fmt.Errorf("unknown input line: %s", l)
+			return res, PhonemeSet{}, fmt.Errorf("unknown input line: %s", l)
 		}
 
 	}
 	if len(phonemeSetLine) == 0 {
-		return res, util.PhonemeSet{}, fmt.Errorf("missing required phoneme set definition")
+		return res, PhonemeSet{}, fmt.Errorf("missing required phoneme set definition")
 	}
 
-	phnSet, err := util.ParsePhonemeSet(phonemeSetLine, phonemeDelimiter)
+	phnSet, err := parsePhonemeSet(phonemeSetLine, phonemeDelimiter)
 	if err != nil {
-		return res, util.PhonemeSet{}, err
+		return res, PhonemeSet{}, err
 	}
-	syllDef, stressPlacement, err := LoadSyllDef(syllDefLines, phonemeDelimiter)
+	syllDef, stressPlacement, err := loadSyllDef(syllDefLines, phonemeDelimiter)
 	if err != nil {
-		return res, util.PhonemeSet{}, err
+		return res, PhonemeSet{}, err
 	}
 	res.SyllDef = syllDef
 	res.StressPlacement = stressPlacement
@@ -65,8 +63,7 @@ func LoadFile(fName string) (Syllabifier, util.PhonemeSet, error) {
 	return res, phnSet, nil
 }
 
-// LoadSyllDef loads a syllable definition from a set of input lines, and an explicitly specified phoneme delimiter
-func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlacement, error) {
+func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlacement, error) {
 	def := MOPSyllDef{} // TODO: Handle other sylldefs too?
 	def.PhnDelim = phnDelim
 	stressPlacement := Undefined
@@ -102,24 +99,24 @@ func LoadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlaceme
 	return def, stressPlacement, nil
 }
 
-func isTest(s string) bool {
+func isSyllTest(s string) bool {
 	return strings.HasPrefix(s, "SYLLDEF TEST ")
 }
 
-var testRe = regexp.MustCompile("^SYLLDEF TEST +(.+) +-> +(.+)$")
+var syllTestRe = regexp.MustCompile("^SYLLDEF TEST +(.+) +-> +(.+)$")
 
-func newTest(s string) (Test, error) {
+func newSyllTest(s string) (SyllTest, error) {
 	var matchRes []string
-	matchRes = testRe.FindStringSubmatch(s)
+	matchRes = syllTestRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Test{}, fmt.Errorf("invalid test definition: " + s)
+		return SyllTest{}, fmt.Errorf("invalid test definition: " + s)
 	}
 	input := matchRes[1]
 	output := matchRes[2]
 	if strings.Contains(output, "->") {
-		return Test{}, fmt.Errorf("invalid test definition: " + s)
+		return SyllTest{}, fmt.Errorf("invalid test definition: " + s)
 	}
-	return Test{Input: input, Output: output}, nil
+	return SyllTest{Input: input, Output: output}, nil
 }
 
 var stressPlacementRe = regexp.MustCompile("^SYLLDEF +STRESS_PLACEMENT +(FirstInSyllable|BeforeSyllabic|AfterSyllabic)$")
@@ -150,8 +147,6 @@ func newStressPlacement(s string) (StressPlacement, error) {
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")
 var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
-var commaSplit = regexp.MustCompile(" *, *")
-var multiSpace = regexp.MustCompile(" +")
 
 func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 	// SYLLDEF (ONSETS|SYLLABIC|DELIMITER) "VALUE"

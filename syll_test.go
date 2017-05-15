@@ -1,11 +1,9 @@
-package syll
+package rbg2p
 
 import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/stts-se/rbg2p/util"
 )
 
 func testMOPValidSplit(t *testing.T, syller Syllabifier, left string, right string, expect bool) {
@@ -73,13 +71,13 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input := sylledTrans{
-		Trans: util.Trans{
-			Phonemes: []util.G2P{
-				util.G2P{G: "t", P: []string{"t"}},
-				util.G2P{G: "o", P: []string{"O"}},
-				util.G2P{G: "ff", P: []string{"f"}},
-				util.G2P{G: "e", P: []string{"@"}},
-				util.G2P{G: "l", P: []string{"l"}},
+		Trans: Trans{
+			Phonemes: []G2P{
+				G2P{G: "t", P: []string{"t"}},
+				G2P{G: "o", P: []string{"O"}},
+				G2P{G: "ff", P: []string{"f"}},
+				G2P{G: "e", P: []string{"@"}},
+				G2P{G: "l", P: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
@@ -94,13 +92,13 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input = sylledTrans{
-		Trans: util.Trans{
-			Phonemes: []util.G2P{
-				util.G2P{G: "t", P: []string{"t"}},
-				util.G2P{G: "o", P: []string{"O"}},
-				util.G2P{G: "x", P: []string{"k", "s"}},
-				util.G2P{G: "e", P: []string{"@"}},
-				util.G2P{G: "l", P: []string{"l"}},
+		Trans: Trans{
+			Phonemes: []G2P{
+				G2P{G: "t", P: []string{"t"}},
+				G2P{G: "o", P: []string{"O"}},
+				G2P{G: "x", P: []string{"k", "s"}},
+				G2P{G: "e", P: []string{"@"}},
+				G2P{G: "l", P: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
@@ -116,9 +114,9 @@ func TestSylledTransString(t *testing.T) {
 
 func testSyllabify(t *testing.T, syller Syllabifier, input string, expect string) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
-	inputT := util.Trans{}
+	inputT := Trans{}
 	for _, p := range strings.Split(input, " ") {
-		inputT.Phonemes = append(inputT.Phonemes, util.G2P{"", []string{p}})
+		inputT.Phonemes = append(inputT.Phonemes, G2P{"", []string{p}})
 	}
 	resT := syller.Syllabify(inputT)
 	res := resT.String(" ", ".")
@@ -164,12 +162,12 @@ func TestSyllabify2(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := util.Trans{
-		Phonemes: []util.G2P{
-			util.G2P{G: "t", P: []string{"t"}},
-			util.G2P{G: "o", P: []string{"O"}},
-			util.G2P{G: "x", P: []string{"k", "s"}},
-			util.G2P{G: "el", P: []string{"@", "l"}},
+	inputT := Trans{
+		Phonemes: []G2P{
+			G2P{G: "t", P: []string{"t"}},
+			G2P{G: "o", P: []string{"O"}},
+			G2P{G: "x", P: []string{"k", "s"}},
+			G2P{G: "el", P: []string{"@", "l"}},
 		},
 	}
 
@@ -182,13 +180,13 @@ func TestSyllabify2(t *testing.T) {
 	}
 
 	//
-	inputT = util.Trans{
-		Phonemes: []util.G2P{
-			util.G2P{G: "t", P: []string{"t"}},
-			util.G2P{G: "o", P: []string{"O"}},
-			util.G2P{G: "x", P: []string{"k", "s"}},
-			util.G2P{G: "e", P: []string{"@"}},
-			util.G2P{G: "l", P: []string{"l"}},
+	inputT = Trans{
+		Phonemes: []G2P{
+			G2P{G: "t", P: []string{"t"}},
+			G2P{G: "o", P: []string{"O"}},
+			G2P{G: "x", P: []string{"k", "s"}},
+			G2P{G: "e", P: []string{"@"}},
+			G2P{G: "l", P: []string{"l"}},
 		},
 	}
 
@@ -201,13 +199,13 @@ func TestSyllabify2(t *testing.T) {
 	}
 
 	//
-	inputT = util.Trans{
-		Phonemes: []util.G2P{
-			util.G2P{G: "t", P: []string{"t"}},
-			util.G2P{G: "u", P: []string{"u0"}},
-			util.G2P{G: "ng", P: []string{"N"}},
-			util.G2P{G: "a", P: []string{"a"}},
-			util.G2P{G: "n", P: []string{"n"}},
+	inputT = Trans{
+		Phonemes: []G2P{
+			G2P{G: "t", P: []string{"t"}},
+			G2P{G: "u", P: []string{"u0"}},
+			G2P{G: "ng", P: []string{"N"}},
+			G2P{G: "a", P: []string{"a"}},
+			G2P{G: "n", P: []string{"n"}},
 		},
 	}
 
@@ -236,17 +234,17 @@ func TestSyllabify3(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := util.Trans{
-		Phonemes: []util.G2P{
-			util.G2P{G: "b", P: []string{"b"}},
-			util.G2P{G: "a", P: []string{"a"}},
-			util.G2P{G: "rr", P: []string{"rr"}},
-			util.G2P{G: "t", P: []string{"t"}},
-			util.G2P{G: "r", P: []string{"r"}},
-			util.G2P{G: "ä", P: []string{"{:"}},
-			util.G2P{G: "d", P: []string{"d"}},
-			util.G2P{G: "e", P: []string{"@"}},
-			util.G2P{G: "n", P: []string{"n"}},
+	inputT := Trans{
+		Phonemes: []G2P{
+			G2P{G: "b", P: []string{"b"}},
+			G2P{G: "a", P: []string{"a"}},
+			G2P{G: "rr", P: []string{"rr"}},
+			G2P{G: "t", P: []string{"t"}},
+			G2P{G: "r", P: []string{"r"}},
+			G2P{G: "ä", P: []string{"{:"}},
+			G2P{G: "d", P: []string{"d"}},
+			G2P{G: "e", P: []string{"@"}},
+			G2P{G: "n", P: []string{"n"}},
 		},
 	}
 
@@ -271,15 +269,15 @@ func TestSyllabify4(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := util.Trans{
-		Phonemes: []util.G2P{
-			util.G2P{G: "b", P: []string{"b"}},
-			util.G2P{G: "o", P: []string{"O"}},
-			util.G2P{G: "rt", P: []string{"rt"}},
-			util.G2P{G: "a", P: []string{"a"}},
-			util.G2P{G: "d", P: []string{"d"}},
-			util.G2P{G: "u", P: []string{"u0"}},
-			util.G2P{G: "sch", P: []string{"S"}},
+	inputT := Trans{
+		Phonemes: []G2P{
+			G2P{G: "b", P: []string{"b"}},
+			G2P{G: "o", P: []string{"O"}},
+			G2P{G: "rt", P: []string{"rt"}},
+			G2P{G: "a", P: []string{"a"}},
+			G2P{G: "d", P: []string{"d"}},
+			G2P{G: "u", P: []string{"u0"}},
+			G2P{G: "sch", P: []string{"S"}},
 		},
 	}
 
@@ -301,7 +299,7 @@ func TestBaqSyller(t *testing.T) {
 		`SYLLDEF STRESS "\" %"`,
 		`SYLLDEF DELIMITER "."`,
 	}
-	def, stressP, err := LoadSyllDef(lines, " ")
+	def, stressP, err := loadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
@@ -336,7 +334,7 @@ func TestSwsInputWithStress(t *testing.T) {
 		`SYLLDEF STRESS "\" \"\" %"`,
 		`SYLLDEF DELIMITER "."`,
 	}
-	def, stressP, err := LoadSyllDef(lines, " ")
+	def, stressP, err := loadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
@@ -412,7 +410,7 @@ func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
 		`SYLLDEF DELIMITER "."`,
 		`SYLLDEF STRESS_PLACEMENT FirstInSyllable`,
 	}
-	def, stressP, err := LoadSyllDef(lines, " ")
+	def, stressP, err := loadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
@@ -488,7 +486,7 @@ func TestSwsInputWithStressPlacement_AfterSyllabic(t *testing.T) {
 		`SYLLDEF DELIMITER "."`,
 		`SYLLDEF STRESS_PLACEMENT AfterSyllabic`,
 	}
-	def, stressP, err := LoadSyllDef(lines, " ")
+	def, stressP, err := loadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return
@@ -564,7 +562,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 		`SYLLDEF DELIMITER "."`,
 		`SYLLDEF STRESS_PLACEMENT BeforeSyllabic`,
 	}
-	def, stressP, err := LoadSyllDef(lines, " ")
+	def, stressP, err := loadSyllDef(lines, " ")
 	if err != nil {
 		t.Errorf("%v", err)
 		return

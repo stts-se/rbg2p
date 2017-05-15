@@ -1,4 +1,4 @@
-package util
+package rbg2p
 
 import "strings"
 

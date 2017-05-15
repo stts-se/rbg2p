@@ -1,4 +1,4 @@
-package util
+package rbg2p
 
 import (
 	"bufio"
@@ -62,8 +62,8 @@ func LoadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
 }
 
 // ValidPhoneme returns true if the input symbol is a valid phoneme, otherwise false
-func (ss PhonemeSet) ValidPhoneme(symbol string) bool {
-	for _, s := range ss.Symbols {
+func (ps PhonemeSet) ValidPhoneme(symbol string) bool {
+	for _, s := range ps.Symbols {
 		if s == symbol {
 			return true
 		}
@@ -72,12 +72,12 @@ func (ss PhonemeSet) ValidPhoneme(symbol string) bool {
 }
 
 // SplitTranscription splits the input transcription into a slice of phonemes, based on the pre-defined phoneme delimiter
-func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
+func (ps PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 	if len(trans) == 0 {
 		return []string{}, nil
 	}
-	if ss.DelimiterRe.MatchString("") {
-		splitted, unknown, err := splitIntoPhonemes(ss.Symbols, trans)
+	if ps.DelimiterRe.MatchString("") {
+		splitted, unknown, err := splitIntoPhonemes(ps.Symbols, trans)
 		if err != nil {
 			return []string{}, err
 		}
@@ -86,26 +86,24 @@ func (ss PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 		}
 		return splitted, nil
 	}
-	return ss.DelimiterRe.Split(trans, -1), nil
+	return ps.DelimiterRe.Split(trans, -1), nil
 }
 
-// Validate an input string using a specified phoneme set
-func Validate(input string, phonemeSet PhonemeSet) ([]string, error) {
+func (ps PhonemeSet) Validate(input string) ([]string, error) {
 	var invalid = []string{}
-	splitted, err := phonemeSet.SplitTranscription(input)
+	splitted, err := ps.SplitTranscription(input)
 	if err != nil {
 		return nil, err
 	}
 	for _, symbol := range splitted {
-		if !phonemeSet.ValidPhoneme(symbol) {
+		if !ps.ValidPhoneme(symbol) {
 			invalid = append(invalid, symbol)
 		}
 	}
 	return invalid, nil
 }
 
-// CheckForUnusedSymbols compares the phoneme set to a map of used symbols, to tell what symbols in the phoneme set hasn't been used. Mainly for package internal use.
-func CheckForUnusedSymbols(usedSymbols map[string]bool, phonemeSet PhonemeSet) []string {
+func checkForUnusedSymbols(usedSymbols map[string]bool, phonemeSet PhonemeSet) []string {
 	warnings := []string{}
 	for _, symbol := range phonemeSet.Symbols {
 		if _, ok := usedSymbols[symbol]; !ok {
