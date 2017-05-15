@@ -19,9 +19,9 @@ Utilities for rule based, manually written, grapheme to phoneme rules
     $ go run cmd/syll/syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 
-## Microservice API/server
+### Microservice API/server
 
-     $ go run server/*.go server/g2p_files
+     $ go run cmd/server/*.go cmd/server/g2p_files
      
  Visit http://localhost:6771/ for info on available API calls
  

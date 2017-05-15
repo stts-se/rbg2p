@@ -1,4 +1,4 @@
-# rbg2p/server
+# rbg2p/cmd/server
 
 $ go run *.go <G2P FILES DIR>
 

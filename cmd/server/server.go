@@ -8,8 +8,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -29,8 +31,9 @@ var g2pM = g2pMutex{
 }
 
 func g2pMain_Handler(w http.ResponseWriter, r *http.Request) {
-	// TODO error if file not found
-	http.ServeFile(w, r, "./src/g2p_demo.html")
+	_, cmdFileName, _, _ := runtime.Caller(0)
+	fString := path.Join(path.Dir(cmdFileName), "src/g2p_demo.html")
+	http.ServeFile(w, r, fString)
 }
 
 var wSplitRe = regexp.MustCompile(" *, *")
@@ -270,7 +273,7 @@ func langFromFilePath(p string) string {
 func main() {
 
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "g2pserver <G2P FILES DIR>\n")
+		fmt.Fprintf(os.Stderr, "server <G2P FILES DIR>\n")
 		os.Exit(0)
 	}
 
@@ -290,14 +293,14 @@ func main() {
 	for _, f := range files {
 		fn = filepath.Join(dir, f.Name())
 		if !strings.HasSuffix(fn, ".g2p") {
-			fmt.Fprintf(os.Stderr, "g2pserver: skipping file: '%s'\n", fn)
+			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 			continue
 		}
 
 		ruleSet, err := rbg2p.LoadFile(fn)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
-			fmt.Fprintf(os.Stderr, "g2pserver: skipping file: '%s'\n", fn)
+			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 			continue
 		}
 
@@ -305,7 +308,7 @@ func main() {
 		g2pM.mutex.Lock()
 		g2pM.g2ps[lang] = ruleSet
 		g2pM.mutex.Unlock()
-		fmt.Fprintf(os.Stderr, "g2pserver: loaded file '%s'\n", fn)
+		fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
 	}
 
 	r := mux.NewRouter().StrictSlash(true)
