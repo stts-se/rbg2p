@@ -169,19 +169,19 @@ func (rs RuleSet) Test() TestResult {
 	return result
 }
 
-func (rs RuleSet) expandLoop(head G2P, tail []G2P, acc []Trans) []Trans {
-	res := []Trans{}
+func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []trans) []trans {
+	res := []trans{}
 	for i := 0; i < len(acc); i++ {
-		for _, add := range head.P {
-			appendRange := []G2P{}
+		for _, add := range head.p {
+			appendRange := []g2p{}
 			// build prefix from previous rounds
-			for _, g2p := range acc[i].Phonemes {
+			for _, g2p := range acc[i].phonemes {
 				appendRange = append(appendRange, g2p)
 			}
 			// append current phonemes
-			g2p := G2P{G: head.G, P: strings.Split(add, rs.PhonemeDelimiter)}
+			g2p := g2p{g: head.g, p: strings.Split(add, rs.PhonemeDelimiter)}
 			appendRange = append(appendRange, g2p)
-			res = append(res, Trans{Phonemes: appendRange})
+			res = append(res, trans{phonemes: appendRange})
 		}
 
 	}
@@ -191,8 +191,8 @@ func (rs RuleSet) expandLoop(head G2P, tail []G2P, acc []Trans) []Trans {
 	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
 }
 
-func (rs RuleSet) expand(phonemes []G2P) []Trans {
-	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []Trans{Trans{}})
+func (rs RuleSet) expand(phonemes []g2p) []trans {
+	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []trans{trans{}})
 }
 
 func (rs RuleSet) applyFilters(trans string) string {
@@ -207,7 +207,7 @@ func (rs RuleSet) applyFilters(trans string) string {
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
 	var s0 = []rune(s)
-	res := []G2P{}
+	res := []g2p{}
 	var couldntMap = []string{}
 	for i < len(s0) {
 		ss := string(s0[i:len(s0)])
@@ -221,14 +221,14 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 				right := string(s0[i+ruleInputLen : len(s0)])
 				if rule.RightContext.Matches(right) {
 					i = i + ruleInputLen
-					res = append(res, G2P{G: rule.Input, P: rule.Output})
+					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
 					break
 				}
 			}
 		}
 		if !matchFound {
-			res = append(res, G2P{G: thisChar, P: []string{rs.DefaultPhoneme}})
+			res = append(res, g2p{g: thisChar, p: []string{rs.DefaultPhoneme}})
 			i = i + 1
 			couldntMap = append(couldntMap, thisChar)
 		}
@@ -240,10 +240,10 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 		//fmt.Printf("%#v\n", t)
 		//fmt.Printf("%#v\n", t.String(" "))
 		if rs.Syllabifier.IsDefined() {
-			s := rs.Syllabifier.Syllabify(t)
-			transes = append(transes, s.String(rs.PhonemeDelimiter, rs.SyllableDelimiter))
+			s := rs.Syllabifier.syllabify(t)
+			transes = append(transes, s.string(rs.PhonemeDelimiter, rs.SyllableDelimiter))
 		} else {
-			transes = append(transes, t.String(rs.PhonemeDelimiter))
+			transes = append(transes, t.string(rs.PhonemeDelimiter))
 		}
 	}
 	var filtered []string
@@ -263,7 +263,7 @@ func compareToPhonemeSet(ruleSet RuleSet) (TestResult, error) {
 	var usedSymbols = map[string]bool{}
 	for _, rule := range ruleSet.Rules {
 		for _, output := range rule.Output {
-			invalid, err := ruleSet.PhonemeSet.Validate(output)
+			invalid, err := ruleSet.PhonemeSet.validate(output)
 			if err != nil {
 				return TestResult{}, fmt.Errorf("found error in rule output /%s/ : %s", output, err)
 			}
@@ -282,7 +282,7 @@ func compareToPhonemeSet(ruleSet RuleSet) (TestResult, error) {
 	}
 	for _, test := range ruleSet.Tests {
 		for _, output := range test.Output {
-			invalid, err := ruleSet.PhonemeSet.Validate(output)
+			invalid, err := ruleSet.PhonemeSet.validate(output)
 			if err != nil {
 				return TestResult{}, fmt.Errorf("found error in test output /%s/ : %s", output, err)
 			}

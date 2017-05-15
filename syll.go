@@ -5,70 +5,6 @@ import (
 	"strings"
 )
 
-// boundary represents syllable boundaries. Primarily for package internal use.
-type boundary struct {
-	G int
-	P int
-}
-
-// sylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
-type sylledTrans struct {
-	Trans      Trans
-	boundaries []boundary
-	Stress     []string
-}
-
-func (t sylledTrans) isboundary(b boundary) bool {
-	for _, bound := range t.boundaries {
-		if bound == b {
-			return true
-		}
-	}
-	return false
-}
-
-// String returns a string representation of the sylledTrans, given the specified delimiters for phonemes and syllables
-func (t sylledTrans) String(phnDelimiter string, syllDelimiter string) string {
-	res := []string{}
-	for gi, g2p := range t.Trans.Phonemes {
-		for pi, p := range g2p.P {
-			index := boundary{G: gi, P: pi}
-			if t.isboundary(index) {
-				res = append(res, syllDelimiter)
-			}
-			if len(p) > 0 {
-				res = append(res, p)
-			}
-		}
-	}
-	return strings.Join(res, phnDelimiter)
-}
-
-// Syllables returns a slice of syllables consisting of (a slice of) phonemes
-func (t sylledTrans) syllables() [][]string {
-	res := [][]string{}
-	thisSyllable := []string{}
-	for gi, g2p := range t.Trans.Phonemes {
-		for pi, p := range g2p.P {
-			index := boundary{G: gi, P: pi}
-			if t.isboundary(index) {
-				res = append(res, thisSyllable)
-				thisSyllable = []string{}
-			}
-			if len(p) > 0 {
-				thisSyllable = append(thisSyllable, p)
-			}
-		}
-	}
-	res = append(res, thisSyllable)
-	return res
-}
-
-//ListPhonemes returns a slice of phonemes as strings
-func (t sylledTrans) ListPhonemes() []string {
-	return t.Trans.ListPhonemes()
-}
-
 // SyllDef is an interface for implementing custom made syllabification strategies
 type SyllDef interface {
 	ValidSplit(left []string, right []string) bool
@@ -197,9 +133,9 @@ func (s Syllabifier) IsDefined() bool {
 
 // SyllabifyFromPhonemes is used to divide a range of phonemes into syllables and create an output string
 func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
-	t := Trans{}
+	t := trans{}
 	for _, phn := range phns {
-		t.Phonemes = append(t.Phonemes, G2P{G: "", P: []string{phn}})
+		t.phonemes = append(t.phonemes, g2p{g: "", p: []string{phn}})
 	}
 	return s.SyllabifyToString(t)
 }
@@ -214,20 +150,19 @@ func (s Syllabifier) SyllabifyFromString(phnSet PhonemeSet, trans string) (strin
 }
 
 // SyllabifyToString is used to divide a transcription into syllables and create an output string
-func (s Syllabifier) SyllabifyToString(t Trans) string {
-	res := s.Syllabify(t)
+func (s Syllabifier) SyllabifyToString(t trans) string {
+	res := s.syllabify(t)
 	return s.stringWithStressPlacement(res)
 }
 
-// Syllabify is used to divide a transcription into syllables
-func (s Syllabifier) Syllabify(t Trans) sylledTrans {
-	res := sylledTrans{Trans: t}
+func (s Syllabifier) syllabify(t trans) sylledTrans {
+	res := sylledTrans{trans: t}
 	left := []string{}
-	right := t.ListPhonemes()
-	for gi, g2p := range t.Phonemes {
-		for pi, p := range g2p.P {
+	right := t.listPhonemes()
+	for gi, g2p := range t.phonemes {
+		for pi, p := range g2p.p {
 			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
-				index := boundary{G: gi, P: pi}
+				index := boundary{g: gi, p: pi}
 				res.boundaries = append(res.boundaries, index)
 			}
 			//fmt.Printf("Syllabify.debug\t%s %s %v %v %v %v\n", left, right, s.SyllDef.ValidSplit(left, right), s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right), res.boundaries)
@@ -256,7 +191,7 @@ func (s Syllabifier) Test(phnSet PhonemeSet) TestResult {
 
 func (s Syllabifier) stringWithStressPlacement(t sylledTrans) string {
 	if s.StressPlacement == Undefined {
-		return t.String(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
+		return t.string(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
 	}
 	syllables := s.parse(t)
 	res := []string{}

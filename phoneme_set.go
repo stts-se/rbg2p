@@ -89,7 +89,7 @@ func (ps PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 	return ps.DelimiterRe.Split(trans, -1), nil
 }
 
-func (ps PhonemeSet) Validate(input string) ([]string, error) {
+func (ps PhonemeSet) validate(input string) ([]string, error) {
 	var invalid = []string{}
 	splitted, err := ps.SplitTranscription(input)
 	if err != nil {

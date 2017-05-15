@@ -71,20 +71,20 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input := sylledTrans{
-		Trans: Trans{
-			Phonemes: []G2P{
-				G2P{G: "t", P: []string{"t"}},
-				G2P{G: "o", P: []string{"O"}},
-				G2P{G: "ff", P: []string{"f"}},
-				G2P{G: "e", P: []string{"@"}},
-				G2P{G: "l", P: []string{"l"}},
+		trans: trans{
+			phonemes: []g2p{
+				g2p{g: "t", p: []string{"t"}},
+				g2p{g: "o", p: []string{"O"}},
+				g2p{g: "ff", p: []string{"f"}},
+				g2p{g: "e", p: []string{"@"}},
+				g2p{g: "l", p: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
-			boundary{G: 2, P: 0},
+			boundary{g: 2, p: 0},
 		},
 	}
-	res := input.String(" ", ".")
+	res := input.string(" ", ".")
 	expect := "t O . f @ l"
 	if res != expect {
 		t.Errorf(fsExpGot, input, expect, res)
@@ -92,20 +92,20 @@ func TestSylledTransString(t *testing.T) {
 
 	//
 	input = sylledTrans{
-		Trans: Trans{
-			Phonemes: []G2P{
-				G2P{G: "t", P: []string{"t"}},
-				G2P{G: "o", P: []string{"O"}},
-				G2P{G: "x", P: []string{"k", "s"}},
-				G2P{G: "e", P: []string{"@"}},
-				G2P{G: "l", P: []string{"l"}},
+		trans: trans{
+			phonemes: []g2p{
+				g2p{g: "t", p: []string{"t"}},
+				g2p{g: "o", p: []string{"O"}},
+				g2p{g: "x", p: []string{"k", "s"}},
+				g2p{g: "e", p: []string{"@"}},
+				g2p{g: "l", p: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
-			boundary{G: 2, P: 1},
+			boundary{g: 2, p: 1},
 		},
 	}
-	res = input.String(" ", ".")
+	res = input.string(" ", ".")
 	expect = "t O k . s @ l"
 	if res != expect {
 		t.Errorf(fsExpGot, input, expect, res)
@@ -114,12 +114,12 @@ func TestSylledTransString(t *testing.T) {
 
 func testSyllabify(t *testing.T, syller Syllabifier, input string, expect string) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
-	inputT := Trans{}
+	inputT := trans{}
 	for _, p := range strings.Split(input, " ") {
-		inputT.Phonemes = append(inputT.Phonemes, G2P{"", []string{p}})
+		inputT.phonemes = append(inputT.phonemes, g2p{"", []string{p}})
 	}
-	resT := syller.Syllabify(inputT)
-	res := resT.String(" ", ".")
+	resT := syller.syllabify(inputT)
+	res := resT.string(" ", ".")
 	if !reflect.DeepEqual(res, expect) {
 		t.Errorf(fsExpGot, input, expect, res)
 	}
@@ -162,56 +162,56 @@ func TestSyllabify2(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := Trans{
-		Phonemes: []G2P{
-			G2P{G: "t", P: []string{"t"}},
-			G2P{G: "o", P: []string{"O"}},
-			G2P{G: "x", P: []string{"k", "s"}},
-			G2P{G: "el", P: []string{"@", "l"}},
+	inputT := trans{
+		phonemes: []g2p{
+			g2p{g: "t", p: []string{"t"}},
+			g2p{g: "o", p: []string{"O"}},
+			g2p{g: "x", p: []string{"k", "s"}},
+			g2p{g: "el", p: []string{"@", "l"}},
 		},
 	}
 
-	inputS := inputT.String(" ")
-	res0 := syller.Syllabify(inputT)
-	res := res0.String(" ", ".")
+	inputS := inputT.string(" ")
+	res0 := syller.syllabify(inputT)
+	res := res0.string(" ", ".")
 	expect := "t O k . s @ l"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
 	}
 
 	//
-	inputT = Trans{
-		Phonemes: []G2P{
-			G2P{G: "t", P: []string{"t"}},
-			G2P{G: "o", P: []string{"O"}},
-			G2P{G: "x", P: []string{"k", "s"}},
-			G2P{G: "e", P: []string{"@"}},
-			G2P{G: "l", P: []string{"l"}},
+	inputT = trans{
+		phonemes: []g2p{
+			g2p{g: "t", p: []string{"t"}},
+			g2p{g: "o", p: []string{"O"}},
+			g2p{g: "x", p: []string{"k", "s"}},
+			g2p{g: "e", p: []string{"@"}},
+			g2p{g: "l", p: []string{"l"}},
 		},
 	}
 
-	inputS = inputT.String(" ")
-	res0 = syller.Syllabify(inputT)
-	res = res0.String(" ", ".")
+	inputS = inputT.string(" ")
+	res0 = syller.syllabify(inputT)
+	res = res0.string(" ", ".")
 	expect = "t O k . s @ l"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
 	}
 
 	//
-	inputT = Trans{
-		Phonemes: []G2P{
-			G2P{G: "t", P: []string{"t"}},
-			G2P{G: "u", P: []string{"u0"}},
-			G2P{G: "ng", P: []string{"N"}},
-			G2P{G: "a", P: []string{"a"}},
-			G2P{G: "n", P: []string{"n"}},
+	inputT = trans{
+		phonemes: []g2p{
+			g2p{g: "t", p: []string{"t"}},
+			g2p{g: "u", p: []string{"u0"}},
+			g2p{g: "ng", p: []string{"N"}},
+			g2p{g: "a", p: []string{"a"}},
+			g2p{g: "n", p: []string{"n"}},
 		},
 	}
 
-	inputS = inputT.String(" ")
-	res0 = syller.Syllabify(inputT)
-	res = res0.String(" ", ".")
+	inputS = inputT.string(" ")
+	res0 = syller.syllabify(inputT)
+	res = res0.string(" ", ".")
 	expect = "t u0 N . a n"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
@@ -234,23 +234,23 @@ func TestSyllabify3(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := Trans{
-		Phonemes: []G2P{
-			G2P{G: "b", P: []string{"b"}},
-			G2P{G: "a", P: []string{"a"}},
-			G2P{G: "rr", P: []string{"rr"}},
-			G2P{G: "t", P: []string{"t"}},
-			G2P{G: "r", P: []string{"r"}},
-			G2P{G: "ä", P: []string{"{:"}},
-			G2P{G: "d", P: []string{"d"}},
-			G2P{G: "e", P: []string{"@"}},
-			G2P{G: "n", P: []string{"n"}},
+	inputT := trans{
+		phonemes: []g2p{
+			g2p{g: "b", p: []string{"b"}},
+			g2p{g: "a", p: []string{"a"}},
+			g2p{g: "rr", p: []string{"rr"}},
+			g2p{g: "t", p: []string{"t"}},
+			g2p{g: "r", p: []string{"r"}},
+			g2p{g: "ä", p: []string{"{:"}},
+			g2p{g: "d", p: []string{"d"}},
+			g2p{g: "e", p: []string{"@"}},
+			g2p{g: "n", p: []string{"n"}},
 		},
 	}
 
-	inputS := inputT.String(" ")
-	res0 := syller.Syllabify(inputT)
-	res := res0.String(" ", ".")
+	inputS := inputT.string(" ")
+	res0 := syller.syllabify(inputT)
+	res := res0.string(" ", ".")
 	expect := "b a rr . t r {: . d @ n"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)
@@ -269,21 +269,21 @@ func TestSyllabify4(t *testing.T) {
 	syller := Syllabifier{SyllDef: def}
 
 	//
-	inputT := Trans{
-		Phonemes: []G2P{
-			G2P{G: "b", P: []string{"b"}},
-			G2P{G: "o", P: []string{"O"}},
-			G2P{G: "rt", P: []string{"rt"}},
-			G2P{G: "a", P: []string{"a"}},
-			G2P{G: "d", P: []string{"d"}},
-			G2P{G: "u", P: []string{"u0"}},
-			G2P{G: "sch", P: []string{"S"}},
+	inputT := trans{
+		phonemes: []g2p{
+			g2p{g: "b", p: []string{"b"}},
+			g2p{g: "o", p: []string{"O"}},
+			g2p{g: "rt", p: []string{"rt"}},
+			g2p{g: "a", p: []string{"a"}},
+			g2p{g: "d", p: []string{"d"}},
+			g2p{g: "u", p: []string{"u0"}},
+			g2p{g: "sch", p: []string{"S"}},
 		},
 	}
 
-	inputS := inputT.String(" ")
-	res0 := syller.Syllabify(inputT)
-	res := res0.String(" ", ".")
+	inputS := inputT.string(" ")
+	res0 := syller.syllabify(inputT)
+	res := res0.string(" ", ".")
 	expect := "b O . rt a . d u0 S"
 	if res != expect {
 		t.Errorf(fsExpGot, inputS, expect, res)

@@ -1,4 +1,6 @@
-/*A .g2p file for syllabification contains a subset of the items used for a proper g2p.
+/*Package rbg2p : syllabification utilities
+
+A .g2p file for syllabification contains a subset of the items used for a proper g2p.
 
 Example (for the CMU lexicon):
 
