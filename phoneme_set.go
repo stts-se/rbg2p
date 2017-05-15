@@ -15,7 +15,7 @@ type PhonemeSet struct {
 }
 
 // NewPhonemeSet creates a phoneme set from a slice of symbols, and a phoneme delimiter string
-func NewPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
+func newPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
 	reString := delimiter
 	if len(delimiter) > 0 {
 		reString = delimiter + "+"
