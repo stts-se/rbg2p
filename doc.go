@@ -126,6 +126,30 @@ Examples:
      TEST kex -> (k e k s, C e k s)
 
 
+---
+
+SEPARATE SYLLABIFICATION RULE FILE
+
+A .g2p file for syllabification contains a subset of the items used for a proper g2p.
+
+Example (for the CMU lexicon):
+
+   PHONEME_SET "AA AE AH AX AO AW AY B CH D DH EH ER EY F G HH IH IY JH K L M N NG OW OY P R S SH T TH UH UW V W Y Z ZH 1 2"
+   PHONEME_DELIMITER " "
+
+   SYLLDEF TYPE MOP
+   SYLLDEF ONSETS "P, T, K, B, D, G, CH, JH, F, V, T, D, S, Z, S, Z, H, L, M, N, N, R, W, J, P R, T R, B R, G R, S T R, S P R, S K R, P L, T L, B L, G L, S T L, S P L, S K L, S P, S T, S K"
+   SYLLDEF SYLLABIC "AA AE AH AX AO AW AY EH ER EY IH IY OW OY UH UW"
+   SYLLDEF STRESS "1 2"
+   SYLLDEF DELIMITER "$"
+
+   SYLLDEF TEST AX P R 1 AA K S AX M AX T -> AX $ P R 1 AA K $ S AX $ M AX T
+   SYLLDEF TEST W 1 UH D S T R 2 IY M -> W 1 UH D $ S T R 2 IY M
+
+
+For details on the .g2p file format, check docs for the root folder of this package.
+
+
 For more examples (used for unit tests), see the test_data folder: https://github.com/stts-se/rbg2p/tree/master/test_data
 
 */
