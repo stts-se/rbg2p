@@ -2,12 +2,12 @@ package rbg2p
 
 import "strings"
 
-// Trans is a container for phonemes in a transcription. Primarily for package internal use.
+// trans is a container for phonemes in a transcription. Primarily for package internal use.
 type trans struct {
 	phonemes []g2p
 }
 
-/*G2P is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Primarily for package internal use. Examples (IPA symbols):
+/*g2p is a container for one-to-many grapheme-phoneme mapping received from the G2P ruleset. Primarily for package internal use. Examples (IPA symbols):
   x -> k, s
   sch -> ʃ
   ff -> f
@@ -19,7 +19,7 @@ type g2p struct {
 	p []string
 }
 
-//ListPhonemes returns a slice of phonemes as strings
+//listPhonemes returns a slice of phonemes as strings
 func (t trans) listPhonemes() []string {
 	var phns []string
 	for _, g2p := range t.phonemes {
@@ -62,7 +62,7 @@ func (t sylledTrans) isboundary(b boundary) bool {
 	return false
 }
 
-// String returns a string representation of the sylledTrans, given the specified delimiters for phonemes and syllables
+// string returns a string representation of the sylledTrans, given the specified delimiters for phonemes and syllables
 func (t sylledTrans) string(phnDelimiter string, syllDelimiter string) string {
 	res := []string{}
 	for gi, g2p := range t.trans.phonemes {
@@ -79,7 +79,7 @@ func (t sylledTrans) string(phnDelimiter string, syllDelimiter string) string {
 	return strings.Join(res, phnDelimiter)
 }
 
-// Syllables returns a slice of syllables consisting of (a slice of) phonemes
+// syllables returns a slice of syllables consisting of (a slice of) phonemes
 func (t sylledTrans) syllables() [][]string {
 	res := [][]string{}
 	thisSyllable := []string{}
@@ -99,7 +99,7 @@ func (t sylledTrans) syllables() [][]string {
 	return res
 }
 
-//ListPhonemes returns a slice of phonemes as strings
+//listPhonemes returns a slice of phonemes as strings
 func (t sylledTrans) listPhonemes() []string {
 	return t.trans.listPhonemes()
 }
