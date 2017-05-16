@@ -9,6 +9,7 @@ PHONEME_DELIMITER " "
 
 // Filters
 
+FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu)) ((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*[.] (?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*(?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))$" -> "$1\"\" $2 $3" // simple filter to put accent II first syllable if the word has two syllables and ends with a vowel
 FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))" -> "$1\" $2" // simple filter to put stress on first syllable
 
 
@@ -20,14 +21,17 @@ SYLLDEF STRESS "\" \"\" %"
 SYLLDEF DELIMITER "."
 SYLLDEF STRESS_PLACEMENT AfterFirstSyllabic
 
+
 // Variables
 
 VAR VOICELESS [p|k|t|f|s|h|c]
 VAR VOICED [b|d|g|z]
 VAR CONS [wrtpsdfghjklzxcvbnm]
-VAR SHORTCONS [wrtpsdfghjklxcvbnm]
+VAR SHORTCONS ([wrtpsdfghjklxcvbnm]|r[tdnsl])
+VAR LONGCONS ([wrtpsdfghjklxcvbnm])\1
 VAR VOWEL [eéyuioåaöä]
 VAR PALAT [eéyiöä]
+VAR NOVOWEL [wrtpsdfghjklxcvbnm]+
 
 // Rules
 
@@ -38,6 +42,8 @@ eu -> eu
 
 ä -> {: / _ r #
 ö -> 9: / _ r #
+ä -> {: / _ r[tdnsl] #
+ö -> 9: / _ r[tdnsl] #
 ä -> { / _ r
 ö -> 9 / _ r
 
@@ -53,6 +59,28 @@ a -> A: / _ SHORTCONS #
 ö -> 2: / _ SHORTCONS #
 ä -> E: / _ SHORTCONS #
 
+e -> e: / # NOVOWEL _ #
+y -> y: / # NOVOWEL _ #
+u -> }: / # NOVOWEL _ #
+i -> i: / # NOVOWEL _ #
+o -> u: / # NOVOWEL _ #
+å -> o: / # NOVOWEL _ #
+a -> A: / # NOVOWEL _ #
+á -> A: / # NOVOWEL _ #
+ö -> 2: / # NOVOWEL _ #
+ä -> E: / # NOVOWEL _ #
+
+e -> e / _ LONGCONS
+y -> Y / _ LONGCONS
+u -> u0 / _ LONGCONS
+i -> I / _ LONGCONS
+o -> U / _ LONGCONS
+å -> O / _ LONGCONS
+a -> a / _ LONGCONS
+á -> a / _ LONGCONS
+ö -> 2 / _ LONGCONS
+ä -> E / _ LONGCONS
+
 e -> e
 y -> Y
 u -> u0
@@ -66,7 +94,7 @@ a -> a
 
 e -> @ / _ #
 
-rt -> (rt, r t)
+rt -> rt
 rd -> rd
 rs -> rs
 rl -> rl
@@ -139,20 +167,26 @@ z -> s
 // Tests
 
 TEST dusch -> (d " u0 S, d " u0 x)
-TEST duscha -> (d " u0 . S a, d " u0 . x a)
-TEST borta -> (b " O . rt a, b " O r . t a)
+TEST duscha -> (d "" u0 . S a, d "" u0 . x a)
+TEST borta -> b "" O . rt a
 TEST abt -> " a p t
-TEST bortadusch -> (b " O . rt a . d u0 S, b " O . rt a . d u0 x, b " O r . t a . d u0 S, b " O r . t a . d u0 x)
+TEST bortadusch -> (b " O . rt a . d u0 S, b " O . rt a . d u0 x)
 TEST filifjonka -> f " I . l I . f j O N . k a
-TEST unga -> " u0 N . a
-TEST 'unga -> " u0 N . a
-TEST a'a -> " a . a
+TEST unga -> "" u0 N . a
+TEST 'unga -> "" u0 N . a
+TEST a'a -> "" a . a
 TEST get -> j " e: t
 TEST gäst -> j " E s t
 TEST gap -> g " A: p
 TEST där -> d " {: r
-TEST pizza -> p " I t . s a
+TEST pizza -> p "" I t . s a
 TEST pilätta -> p " I . l E . t a
 TEST fragráncia -> f r " a . g r a n . s I . a
 TEST fragrancia -> f r " a . g r a n . s I . a
 TEST fragéncia -> f r " a . j e: n . s I . a
+TEST papp -> p " a p
+TEST pappa -> p "" a . p a
+TEST part -> p " A: rt
+TEST borta -> b "" O . rt a
+TEST bra -> b r " A:
+
