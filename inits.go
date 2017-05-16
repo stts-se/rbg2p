@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/dlclark/regexp2"
 )
 
 func isVar(s string) bool {
@@ -140,7 +142,7 @@ func newVar(s string) (string, string, error) {
 	}
 	name := matchRes[1]
 	value := matchRes[2]
-	_, err := regexp.Compile(value)
+	_, err := regexp2.Compile(value, regexp2.None)
 	if err != nil {
 		return "", "", fmt.Errorf("invalid var in input (regular expression failed) for /%s/: %s", s, err)
 	}
@@ -183,14 +185,14 @@ func newFilter(s string) (Filter, error) {
 	if strings.Contains(output, "->") {
 		return Filter{}, fmt.Errorf("invalid filter definition: " + s)
 	}
-	re, err := regexp.Compile(input)
+	re, err := regexp2.Compile(input, regexp2.None)
 	if err != nil {
 		return Filter{}, fmt.Errorf("invalid regexp in filter definition input /%s/ : %s", s, err)
 	}
 	return Filter{Regexp: re, Output: output}, nil
 }
 
-func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp.Regexp, error) {
+func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {
 	if isLeft {
 		s0 = strings.Replace(s0, "#", "^", -1)
 	} else {
@@ -203,9 +205,9 @@ func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp.Regexp,
 		}
 	}
 	if isLeft {
-		return regexp.Compile(strings.Join(splitted, "") + "$")
+		return regexp2.Compile(strings.Join(splitted, "")+"$", regexp2.None)
 	}
-	return regexp.Compile("^" + strings.Join(splitted, ""))
+	return regexp2.Compile("^"+strings.Join(splitted, ""), regexp2.None)
 }
 
 var contextRe = regexp.MustCompile("^ +/ +((?:[^_>]+)?) *_ *((?:[^_>]+)?)$")

@@ -3,8 +3,9 @@ package rbg2p
 import (
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
+
+	"github.com/dlclark/regexp2"
 )
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
@@ -13,15 +14,19 @@ type Context struct {
 	Input string
 
 	// Regexp is the input string converted to a regular expression for internal use (with variables expanded, and adapted anchoring)
-	Regexp *regexp.Regexp
+	Regexp *regexp2.Regexp
 }
 
 // Matches checks if the input string matches the context rule
-func (c Context) Matches(s string) bool {
+func (c Context) Matches(s string) (bool, error) {
 	if c.IsDefined() {
-		return c.Regexp.MatchString(s)
+		res, err := c.Regexp.MatchString(s)
+		if err != nil {
+			return false, err
+		}
+		return res, nil
 	}
-	return true
+	return true, nil
 }
 
 // IsDefined returns true if the contained regexp is defined
@@ -51,13 +56,14 @@ func (c Context) equals(c2 Context) bool {
 
 // Filter is a regexp filter for rules that cannot be expressed using the standard rule systme
 type Filter struct {
-	Regexp *regexp.Regexp
+	Regexp *regexp2.Regexp
 	Output string
 }
 
 // Apply is used to apply the filter to an input string
-func (f Filter) Apply(s string) string {
-	return f.Regexp.ReplaceAllString(s, f.Output)
+func (f Filter) Apply(s string) (string, error) {
+	//return f.Regexp.ReplaceAllString(s, f.Output)
+	return f.Regexp.Replace(s, f.Output, -1, -1)
 }
 
 // Rule is a g2p rule representation
@@ -195,12 +201,16 @@ func (rs RuleSet) expand(phonemes []g2p) []trans {
 	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []trans{trans{}})
 }
 
-func (rs RuleSet) applyFilters(trans string) string {
+func (rs RuleSet) applyFilters(trans string) (string, error) {
 	res := trans
+	var err error
 	for _, f := range rs.Filters {
-		res = f.Apply(res)
+		res, err = f.Apply(res)
+		if err != nil {
+			return res, fmt.Errorf("couldn't execute regexp : %s", err)
+		}
 	}
-	return res
+	return res, nil
 }
 
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
@@ -215,11 +225,19 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 		left := string(s0[0:i])
 		var matchFound = false
 		for _, rule := range rs.Rules {
+			leftMatch, err := rule.LeftContext.Matches(left)
+			if err != nil {
+				return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.LeftContext.Regexp, err)
+			}
 			if strings.HasPrefix(ss, rule.Input) &&
-				rule.LeftContext.Matches(left) {
+				leftMatch {
 				ruleInputLen := len([]rune(rule.Input))
 				right := string(s0[i+ruleInputLen : len(s0)])
-				if rule.RightContext.Matches(right) {
+				rightMatch, err := rule.RightContext.Matches(right)
+				if err != nil {
+					return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.RightContext.Regexp, err)
+				}
+				if rightMatch {
 					i = i + ruleInputLen
 					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
@@ -248,7 +266,10 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 	}
 	var filtered []string
 	for _, t := range transes {
-		fted := rs.applyFilters(t)
+		fted, err := rs.applyFilters(t)
+		if err != nil {
+			return filtered, err
+		}
 		filtered = append(filtered, fted)
 	}
 	if len(couldntMap) > 0 {

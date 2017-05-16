@@ -3,9 +3,10 @@ package rbg2p
 import (
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/dlclark/regexp2"
 )
 
 var fsExpGot = "Expected: %v got: %v"
@@ -104,6 +105,10 @@ func TestNewTest(t *testing.T) {
 
 }
 
+func test_CompileRegexp(s string) *regexp2.Regexp {
+	return regexp2.MustCompile("$", regexp2.None)
+}
+
 func TestNewRule(t *testing.T) {
 	vars := map[string]string{
 		"VOICED": "[dgjlvbnm]",
@@ -112,7 +117,7 @@ func TestNewRule(t *testing.T) {
 		"sch -> (x, S) / _ #": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
-			RightContext: Context{"#", regexp.MustCompile("$")}},
+			RightContext: Context{"#", test_CompileRegexp("$")}},
 		"sch -> (x, S)": Rule{Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
@@ -124,11 +129,11 @@ func TestNewRule(t *testing.T) {
 		"a -> A / _ VOICED": Rule{Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{"VOICED", regexp.MustCompile("[dgjlvbnm]")}},
+			RightContext: Context{"VOICED", test_CompileRegexp("[dgjlvbnm]")}},
 		"a -> A / _ VOICED #": Rule{Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{"VOICED #", regexp.MustCompile("[dgjlvbnm]$")}},
+			RightContext: Context{"VOICED #", test_CompileRegexp("[dgjlvbnm]$")}},
 	}
 	invalidLines := map[string]Rule{}
 	failLines := []string{
