@@ -29,7 +29,7 @@ func main() {
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
 	var help = f.Bool("help", false, "print help message")
 
-	var usage = `go run syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+	var usage = `go run syll.go <FLAGS> <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)

@@ -37,7 +37,7 @@ func main() {
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
 
-	var usage = `go run g2p.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+	var usage = `go run g2p.go <FLAGS> <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
