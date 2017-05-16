@@ -48,16 +48,16 @@ eu -> eu
 ö -> 9 / _ r
 
 é -> e:
-e -> e: / _ SHORTCONS #
-y -> y: / _ SHORTCONS #
-u -> }: / _ SHORTCONS #
-i -> i: / _ SHORTCONS #
-o -> u: / _ SHORTCONS #
-å -> o: / _ SHORTCONS #
-a -> A: / _ SHORTCONS #
-á -> A: / _ SHORTCONS #
-ö -> 2: / _ SHORTCONS #
-ä -> E: / _ SHORTCONS #
+e -> e: / # NOVOWEL _ SHORTCONS #
+y -> y: / # NOVOWEL _ SHORTCONS #
+u -> }: / # NOVOWEL _ SHORTCONS #
+i -> i: / # NOVOWEL _ SHORTCONS #
+o -> u: / # NOVOWEL _ SHORTCONS #
+å -> o: / # NOVOWEL _ SHORTCONS #
+a -> A: / # NOVOWEL _ SHORTCONS #
+á -> A: / # NOVOWEL _ SHORTCONS #
+ö -> 2: / # NOVOWEL _ SHORTCONS #
+ä -> E: / # NOVOWEL _ SHORTCONS #
 
 e -> e: / # NOVOWEL _ #
 y -> y: / # NOVOWEL _ #
@@ -189,4 +189,4 @@ TEST pappa -> p "" a . p a
 TEST part -> p " A: rt
 TEST borta -> b "" O . rt a
 TEST bra -> b r " A:
-
+TEST sedan -> s " e . d a n

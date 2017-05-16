@@ -112,8 +112,6 @@ FLAGS:
 		os.Exit(1)
 	}
 
-	fmt.Println()
-
 	nTotal := 0
 	nErrs := 0
 	nTrans := 0
