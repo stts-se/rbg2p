@@ -36,7 +36,7 @@ VAR SHORTCONS ([wrtpsdfghjklxcvbnm]|r[tdnsl])
 VAR LONGCONS ([wrtpsdfghjklxcvbnm])\1
 VAR VOWEL [eéyuioåaöä]
 VAR PALAT [eéyiöä]
-VAR NOVOWEL [wrtpsdfghjklxcvbnm]+
+VAR NOVOWEL [wrtpsdfghjklxcvbnm]*
 
 // Rules
 
@@ -104,6 +104,7 @@ e -> e
 y -> Y
 u -> u0
 i -> I
+o -> U / _ #
 o -> O
 å -> O
 a -> a
@@ -144,10 +145,10 @@ zz -> t s
 x -> k s
 
 stj -> x
-k -> C / _ PALAT
+//k -> C / _ PALAT
 tj -> C
 g -> j / r _
-g -> j / _ PALAT
+//g -> j / _ PALAT
 g -> g
 ps -> s / # _
 
@@ -195,15 +196,15 @@ TEST filifjonka -> f " I . l I . f j O N . k a
 TEST unga -> "" u0 N . a
 TEST 'unga -> "" u0 N . a
 TEST a'a -> "" a . a
-TEST get -> j " e: t
-TEST gäst -> j " E s t
+//TEST get -> j " e: t
+//TEST gäst -> j " E s t
 TEST gap -> g " A: p
 TEST där -> d " {: r
 TEST pizza -> p "" I t . s a
 TEST pilätta -> p " I . l E . t a
 TEST fragráncia -> f r " a . g r a n . s I . a
 TEST fragrancia -> f r " a . g r a n . s I . a
-TEST fragéncia -> f r " a . j e: n . s I . a
+TEST fragéncia -> f r " a . g e: n . s I . a
 TEST papp -> p " a p
 TEST pappa -> p "" a . p a
 TEST part -> p " A: rt
@@ -212,5 +213,6 @@ TEST bra -> b r " A:
 TEST sedan -> s " e . d a n
 TEST nära -> n "" {: . r a
 TEST berg -> b " { r j
-TEST cerro -> s "" { . r O
+TEST cerro -> s "" { . r U
 TEST större -> s t "" 9 . r e
+TEST ut -> " }: t
