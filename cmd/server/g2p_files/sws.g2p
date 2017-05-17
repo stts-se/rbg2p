@@ -122,6 +122,7 @@ rn -> rn
 
 sch -> (S, x) / _ a? # 
 sch -> S
+sh -> S
 
 ng -> N
 
