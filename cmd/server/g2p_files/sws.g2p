@@ -11,6 +11,11 @@ PHONEME_DELIMITER " "
 
 FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu)) ((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*[.] (?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*(?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))$" -> "$1\"\" $2 $3" // simple filter to put accent II first syllable if the word has two syllables and ends with a vowel
 FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))" -> "$1\" $2" // simple filter to put stress on first syllable
+FILTER "e([." ]+)r" -> "{$1r" // e r => { r
+FILTER "E([." ]+)r" -> "{$1r"
+FILTER "2([." ]+)r" -> "9$1r"
+FILTER "E:([." ]+)r" -> "{:$1r"
+FILTER "2:([." ]+)r" -> "9:$1r"
 
 
 // Syllabification
@@ -44,8 +49,11 @@ eu -> eu
 ö -> 9: / _ r #
 ä -> {: / _ r[tdnsl] #
 ö -> 9: / _ r[tdnsl] #
+ö -> 9: / _ r VOWEL #
+ä -> {: / _ r VOWEL #
 ä -> { / _ r
 ö -> 9 / _ r
+e -> { / # NOVOWEL _ r CONS #
 
 é -> e:
 e -> e: / # NOVOWEL _ SHORTCONS #
@@ -58,6 +66,17 @@ a -> A: / # NOVOWEL _ SHORTCONS #
 á -> A: / # NOVOWEL _ SHORTCONS #
 ö -> 2: / # NOVOWEL _ SHORTCONS #
 ä -> E: / # NOVOWEL _ SHORTCONS #
+
+e -> e: / _ CONS VOWEL #
+y -> y: / _ CONS VOWEL #
+u -> }: / _ CONS VOWEL #
+i -> i: / _ CONS VOWEL #
+o -> u: / _ CONS VOWEL #
+å -> o: / _ CONS VOWEL #
+a -> A: / _ CONS VOWEL #
+á -> A: / _ CONS VOWEL #
+ö -> 2: / _ CONS VOWEL #
+ä -> E: / _ CONS VOWEL #
 
 e -> e: / # NOVOWEL _ #
 y -> y: / # NOVOWEL _ #
@@ -127,6 +146,7 @@ x -> k s
 stj -> x
 k -> C / _ PALAT
 tj -> C
+g -> j / r _
 g -> j / _ PALAT
 g -> g
 ps -> s / # _
@@ -190,3 +210,7 @@ TEST part -> p " A: rt
 TEST borta -> b "" O . rt a
 TEST bra -> b r " A:
 TEST sedan -> s " e . d a n
+TEST nära -> n "" {: . r a
+TEST berg -> b " { r j
+TEST cerro -> s "" { . r O
+TEST större -> s t "" 9 . r e
