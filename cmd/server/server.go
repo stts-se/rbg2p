@@ -32,7 +32,7 @@ var g2pM = g2pMutex{
 
 func g2pMain_Handler(w http.ResponseWriter, r *http.Request) {
 	_, cmdFileName, _, _ := runtime.Caller(0)
-	fString := path.Join(path.Dir(cmdFileName), "src/g2p_demo.html")
+	fString := path.Join(path.Dir(cmdFileName), "static/g2p_demo.html")
 	http.ServeFile(w, r, fString)
 }
 
