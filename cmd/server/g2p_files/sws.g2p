@@ -123,6 +123,7 @@ rn -> rn
 sch -> (S, x) / _ a? # 
 sch -> S
 sh -> S
+sj -> x
 
 ng -> N
 
@@ -217,3 +218,4 @@ TEST berg -> b " { r j
 TEST cerro -> s "" { . r U
 TEST större -> s t "" 9 . r e
 TEST ut -> " }: t
+TEST sjö -> x " 2:
