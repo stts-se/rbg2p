@@ -10,6 +10,7 @@ PHONEME_DELIMITER " "
 // Filters
 
 FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu)) ((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*[.] (?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*(?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))$" -> "$1\"\" $2 $3" // simple filter to put accent II first syllable if the word has two syllables and ends with a vowel
+FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu)) ((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*[.] (?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*([UOa] rs?))$" -> "$1\"\" $2 $3" // simple filter to put accent II first syllable if the word has two syllables and ends with '[OUa] r'
 FILTER "^((?:[^i:Iu0\}:aA:u:UE:\{:E\{auy:Ye:e2:9:29o:O@eu" ]+ )*)((?:i:|I|u0|\}:|a|A:|u:|U|E:|\{:|E|\{|au|y:|Y|e:|e|2:|9:|2|9|o:|O|@|eu))" -> "$1\" $2" // simple filter to put stress on first syllable
 FILTER "e([." ]+)r" -> "{$1r" // e r => { r
 FILTER "E([." ]+)r" -> "{$1r"
@@ -78,6 +79,17 @@ a -> A: / _ CONS VOWEL #
 ö -> 2: / _ CONS VOWEL #
 ä -> E: / _ CONS VOWEL #
 
+e -> e: / # NOVOWEL _ VOWEL #
+y -> y: / # NOVOWEL _ VOWEL #
+u -> }: / # NOVOWEL _ VOWEL #
+i -> i: / # NOVOWEL _ VOWEL #
+o -> u: / # NOVOWEL _ VOWEL #
+å -> o: / # NOVOWEL _ VOWEL #
+a -> A: / # NOVOWEL _ VOWEL #
+á -> A: / # NOVOWEL _ VOWEL #
+ö -> 2: / # NOVOWEL _ VOWEL #
+ä -> E: / # NOVOWEL _ VOWEL #
+
 e -> e: / # NOVOWEL _ #
 y -> y: / # NOVOWEL _ #
 u -> }: / # NOVOWEL _ #
@@ -105,6 +117,8 @@ y -> Y
 u -> u0
 i -> I
 o -> U / _ #
+o -> U / _ r #
+o -> U / _ rs #
 o -> O
 å -> O
 a -> a
@@ -146,11 +160,12 @@ vv -> v
 zz -> t s
 x -> k s
 
+k -> C / # _ PALAT
+g -> j / # _ PALAT
 stj -> x
-//k -> C / _ PALAT
 tj -> C
-g -> j / r _
-//g -> j / _ PALAT
+g -> j / r _ #
+g -> j / r _ [se]
 g -> g
 ps -> s / # _
 
@@ -219,3 +234,6 @@ TEST cerro -> s "" { . r U
 TEST större -> s t "" 9 . r e
 TEST ut -> " }: t
 TEST sjö -> x " 2:
+TEST nya -> n "" y: . a
+TEST källor -> C "" E . l U r
+TEST hittar -> h "" I . t a r
