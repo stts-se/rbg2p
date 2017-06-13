@@ -326,6 +326,16 @@ func main() {
 	// for legacy calls from ltool/yalt
 	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
 
+	fmt.Println("Serving urls:")
+	r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		t, err := route.GetPathTemplate()
+		if err != nil {
+			return err
+		}
+		fmt.Println(t)
+		return nil
+	})
+
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
 	err = http.ListenAndServe(port, r)
