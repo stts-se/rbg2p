@@ -40,20 +40,19 @@ func (t trans) string(phnDelimiter string) string {
 	return strings.Join(phns, phnDelimiter)
 }
 
-// boundary represents syllable boundaries. Primarily for package internal use.
+// boundary represents syllable boundaries
 type boundary struct {
 	g int
 	p int
 }
 
-// sylledTrans is a syllabified transcription (containing a Trans instance and a slice of indices for syllable boundaries)
+// sylledTrans is a syllabified transcription (containing a Trans instance, a slice of indices for syllable boundaries)
 type sylledTrans struct {
 	trans      trans
 	boundaries []boundary
-	stress     []string
 }
 
-func (t sylledTrans) isboundary(b boundary) bool {
+func (t sylledTrans) isBoundary(b boundary) bool {
 	for _, bound := range t.boundaries {
 		if bound == b {
 			return true
@@ -68,7 +67,7 @@ func (t sylledTrans) string(phnDelimiter string, syllDelimiter string) string {
 	for gi, g2p := range t.trans.phonemes {
 		for pi, p := range g2p.p {
 			index := boundary{g: gi, p: pi}
-			if t.isboundary(index) {
+			if t.isBoundary(index) {
 				res = append(res, syllDelimiter)
 			}
 			if len(p) > 0 {
@@ -86,7 +85,7 @@ func (t sylledTrans) syllables() [][]string {
 	for gi, g2p := range t.trans.phonemes {
 		for pi, p := range g2p.p {
 			index := boundary{g: gi, p: pi}
-			if t.isboundary(index) {
+			if t.isBoundary(index) {
 				res = append(res, thisSyllable)
 				thisSyllable = []string{}
 			}

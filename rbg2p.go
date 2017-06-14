@@ -255,8 +255,6 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 
 	transes := []string{}
 	for _, t := range expanded {
-		//fmt.Printf("%#v\n", t)
-		//fmt.Printf("%#v\n", t.String(" "))
 		if rs.Syllabifier.IsDefined() {
 			s := rs.Syllabifier.syllabify(t)
 			transes = append(transes, s.string(rs.PhonemeDelimiter, rs.SyllableDelimiter))
