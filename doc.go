@@ -152,5 +152,8 @@ For details on the .g2p file format, check docs for the root folder of this pack
 
 For more examples (used for unit tests), see the test_data folder: https://github.com/stts-se/rbg2p/tree/master/test_data
 
+
+To test a single g2p file from the command line, use cmd/g2p/.
+
 */
 package rbg2p
