@@ -91,7 +91,7 @@ func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
 	}
 
 	if len(right) > 0 && def.IsStress(right[0]) {
-		right = right[1:len(right)]
+		right = right[1:]
 	}
 
 	onset := []string{}
@@ -166,7 +166,7 @@ func (s Syllabifier) syllabify(t trans) sylledTrans {
 				res.boundaries = append(res.boundaries, index)
 			}
 			left = append(left, p)
-			right = right[1:len(right)]
+			right = right[1:]
 		}
 	}
 	return res

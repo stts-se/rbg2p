@@ -194,11 +194,11 @@ func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []trans) []trans {
 	if len(tail) == 0 {
 		return res
 	}
-	return rs.expandLoop(tail[0], tail[1:len(tail)], res)
+	return rs.expandLoop(tail[0], tail[1:], res)
 }
 
 func (rs RuleSet) expand(phonemes []g2p) []trans {
-	return rs.expandLoop(phonemes[0], phonemes[1:len(phonemes)], []trans{trans{}})
+	return rs.expandLoop(phonemes[0], phonemes[1:], []trans{{}})
 }
 
 func (rs RuleSet) applyFilters(trans string) (string, error) {
@@ -220,7 +220,7 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 	res := []g2p{}
 	var couldntMap = []string{}
 	for i < len(s0) {
-		ss := string(s0[i:len(s0)])
+		ss := string(s0[i:])
 		thisChar := string(s0[i : i+1])
 		left := string(s0[0:i])
 		var matchFound = false
@@ -232,7 +232,7 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 			if strings.HasPrefix(ss, rule.Input) &&
 				leftMatch {
 				ruleInputLen := len([]rune(rule.Input))
-				right := string(s0[i+ruleInputLen : len(s0)])
+				right := string(s0[i+ruleInputLen:])
 				rightMatch, err := rule.RightContext.Matches(right)
 				if err != nil {
 					return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.RightContext.Regexp, err)

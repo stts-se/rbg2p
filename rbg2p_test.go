@@ -19,13 +19,13 @@ type tVar struct {
 
 func TestNewVar(t *testing.T) {
 	validLines := map[string]tVar{
-		"VAR VOICED_PLOSIVE [dgb]":      tVar{name: "VOICED_PLOSIVE", value: "[dgb]"},
-		"VAR VOWEL [aoiuye]":            tVar{name: "VOWEL", value: "[aoiuye]"},
-		"VAR VOICELESS [p|k|t|f|s|h|c]": tVar{name: "VOICELESS", value: "[p|k|t|f|s|h|c]"},
+		"VAR VOICED_PLOSIVE [dgb]":      {name: "VOICED_PLOSIVE", value: "[dgb]"},
+		"VAR VOWEL [aoiuye]":            {name: "VOWEL", value: "[aoiuye]"},
+		"VAR VOICELESS [p|k|t|f|s|h|c]": {name: "VOICELESS", value: "[p|k|t|f|s|h|c]"},
 	}
 	invalidLines := map[string]tVar{
-		"VAR VOICED_PLOSIVE [dgb]": tVar{name: "VOICED_PLOSIVE", value: "dgb"},
-		"VAR VOWEL [aoiuye]":       tVar{name: "VOWEL", value: "[aoiuye"},
+		"VAR VOICED_PLOSIVE [dgb]": {name: "VOICED_PLOSIVE", value: "dgb"},
+		"VAR VOWEL [aoiuye]":       {name: "VOWEL", value: "[aoiuye"},
 	}
 	failLines := []string{
 		"VAR VOICED_PLOSIVE",
@@ -63,12 +63,12 @@ func TestNewVar(t *testing.T) {
 
 func TestNewTest(t *testing.T) {
 	validLines := map[string]Test{
-		"TEST anka -> AnkA":            Test{Input: "anka", Output: []string{"AnkA"}},
-		"TEST banka -> (bAnkA, bANkA)": Test{Input: "banka", Output: []string{"bAnkA", "bANkA"}},
+		"TEST anka -> AnkA":            {Input: "anka", Output: []string{"AnkA"}},
+		"TEST banka -> (bAnkA, bANkA)": {Input: "banka", Output: []string{"bAnkA", "bANkA"}},
 	}
 	invalidLines := map[string]Test{
-		"TEST anka -> AnkA":            Test{Input: "anka", Output: []string{"anka"}},
-		"TEST banka -> (bAnkA, bANkA)": Test{Input: "banka", Output: []string{"bAnkA", "bANKkA"}},
+		"TEST anka -> AnkA":            {Input: "anka", Output: []string{"anka"}},
+		"TEST banka -> (bAnkA, bANkA)": {Input: "banka", Output: []string{"bAnkA", "bANKkA"}},
 	}
 	failLines := []string{
 		"TEST anka",
@@ -114,23 +114,23 @@ func TestNewRule(t *testing.T) {
 		"VOICED": "[dgjlvbnm]",
 	}
 	validLines := map[string]Rule{
-		"sch -> (x, S) / _ #": Rule{Input: "sch",
+		"sch -> (x, S) / _ #": {Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
 			RightContext: Context{"#", test_CompileRegexp("$")}},
-		"sch -> (x, S)": Rule{Input: "sch",
+		"sch -> (x, S)": {Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
 			RightContext: Context{}},
-		"a -> A": Rule{Input: "a",
+		"a -> A": {Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
 			RightContext: Context{}},
-		"a -> A / _ VOICED": Rule{Input: "a",
+		"a -> A / _ VOICED": {Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
 			RightContext: Context{"VOICED", test_CompileRegexp("[dgjlvbnm]")}},
-		"a -> A / _ VOICED #": Rule{Input: "a",
+		"a -> A / _ VOICED #": {Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
 			RightContext: Context{"VOICED #", test_CompileRegexp("[dgjlvbnm]$")}},
@@ -449,13 +449,13 @@ func TestSyllabifySwsTestFile(t *testing.T) {
 	//
 	inputT := trans{
 		phonemes: []g2p{
-			g2p{g: "b", p: []string{"b"}},
-			g2p{g: "o", p: []string{"O"}},
-			g2p{g: "rt", p: []string{"rt"}},
-			g2p{g: "a", p: []string{"a"}},
-			g2p{g: "d", p: []string{"d"}},
-			g2p{g: "u", p: []string{"u0"}},
-			g2p{g: "sch", p: []string{"S"}},
+			{g: "b", p: []string{"b"}},
+			{g: "o", p: []string{"O"}},
+			{g: "rt", p: []string{"rt"}},
+			{g: "a", p: []string{"a"}},
+			{g: "d", p: []string{"d"}},
+			{g: "u", p: []string{"u0"}},
+			{g: "sch", p: []string{"S"}},
 		},
 	}
 

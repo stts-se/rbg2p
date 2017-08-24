@@ -73,15 +73,15 @@ func TestSylledTransString(t *testing.T) {
 	input := sylledTrans{
 		trans: trans{
 			phonemes: []g2p{
-				g2p{g: "t", p: []string{"t"}},
-				g2p{g: "o", p: []string{"O"}},
-				g2p{g: "ff", p: []string{"f"}},
-				g2p{g: "e", p: []string{"@"}},
-				g2p{g: "l", p: []string{"l"}},
+				{g: "t", p: []string{"t"}},
+				{g: "o", p: []string{"O"}},
+				{g: "ff", p: []string{"f"}},
+				{g: "e", p: []string{"@"}},
+				{g: "l", p: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
-			boundary{g: 2, p: 0},
+			{g: 2, p: 0},
 		},
 	}
 	res := input.string(" ", ".")
@@ -94,15 +94,15 @@ func TestSylledTransString(t *testing.T) {
 	input = sylledTrans{
 		trans: trans{
 			phonemes: []g2p{
-				g2p{g: "t", p: []string{"t"}},
-				g2p{g: "o", p: []string{"O"}},
-				g2p{g: "x", p: []string{"k", "s"}},
-				g2p{g: "e", p: []string{"@"}},
-				g2p{g: "l", p: []string{"l"}},
+				{g: "t", p: []string{"t"}},
+				{g: "o", p: []string{"O"}},
+				{g: "x", p: []string{"k", "s"}},
+				{g: "e", p: []string{"@"}},
+				{g: "l", p: []string{"l"}},
 			},
 		},
 		boundaries: []boundary{
-			boundary{g: 2, p: 1},
+			{g: 2, p: 1},
 		},
 	}
 	res = input.string(" ", ".")
@@ -164,10 +164,10 @@ func TestSyllabify2(t *testing.T) {
 	//
 	inputT := trans{
 		phonemes: []g2p{
-			g2p{g: "t", p: []string{"t"}},
-			g2p{g: "o", p: []string{"O"}},
-			g2p{g: "x", p: []string{"k", "s"}},
-			g2p{g: "el", p: []string{"@", "l"}},
+			{g: "t", p: []string{"t"}},
+			{g: "o", p: []string{"O"}},
+			{g: "x", p: []string{"k", "s"}},
+			{g: "el", p: []string{"@", "l"}},
 		},
 	}
 
@@ -182,11 +182,11 @@ func TestSyllabify2(t *testing.T) {
 	//
 	inputT = trans{
 		phonemes: []g2p{
-			g2p{g: "t", p: []string{"t"}},
-			g2p{g: "o", p: []string{"O"}},
-			g2p{g: "x", p: []string{"k", "s"}},
-			g2p{g: "e", p: []string{"@"}},
-			g2p{g: "l", p: []string{"l"}},
+			{g: "t", p: []string{"t"}},
+			{g: "o", p: []string{"O"}},
+			{g: "x", p: []string{"k", "s"}},
+			{g: "e", p: []string{"@"}},
+			{g: "l", p: []string{"l"}},
 		},
 	}
 
@@ -201,11 +201,11 @@ func TestSyllabify2(t *testing.T) {
 	//
 	inputT = trans{
 		phonemes: []g2p{
-			g2p{g: "t", p: []string{"t"}},
-			g2p{g: "u", p: []string{"u0"}},
-			g2p{g: "ng", p: []string{"N"}},
-			g2p{g: "a", p: []string{"a"}},
-			g2p{g: "n", p: []string{"n"}},
+			{g: "t", p: []string{"t"}},
+			{g: "u", p: []string{"u0"}},
+			{g: "ng", p: []string{"N"}},
+			{g: "a", p: []string{"a"}},
+			{g: "n", p: []string{"n"}},
 		},
 	}
 
@@ -236,15 +236,15 @@ func TestSyllabify3(t *testing.T) {
 	//
 	inputT := trans{
 		phonemes: []g2p{
-			g2p{g: "b", p: []string{"b"}},
-			g2p{g: "a", p: []string{"a"}},
-			g2p{g: "rr", p: []string{"rr"}},
-			g2p{g: "t", p: []string{"t"}},
-			g2p{g: "r", p: []string{"r"}},
-			g2p{g: "ä", p: []string{"{:"}},
-			g2p{g: "d", p: []string{"d"}},
-			g2p{g: "e", p: []string{"@"}},
-			g2p{g: "n", p: []string{"n"}},
+			{g: "b", p: []string{"b"}},
+			{g: "a", p: []string{"a"}},
+			{g: "rr", p: []string{"rr"}},
+			{g: "t", p: []string{"t"}},
+			{g: "r", p: []string{"r"}},
+			{g: "ä", p: []string{"{:"}},
+			{g: "d", p: []string{"d"}},
+			{g: "e", p: []string{"@"}},
+			{g: "n", p: []string{"n"}},
 		},
 	}
 
@@ -271,13 +271,13 @@ func TestSyllabify4(t *testing.T) {
 	//
 	inputT := trans{
 		phonemes: []g2p{
-			g2p{g: "b", p: []string{"b"}},
-			g2p{g: "o", p: []string{"O"}},
-			g2p{g: "rt", p: []string{"rt"}},
-			g2p{g: "a", p: []string{"a"}},
-			g2p{g: "d", p: []string{"d"}},
-			g2p{g: "u", p: []string{"u0"}},
-			g2p{g: "sch", p: []string{"S"}},
+			{g: "b", p: []string{"b"}},
+			{g: "o", p: []string{"O"}},
+			{g: "rt", p: []string{"rt"}},
+			{g: "a", p: []string{"a"}},
+			{g: "d", p: []string{"d"}},
+			{g: "u", p: []string{"u0"}},
+			{g: "sch", p: []string{"S"}},
 		},
 	}
 
