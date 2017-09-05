@@ -1,6 +1,8 @@
 # rbg2p
 Utilities for rule based, manually written, grapheme to phoneme rules
 
+[![GoDoc](https://godoc.org/github.com/stts-se/rbg2p?status.svg)](https://godoc.org/github.com/stts-se/rbg2p) [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/rbg2p)](https://goreportcard.com/report/github.com/stts-se/rbg2p)
+
 ## Command line tools
 
 ### G2P
@@ -25,6 +27,3 @@ Utilities for rule based, manually written, grapheme to phoneme rules
      
  Visit http://localhost:6771/ for info on available API calls
  
-## API docs
-
-[![GoDoc](https://godoc.org/github.com/stts-se/rbg2p?status.svg)](https://godoc.org/github.com/stts-se/rbg2p)
