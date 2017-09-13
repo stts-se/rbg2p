@@ -22,11 +22,13 @@ import (
 
 type g2pMutex struct {
 	g2ps  map[string]rbg2p.RuleSet
+	sylls map[string]rbg2p.Syllabifier
 	mutex *sync.RWMutex
 }
 
 var g2pM = g2pMutex{
 	g2ps:  make(map[string]rbg2p.RuleSet),
+	sylls: make(map[string]rbg2p.Syllabifier),
 	mutex: &sync.RWMutex{},
 }
 
@@ -47,25 +49,32 @@ type Word struct {
 func syllabify(lang string, trans string) (string, int, error) {
 	g2pM.mutex.RLock()
 	defer g2pM.mutex.RUnlock()
-	ruleSet, ok := g2pM.g2ps[lang]
+	syller, ok := g2pM.sylls[lang]
 	if !ok {
-		msg := "unknown 'lang': " + lang
-		langs := listLanguages()
-		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
-		return "", http.StatusBadRequest, fmt.Errorf(msg)
-	}
+		ruleSet, ok := g2pM.g2ps[lang]
+		if !ok {
+			msg := "unknown 'lang': " + lang
+			langs, err := listSyllLanguages()
+			if err != nil {
+				return "", http.StatusInternalServerError, err
+			}
+			msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
+			return "", http.StatusBadRequest, fmt.Errorf(msg)
+		}
 
-	if !ruleSet.Syllabifier.IsDefined() {
-		msg := fmt.Sprintf("no syllabifier defined for language %s", lang)
-		return "", http.StatusInternalServerError, fmt.Errorf(msg)
-	}
+		if !ruleSet.Syllabifier.IsDefined() {
+			msg := fmt.Sprintf("no syllabifier defined for language %s", lang)
+			return "", http.StatusInternalServerError, fmt.Errorf(msg)
+		}
+		syller = ruleSet.Syllabifier
 
-	phns, err := ruleSet.PhonemeSet.SplitTranscription(trans)
+	}
+	phns, err := syller.PhonemeSet.SplitTranscription(trans)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't split input transcription /%s/ : %s", trans, err)
 		return "", http.StatusInternalServerError, fmt.Errorf(msg)
 	}
-	sylled := ruleSet.Syllabifier.SyllabifyFromPhonemes(phns)
+	sylled := syller.SyllabifyFromPhonemes(phns)
 	return sylled, http.StatusOK, nil
 }
 
@@ -112,7 +121,7 @@ func transcribe(lang string, word string) (Word, int, error) {
 	ruleSet, ok := g2pM.g2ps[lang]
 	if !ok {
 		msg := "unknown 'lang': " + lang
-		langs := listLanguages()
+		langs := listG2PLanguages()
 		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
 		return Word{}, http.StatusBadRequest, fmt.Errorf(msg)
 	}
@@ -237,7 +246,7 @@ func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Fprintf(w, string(res.Transes[0]))
 }
 
-func listLanguages() []string {
+func listG2PLanguages() []string {
 	var res []string
 	for name := range g2pM.g2ps {
 		res = append(res, name)
@@ -245,10 +254,48 @@ func listLanguages() []string {
 	return res
 }
 
-func list_Handler(w http.ResponseWriter, r *http.Request) {
+func listSyllLanguages() ([]string, error) {
+	var res []string
+	for name, g2p := range g2pM.g2ps {
+		if g2p.Syllabifier.IsDefined() {
+			res = append(res, name)
+		}
+	}
+	for name := range g2pM.sylls {
+		if rbg2p.Contains(res, name) {
+			return res, fmt.Errorf("name conflict for '%s' (g2p and syllabifier cannot share the same name)", name)
+		}
+		res = append(res, name)
+	}
+	return res, nil
+}
+
+func g2pList_Handler(w http.ResponseWriter, r *http.Request) {
 	g2pM.mutex.RLock()
-	res := listLanguages()
+	res := listG2PLanguages()
 	g2pM.mutex.RUnlock()
+
+	sort.Strings(res)
+	j, err := json.Marshal(res)
+	if err != nil {
+		msg := fmt.Sprintf("failed json marshalling : %v", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, string(j))
+}
+
+func syllList_Handler(w http.ResponseWriter, r *http.Request) {
+	g2pM.mutex.RLock()
+	res, err := listSyllLanguages()
+	g2pM.mutex.RUnlock()
+	if err != nil {
+		msg := fmt.Sprintf("%s", err)
+		log.Println(msg)
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
 
 	sort.Strings(res)
 	j, err := json.Marshal(res)
@@ -266,6 +313,8 @@ func langFromFilePath(p string) string {
 	b := filepath.Base(p)
 	if strings.HasSuffix(b, ".g2p") {
 		b = b[0 : len(b)-4]
+	} else if strings.HasSuffix(b, ".syll") {
+		b = b[0 : len(b)-5]
 	}
 	return b
 }
@@ -292,23 +341,45 @@ func main() {
 	var fn string
 	for _, f := range files {
 		fn = filepath.Join(dir, f.Name())
-		if !strings.HasSuffix(fn, ".g2p") {
+		if strings.HasSuffix(fn, ".g2p") {
+
+			ruleSet, err := rbg2p.LoadFile(fn)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
+				continue
+			}
+
+			lang := langFromFilePath(fn)
+			g2pM.mutex.Lock()
+			g2pM.g2ps[lang] = ruleSet
+			g2pM.mutex.Unlock()
+			fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
+
+		} else if strings.HasSuffix(fn, ".syll") {
+
+			syll, err := rbg2p.LoadSyllFile(fn)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
+				continue
+			}
+
+			lang := langFromFilePath(fn)
+			g2pM.mutex.Lock()
+			g2pM.sylls[lang] = syll
+			g2pM.mutex.Unlock()
+			fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
+
+		} else {
 			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 			continue
 		}
 
-		ruleSet, err := rbg2p.LoadFile(fn)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
-			continue
-		}
+	}
 
-		lang := langFromFilePath(fn)
-		g2pM.mutex.Lock()
-		g2pM.g2ps[lang] = ruleSet
-		g2pM.mutex.Unlock()
-		fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
+	if _, err := listSyllLanguages(); err != nil {
+		log.Fatalf("server init error : %s", err)
 	}
 
 	r := mux.NewRouter().StrictSlash(true)
@@ -318,10 +389,11 @@ func main() {
 
 	s := r.PathPrefix("/rbg2p").Subrouter()
 
-	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
-	s.HandleFunc("/list", list_Handler)                           //.Methods("get")
+	s.HandleFunc("/g2p/list", g2pList_Handler)
+	s.HandleFunc("/syll/list", syllList_Handler)
 
-	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler) //.Methods("get", "post")
+	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
+	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler)  //.Methods("get", "post")
 
 	// for legacy calls from ltool/yalt
 	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)

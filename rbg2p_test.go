@@ -182,6 +182,14 @@ func TestLoadFile2(t *testing.T) {
 	}
 }
 
+func TestLoadFile3(t *testing.T) {
+	fName := "test_data/enu_cmu.syll"
+	_, err := LoadSyllFile(fName)
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+}
+
 func loadAndTest(t *testing.T, fName string) (RuleSet, error) {
 	rs, err := LoadFile(fName)
 	if err != nil {
@@ -502,13 +510,13 @@ func xxxTestBaq(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 }
-func loadAndTestSyll(t *testing.T, fName string) (Syllabifier, PhonemeSet, error) {
-	syller, pSet, err := LoadSyllFile(fName)
+func loadAndTestSyll(t *testing.T, fName string) (Syllabifier, error) {
+	syller, err := LoadSyllFile(fName)
 	if err != nil {
-		return syller, pSet, fmt.Errorf("didn't expect error for input file %s : %s", fName, err)
+		return syller, fmt.Errorf("didn't expect error for input file %s : %s", fName, err)
 	}
 
-	result := syller.Test(pSet)
+	result := syller.Test()
 	if len(result.Errors) > 0 {
 		for _, e := range result.Errors {
 			fmt.Printf("ERROR: %v\n", e)
@@ -530,20 +538,20 @@ func loadAndTestSyll(t *testing.T, fName string) (Syllabifier, PhonemeSet, error
 		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(syller.Tests), fName)
 	}
 	if len(result.Errors) > 0 || len(result.FailedTests) > 0 {
-		return syller, pSet, fmt.Errorf("Init/tests failed for %s", fName)
+		return syller, fmt.Errorf("Init/tests failed for %s", fName)
 	}
-	return syller, pSet, nil
+	return syller, nil
 }
 
 func TestSwsSyll(t *testing.T) {
-	_, _, err := loadAndTestSyll(t, "test_data/sws_test_syll.g2p")
+	_, err := loadAndTestSyll(t, "test_data/sws_test_syll.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
 }
 
 func TestSwsSyllFail(t *testing.T) {
-	_, _, err := loadAndTestSyll(t, "test_data/sws_test_syll_fail.g2p")
+	_, err := loadAndTestSyll(t, "test_data/sws_test_syll_fail.g2p")
 	if err == nil {
 		t.Errorf("expected error here")
 	}

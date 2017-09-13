@@ -124,11 +124,12 @@ type Syllabifier struct {
 	SyllDef         SyllDef
 	Tests           []SyllTest
 	StressPlacement StressPlacement
+	PhonemeSet      PhonemeSet
 }
 
 // IsDefined is used to determine if there is a syllabifier defined or not
 func (s Syllabifier) IsDefined() bool {
-	return s.SyllDef.IsDefined()
+	return s.SyllDef != nil && s.SyllDef.IsDefined()
 }
 
 // SyllabifyFromPhonemes is used to divide a range of phonemes into syllables and create an output string
@@ -141,8 +142,8 @@ func (s Syllabifier) SyllabifyFromPhonemes(phns []string) string {
 }
 
 // SyllabifyFromString is used to divide a transcription string into syllables and create an output string
-func (s Syllabifier) SyllabifyFromString(phnSet PhonemeSet, trans string) (string, error) {
-	phns, err := phnSet.SplitTranscription(trans)
+func (s Syllabifier) SyllabifyFromString(trans string) (string, error) {
+	phns, err := s.PhonemeSet.SplitTranscription(trans)
 	if err != nil {
 		return "", err
 	}
@@ -173,10 +174,10 @@ func (s Syllabifier) syllabify(t trans) sylledTrans {
 }
 
 //Test to test the input syllabifier definition using tests in the input data or file
-func (s Syllabifier) Test(phnSet PhonemeSet) TestResult {
+func (s Syllabifier) Test() TestResult {
 	var result = TestResult{}
 	for _, test := range s.Tests {
-		res, err := s.SyllabifyFromString(phnSet, test.Input)
+		res, err := s.SyllabifyFromString(test.Input)
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("found error in test input (couldn't split) /%s/ : %s", test.Input, err))
 		}

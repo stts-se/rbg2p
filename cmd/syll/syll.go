@@ -11,8 +11,8 @@ import (
 	"github.com/stts-se/rbg2p"
 )
 
-func syllabify(syller rbg2p.Syllabifier, phnSet rbg2p.PhonemeSet, trans string) bool {
-	phonemes, err := phnSet.SplitTranscription(trans)
+func syllabify(syller rbg2p.Syllabifier, trans string) bool {
+	phonemes, err := syller.PhonemeSet.SplitTranscription(trans)
 	if err != nil {
 		l.Printf("%s", err)
 		return false
@@ -61,14 +61,14 @@ FLAGS:
 	}
 
 	ruleFile := args[0]
-	syller, phnSet, err := rbg2p.LoadSyllFile(ruleFile)
+	syller, err := rbg2p.LoadSyllFile(ruleFile)
 	if err != nil {
 		l.Printf("couldn't load rule file %s : %s", ruleFile, err)
 		os.Exit(1)
 	}
 
 	haltingError := false
-	result := syller.Test(phnSet)
+	result := syller.Test()
 	for _, e := range result.Errors {
 		l.Printf("ERROR: %v\n", e)
 	}
@@ -102,7 +102,7 @@ FLAGS:
 		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			if syllabify(syller, phnSet, s) {
+			if syllabify(syller, s) {
 				nOK = nOK + 1
 			} else {
 				nErrs = nErrs + 1
@@ -122,7 +122,7 @@ FLAGS:
 				}
 				nTotal = nTotal + 1
 				line := sc.Text()
-				if syllabify(syller, phnSet, line) {
+				if syllabify(syller, line) {
 					nOK = nOK + 1
 				} else {
 					nErrs = nErrs + 1

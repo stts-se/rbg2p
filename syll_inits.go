@@ -9,21 +9,21 @@ import (
 )
 
 // LoadSyllFile loads a syllabifier from the specified file
-func LoadSyllFile(fName string) (Syllabifier, PhonemeSet, error) {
+func LoadSyllFile(fName string) (Syllabifier, error) {
 	syllDefLines := []string{}
 	res := Syllabifier{}
 	phonemeDelimiter := " "
 	fh, err := os.Open(fName)
 	defer fh.Close()
 	if err != nil {
-		return res, PhonemeSet{}, err
+		return res, err
 	}
 	n := 0
 	var phonemeSetLine string
 	s := bufio.NewScanner(fh)
 	for s.Scan() {
 		if err := s.Err(); err != nil {
-			return res, PhonemeSet{}, err
+			return res, err
 		}
 		n++
 		l := trimComment(strings.TrimSpace(s.Text()))
@@ -31,7 +31,7 @@ func LoadSyllFile(fName string) (Syllabifier, PhonemeSet, error) {
 		} else if isSyllTest(l) {
 			t, err := newSyllTest(l)
 			if err != nil {
-				return res, PhonemeSet{}, err
+				return res, err
 			}
 			res.Tests = append(res.Tests, t)
 		} else if isSyllDefLine(l) {
@@ -41,26 +41,27 @@ func LoadSyllFile(fName string) (Syllabifier, PhonemeSet, error) {
 		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
 		} else {
-			return res, PhonemeSet{}, fmt.Errorf("unknown input line: %s", l)
+			return res, fmt.Errorf("unknown input line: %s", l)
 		}
 
 	}
 	if len(phonemeSetLine) == 0 {
-		return res, PhonemeSet{}, fmt.Errorf("missing required phoneme set definition")
+		return res, fmt.Errorf("missing required phoneme set definition")
 	}
 
 	phnSet, err := parsePhonemeSet(phonemeSetLine, phonemeDelimiter)
 	if err != nil {
-		return res, PhonemeSet{}, err
+		return res, err
 	}
 	syllDef, stressPlacement, err := loadSyllDef(syllDefLines, phonemeDelimiter)
 	if err != nil {
-		return res, PhonemeSet{}, err
+		return res, err
 	}
 	res.SyllDef = syllDef
 	res.StressPlacement = stressPlacement
+	res.PhonemeSet = phnSet
 
-	return res, phnSet, nil
+	return res, nil
 }
 
 func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlacement, error) {

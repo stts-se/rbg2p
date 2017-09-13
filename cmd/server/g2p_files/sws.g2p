@@ -25,7 +25,7 @@ SYLLDEF ONSETS "p, b, t, rt, m, n, d, rd, k, g, rn, f, v, C, rs, r, l, s, x, S, 
 SYLLDEF SYLLABIC "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu"
 SYLLDEF STRESS "\" \"\" %"
 SYLLDEF DELIMITER "."
-SYLLDEF STRESS_PLACEMENT AfterFirstSyllabic
+SYLLDEF STRESS_PLACEMENT AfterSyllabic
 
 
 // Variables
