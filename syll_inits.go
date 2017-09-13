@@ -40,6 +40,8 @@ func LoadSyllFile(fName string) (Syllabifier, error) {
 			phonemeDelimiter, err = parsePhonemeDelimiter(l)
 		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
+		} else if isG2PLine(l) {
+			// do nothing
 		} else {
 			return res, fmt.Errorf("unknown input line: %s", l)
 		}

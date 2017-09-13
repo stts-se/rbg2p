@@ -67,7 +67,6 @@ func syllabify(lang string, trans string) (string, int, error) {
 			return "", http.StatusInternalServerError, fmt.Errorf(msg)
 		}
 		syller = ruleSet.Syllabifier
-
 	}
 	phns, err := syller.PhonemeSet.SplitTranscription(trans)
 	if err != nil {

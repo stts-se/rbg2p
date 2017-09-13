@@ -22,6 +22,12 @@ func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
 }
 
+var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
+
+func isG2PLine(s string) bool {
+	return g2pLineRe.MatchString(s) || ruleRe.MatchString(s)
+}
+
 // LoadFile loads a g2p rule set from the specified file
 func LoadFile(fName string) (RuleSet, error) {
 	ruleSet := RuleSet{Vars: map[string]string{}}
@@ -95,7 +101,7 @@ func LoadFile(fName string) (RuleSet, error) {
 			return ruleSet, err
 		}
 		ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
-		ruleSet.Syllabifier = Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement}
+		ruleSet.Syllabifier = Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement, PhonemeSet: ruleSet.PhonemeSet}
 	}
 
 	for _, l := range ruleLines {
