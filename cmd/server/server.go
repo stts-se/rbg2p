@@ -38,6 +38,10 @@ func g2pMain_Handler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, fString)
 }
 
+func ping_Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "rbg2p")
+}
+
 var wSplitRe = regexp.MustCompile(" *, *")
 
 // Word internal struct for json
@@ -383,16 +387,18 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 
-	r.HandleFunc("/rbg2p", g2pMain_Handler) //.Methods("get")
-	r.HandleFunc("/", g2pMain_Handler)      //.Methods("get")
+	r.HandleFunc("/rbg2p", g2pMain_Handler)
+	r.HandleFunc("/", g2pMain_Handler)
+
+	r.HandleFunc("/ping", ping_Handler)
 
 	s := r.PathPrefix("/rbg2p").Subrouter()
 
 	s.HandleFunc("/g2p/list", g2pList_Handler)
 	s.HandleFunc("/syll/list", syllList_Handler)
 
-	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler) //.Methods("get", "post")
-	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler)  //.Methods("get", "post")
+	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
+	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler)
 
 	// for legacy calls from ltool/yalt
 	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
