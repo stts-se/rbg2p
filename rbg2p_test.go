@@ -556,3 +556,7 @@ func TestSwsSyllFail(t *testing.T) {
 		t.Errorf("expected error here")
 	}
 }
+
+func TestKnaneliBrak(t *testing.T) {
+	t.Errorf("TOTAL SYSTEM MELTDOWN: CRAZY TEST! Oink-oink!")
+}
