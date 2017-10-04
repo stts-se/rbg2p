@@ -142,6 +142,19 @@ func transcribe(lang string, word string) (Word, int, error) {
 	return res, http.StatusOK, nil
 }
 
+func ruleContent(lang string) (string, int, error) {
+	g2pM.mutex.RLock()
+	defer g2pM.mutex.RUnlock()
+	ruleSet, ok := g2pM.g2ps[lang]
+	if !ok {
+		msg := "unknown 'lang': " + lang
+		langs := listG2PLanguages()
+		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
+		return "", http.StatusBadRequest, fmt.Errorf(msg)
+	}
+	return ruleSet.Content, http.StatusOK, nil
+}
+
 func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 
 	format := r.FormValue("format")
@@ -175,15 +188,20 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	j, err := json.Marshal(res)
-	if err != nil {
-		msg := fmt.Sprintf("failed json marshalling : %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
-		return
+	if "text" == format || "txt" == format {
+		res := strings.Join(res.Transes, "\n")
+		fmt.Fprintf(w, res)
+	} else {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		j, err := json.Marshal(res)
+		if err != nil {
+			msg := fmt.Sprintf("failed json marshalling : %v", err)
+			log.Println(msg)
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintf(w, string(j))
 	}
-	fmt.Fprintf(w, string(j))
 }
 
 // XMLWords container go generate xml from http request, for legacy calls from ltool/yalt
@@ -289,6 +307,26 @@ func g2pList_Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
+func g2pRules_Handler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	lang := vars["lang"]
+	if "" == lang {
+		msg := "no value for the expected 'lang' parameter"
+		log.Println(msg)
+		http.Error(w, msg, http.StatusBadRequest)
+		return
+	}
+
+	res, status, err := ruleContent(lang)
+	if err != nil {
+		log.Printf("%s\n", err)
+		http.Error(w, fmt.Sprintf("%s", err), status)
+		return
+	}
+
+	fmt.Fprintf(w, res)
+}
+
 func syllList_Handler(w http.ResponseWriter, r *http.Request) {
 	g2pM.mutex.RLock()
 	res, err := listSyllLanguages()
@@ -387,21 +425,20 @@ func main() {
 
 	r := mux.NewRouter().StrictSlash(true)
 
-	r.HandleFunc("/rbg2p", g2pMain_Handler)
 	r.HandleFunc("/", g2pMain_Handler)
 
 	r.HandleFunc("/ping", ping_Handler)
 
-	s := r.PathPrefix("/rbg2p").Subrouter()
+	r.HandleFunc("/g2p/list", g2pList_Handler)
+	r.HandleFunc("/syll/list", syllList_Handler)
 
-	s.HandleFunc("/g2p/list", g2pList_Handler)
-	s.HandleFunc("/syll/list", syllList_Handler)
+	r.HandleFunc("/g2p/rules/{lang}", g2pRules_Handler)
 
-	s.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
-	s.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler)
+	r.HandleFunc("/transcribe/{lang}/{word}", transcribe_Handler)
+	r.HandleFunc("/syllabify/{lang}/{trans}", syllabify_Handler)
 
 	// for legacy calls from ltool/yalt
-	s.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
+	r.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
 
 	fmt.Println("Serving urls:")
 	r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {

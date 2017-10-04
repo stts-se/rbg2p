@@ -41,6 +41,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	}
 	n := 0
 	s := bufio.NewScanner(fh)
+	var inputLines []string
 	var ruleLines []string
 	var phonemeSetLine string
 	for s.Scan() {
@@ -48,7 +49,9 @@ func LoadFile(fName string) (RuleSet, error) {
 			return ruleSet, err
 		}
 		n++
-		l := trimComment(strings.TrimSpace(s.Text()))
+		lOrig := strings.TrimSpace(s.Text())
+		l := trimComment(lOrig)
+		inputLines = append(inputLines, lOrig)
 		if isBlankLine(l) || isComment(l) {
 		} else if isPhonemeDelimiter(l) {
 			delim, err := parsePhonemeDelimiter(l)
@@ -114,6 +117,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {
 		return ruleSet, fmt.Errorf("No character set defined for input file %s", fName)
 	}
+	ruleSet.Content = strings.Join(inputLines, "\n")
 	return ruleSet, nil
 }
 

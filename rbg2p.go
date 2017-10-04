@@ -110,6 +110,7 @@ type RuleSet struct {
 	Tests             []Test
 	Filters           []Filter
 	Syllabifier       Syllabifier
+	Content           string
 }
 
 func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
