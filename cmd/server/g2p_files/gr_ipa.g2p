@@ -26,13 +26,19 @@ TEST ικιαν -> i c a n
 αι -> e
 εί -> ˈ i
 ει -> i
+οί -> ˈ i
+οι -> i
 ου -> u
 ού -> ˈ u
+υι -> i
 σσ -> s
 μπ -> b / # _
 μπ -> m b
 ρρ -> r
 λλ -> l
+γκ -> n g
+ντ -> d / # _
+ντ -> n d
 
 // Double character tests
 TEST μαί -> m ˈ e
@@ -41,12 +47,17 @@ TEST ρεί -> r ˈ i
 TEST λει -> l i
 TEST φου -> f u
 TEST πού -> p ˈ u
+TEST ποί -> p ˈ i
+TEST τοι -> t i
 TEST ουμπου -> u m b u
 TEST μπου -> b u
 TEST αρρη -> a r i
 TEST υλλο -> i l o
 TEST σσης -> s i s
-
+TEST αγκο -> a n g o
+TEST νταλ -> d a l
+TEST οντο -> o n d o
+TEST ρυι -> r i
 
 // Default single character rules
 ΐ -> ˈ i
