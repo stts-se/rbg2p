@@ -11,6 +11,7 @@ PHONEME_DELIMITER " "
 λια -> ʎ a
 λιά -> ʎ ˈ a
 κκι -> c i
+κια -> c a
 
 // Triple character tests
 TEST αγια -> a ʝ a
@@ -18,6 +19,7 @@ TEST λιον -> ʎ o n
 TEST αλιό -> a ʎ ˈ o
 TEST λιαν -> ʎ a n
 TEST κοκκι -> k o c i
+TEST ικιαν -> i c a n
 
 // Double character rules
 αί -> ˈ e
@@ -26,7 +28,6 @@ TEST κοκκι -> k o c i
 ει -> i
 ου -> u
 ού -> ˈ u
-ια -> ʝ a
 σσ -> s
 μπ -> b / # _
 μπ -> m b
