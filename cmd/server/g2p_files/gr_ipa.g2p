@@ -1,0 +1,124 @@
+CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ"
+PHONEME_SET "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ k⁀s p⁀s"
+
+DEFAULT_PHONEME "_"
+PHONEME_DELIMITER " "
+
+// Triple character rules
+για -> ʝ a
+λιο -> ʎ o
+λιό -> ʎ ˈ o
+λια -> ʎ a
+λιά -> ʎ ˈ a
+κκι -> c i
+
+// Triple character tests
+TEST αγια -> a ʝ a
+TEST λιον -> ʎ o n
+TEST αλιό -> a ʎ ˈ o
+TEST λιαν -> ʎ a n
+TEST κοκκι -> k o c i
+
+// Double character rules
+αί -> ˈ e
+αι -> e
+εί -> ˈ i
+ει -> i
+ου -> u
+ού -> ˈ u
+ια -> ʝ a
+σσ -> s
+μπ -> b / # _
+μπ -> m b
+ρρ -> r
+λλ -> l
+
+// Double character tests
+TEST μαί -> m ˈ e
+TEST δαι -> ð e
+TEST ρεί -> r ˈ i
+TEST λει -> l i
+TEST φου -> f u
+TEST πού -> p ˈ u
+TEST ουμπου -> u m b u
+TEST μπου -> b u
+TEST αρρη -> a r i
+TEST υλλο -> i l o
+TEST σσης -> s i s
+
+
+// Default single character rules
+ΐ -> ˈ i
+ά -> ˈ a
+έ ->  ˈ e
+ή -> ˈ i
+ί -> ˈ i
+ΰ -> ˈ i
+α -> a
+β -> v
+γ -> ɣ
+δ -> ð
+ε -> e
+ζ -> z
+η -> i
+θ -> θ
+ι -> i
+κ -> k
+λ -> l
+μ -> m
+ν -> n
+ξ -> k⁀s
+ο -> o
+π -> p
+ρ -> r
+ς -> s
+σ -> s
+τ -> t
+υ -> i
+φ ->  f
+χ -> x
+ψ -> p⁀s
+ω -> o
+ϊ -> i
+ϋ -> i
+ό -> ˈ o
+ύ -> ˈ i
+ώ -> ˈ o
+
+// Default single character rule tests
+TEST αΐ -> a ˈ i
+TEST ρά -> r ˈ a
+TEST λέ -> l ˈ e
+TEST ιή -> i ˈ i
+TEST ρί -> r ˈ i
+TEST αΰ -> a ˈ i
+TEST πα -> p a
+TEST βα -> v a
+TEST ηγ -> i ɣ
+TEST δε -> ð e
+TEST με -> m e
+TEST ζα -> z a
+TEST νη -> n i
+TEST θε -> θ e
+TEST ρι -> r i
+TEST κω -> k o
+TEST αλ -> a l
+TEST μα -> m a
+TEST να -> n a
+TEST ξη -> k⁀s i
+TEST ρο -> r o
+TEST πα -> p a
+TEST ρα -> r a
+TEST ης -> i s
+TEST σι -> s i
+TEST τε -> t e
+TEST ρυ -> r i
+TEST φυ ->  f i
+TEST χα -> x a
+TEST ψη -> p⁀s i
+TEST κω -> k o
+TEST αϊ -> a i
+TEST εϋ -> e i
+TEST πό -> p ˈ o
+TEST ρύ -> r ˈ i
+TEST χώ -> x ˈ o
