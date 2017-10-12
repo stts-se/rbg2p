@@ -1,5 +1,5 @@
 CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ"
-PHONEME_SET "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ k⁀s p⁀s"
+PHONEME_SET "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ d⁀z t⁀s k⁀s p⁀s"
 
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
@@ -39,6 +39,8 @@ TEST ικιαν -> i c a n
 γκ -> n g
 ντ -> d / # _
 ντ -> n d
+τζ -> d⁀z
+τσ -> t⁀s
 
 // Double character tests
 TEST μαί -> m ˈ e
@@ -58,6 +60,9 @@ TEST αγκο -> a n g o
 TEST νταλ -> d a l
 TEST οντο -> o n d o
 TEST ρυι -> r i
+TEST τζα -> d⁀z a
+TEST τζη -> d⁀z i
+TEST τση -> t⁀s i
 
 // Default single character rules
 ΐ -> ˈ i
