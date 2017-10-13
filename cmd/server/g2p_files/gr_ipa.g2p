@@ -4,10 +4,6 @@ PHONEME_SET "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ �
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
-// Voicing of σ before some voiced consonants
-σ -> z / _ [βγδμνρ]
-TEST σβήνω -> z v ˈ i n o
-
 
 // Triple character rules
 για -> ʝ a
@@ -102,6 +98,8 @@ VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 π -> p
 ρ -> r
 ς -> s
+// Voicing of σ before some voiced consonants
+σ -> z / _ [βγδμνρ]
 σ -> s
 τ -> t
 υ -> i
@@ -142,6 +140,7 @@ TEST ρο -> r o
 TEST πα -> p a
 TEST ρα -> r a
 TEST ης -> i s
+TEST σβήνω -> z v ˈ i n o
 TEST σι -> s i
 TEST τε -> t e
 TEST ρυ -> r i
