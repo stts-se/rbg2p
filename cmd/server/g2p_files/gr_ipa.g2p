@@ -6,7 +6,6 @@ DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
-VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
 
 
 // ??
