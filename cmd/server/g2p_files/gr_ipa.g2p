@@ -30,10 +30,10 @@ VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
 κιό -> c ˈ o
 κιω -> c o
 κιώ -> c ˈ o
-νιώ -> ɲ ˈ o
 νιω -> ɲ o
+νιώ -> ɲ ˈ o
 νια -> ɲ a
-
+νιά -> ɲ ˈ a
 
 // Triple character tests
 TEST αγια -> a ʝ a
@@ -47,6 +47,7 @@ TEST ακιω -> a c o
 TEST ίνιων -> ˈ i ɲ o n
 TEST νιας -> ɲ a s
 TEST ακιό -> a c ˈ o
+TEST ινιάς -> i ɲ ˈ a s
 
 // Double character rules
 αί -> ˈ e
