@@ -19,6 +19,10 @@ VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
 
 
 // Triple character rules
+
+// ???
+// ιου -> u
+
 για -> ʝ a
 λιο -> ʎ o
 λιό -> ʎ ˈ o
@@ -36,6 +40,9 @@ VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
 νιώ -> ɲ ˈ o
 νια -> ɲ a
 νιά -> ɲ ˈ a
+για -> ʝ a
+γιά -> ʝ ˈ a
+
 
 // Triple character tests
 TEST αγια -> a ʝ a
@@ -51,6 +58,8 @@ TEST ίνιων -> ˈ i ɲ o n
 TEST νιας -> ɲ a s
 TEST ακιό -> a c ˈ o
 TEST ινιάς -> i ɲ ˈ a s
+TEST γιάν -> ʝ ˈ a n
+TEST ογια -> o ʝ a
 
 // Double character rules
 αί -> ˈ e
@@ -67,6 +76,7 @@ TEST ινιάς -> i ɲ ˈ a s
 μπ -> m b
 ρρ -> r
 λλ -> l
+νν -> n
 
 // ??
 γγ -> n ɟ /  _ PALAT
@@ -97,6 +107,7 @@ TEST ουμπου -> u m b u
 TEST μπου -> b u
 TEST αρρη -> a r i
 TEST υλλο -> i l o
+TEST αννό -> a n ˈ o
 TEST σσης -> s i s
 TEST αγκο -> a n g o
 TEST νταλ -> d a l
