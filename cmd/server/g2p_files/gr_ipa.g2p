@@ -7,6 +7,8 @@ PHONEME_DELIMITER " "
 
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 
+VAR VOICED (ΐ|ά|έ|ή|ί|ΰ|α|β|γ|ε|ζ|η|ι|λ|μ|ν|ο|ρ|υ|ω|ϊ|ϋ|ό|ύ|ώ)
+VAR UNVOICED (δ|θ|κ|ξ|π|ς|σ|τ|φ|χ|ψ)
 
 // ??
 //νιού -> ɲ ˈ u
@@ -42,6 +44,8 @@ VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 για -> ʝ a
 γιά -> ʝ ˈ a
 
+μπτ -> (m t , m p t)
+
 
 // Triple character tests
 TEST αγια -> a ʝ a
@@ -70,12 +74,21 @@ TEST ογια -> o ʝ a
 ου -> u
 ού -> ˈ u
 υι -> i
+ύι -> i
+ωι -> o
 σσ -> s
 μπ -> b / # _
 μπ -> m b
 ρρ -> r
 λλ -> l
 νν -> n
+
+// ??
+αυ -> a v / _ VOICED
+αυ -> a f / _ UNVOICED
+ευ -> e v / _ VOICED
+ευ -> e f / _ UNVOICED
+
 
 // ??
 γγ -> n ɟ /  _ PALAT
@@ -117,6 +130,10 @@ TEST τζη -> d⁀z i
 TEST τση -> t⁀s i
 TEST ογγυ -> o n ɟ i
 TEST αγγα -> a n g a
+TEST αυκ -> a f k
+TEST αυρ -> a v r
+TEST πευτ -> p e f t
+TEST ρευμ -> r e v m
 
 //
 // Default single character rules
