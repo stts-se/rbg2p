@@ -25,7 +25,9 @@ VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
 λια -> ʎ a
 λιά -> ʎ ˈ a
 κκι -> c i
+κκί -> c ˈ i
 κια -> c a
+κιά -> c ˈ a
 κιο -> c o
 κιό -> c ˈ o
 κιω -> c o
@@ -41,6 +43,7 @@ TEST λιον -> ʎ o n
 TEST αλιό -> a ʎ ˈ o
 TEST λιαν -> ʎ a n
 TEST κοκκι -> k o c i
+TEST οκκίν -> o c ˈ i n
 TEST ικιαν -> i c a n
 TEST κιοπ -> c o p
 TEST ακιω -> a c o
