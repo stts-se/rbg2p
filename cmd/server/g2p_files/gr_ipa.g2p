@@ -1,8 +1,21 @@
+// TODO Add some defaults for Latin characters?  
 CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώ"
 PHONEME_SET "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ d⁀z t⁀s k⁀s p⁀s"
 
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
+
+VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
+VAR PALAT2 (οι|οί|ει|εί|υ|η|ή|ι|ί)
+
+
+// ??
+//νιού -> ɲ ˈ u
+//νεια - > ɲ a
+//νειά -> ɲ ˈ a
+//νειo -> ɲ o
+//νειό -> ɲ ˈ o
+
 
 
 // Triple character rules
@@ -13,6 +26,14 @@ PHONEME_DELIMITER " "
 λιά -> ʎ ˈ a
 κκι -> c i
 κια -> c a
+κιο -> c o
+κιό -> c ˈ o
+κιω -> c o
+κιώ -> c ˈ o
+νιώ -> ɲ ˈ o
+νιω -> ɲ o
+νια -> ɲ a
+
 
 // Triple character tests
 TEST αγια -> a ʝ a
@@ -21,6 +42,11 @@ TEST αλιό -> a ʎ ˈ o
 TEST λιαν -> ʎ a n
 TEST κοκκι -> k o c i
 TEST ικιαν -> i c a n
+TEST κιοπ -> c o p
+TEST ακιω -> a c o
+TEST ίνιων -> ˈ i ɲ o n
+TEST νιας -> ɲ a s
+TEST ακιό -> a c ˈ o
 
 // Double character rules
 αί -> ˈ e
@@ -37,9 +63,19 @@ TEST ικιαν -> i c a n
 μπ -> m b
 ρρ -> r
 λλ -> l
+
+// ??
+γγ -> n ɟ /  _ PALAT
+γγ -> n g
+
+γκ -> ɟ / # _ PALAT
+γκ -> n ɟ /  _ PALAT
+γκ -> g / # _
 γκ -> n g
+
 ντ -> d / # _
 ντ -> n d
+
 τζ -> d⁀z
 τσ -> t⁀s
 
@@ -65,12 +101,12 @@ TEST ρυι -> r i
 TEST τζα -> d⁀z a
 TEST τζη -> d⁀z i
 TEST τση -> t⁀s i
+TEST ογγυ -> o n ɟ i
+TEST αγγα -> a n g a
 
 //
 // Default single character rules
 //
-
-VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 
 ΐ -> ˈ i
 ά -> ˈ a
