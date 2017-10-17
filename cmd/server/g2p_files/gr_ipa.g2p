@@ -91,6 +91,10 @@ TEST αμπτ -> (a m t, a m p t)
 αυ -> a f / _ UNVOICED
 ευ -> e v / _ VOICED
 ευ -> e f / _ UNVOICED
+αύ -> ˈ a v / _ VOICED
+αύ -> ˈ a f / _ UNVOICED
+εύ -> ˈ e v / _ VOICED
+εύ -> ˈ e f / _ UNVOICED
 
 
 // ??
@@ -225,3 +229,4 @@ TEST εϋ -> e i
 TEST πό -> p ˈ o
 TEST ρύ -> r ˈ i
 TEST χώ -> x ˈ o
+TEST Πεύκο -> p ˈ e f k o
