@@ -79,10 +79,17 @@ func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
 }
 
-// equals checks for equality (including underlying slices and regexps); used for unit tests
+// equals: checks for equality (including underlying slices and regexps); used for unit tests
 func (r Rule) equals(r2 Rule) bool {
 	return r.Input == r2.Input &&
 		reflect.DeepEqual(r.Output, r2.Output) &&
+		r.LeftContext.equals(r2.LeftContext) &&
+		r.RightContext.equals(r2.RightContext)
+}
+
+// equalsExceptOutput: checks for equality except for output (including underlying slices and regexps); used for unit tests
+func (r Rule) equalsExceptOutput(r2 Rule) bool {
+	return r.Input == r2.Input &&
 		r.LeftContext.equals(r2.LeftContext) &&
 		r.RightContext.equals(r2.RightContext)
 }

@@ -380,12 +380,18 @@ func main() {
 	// populate map of g2p rules from files.
 	// The base file name minus '.g2p' is the language name.
 	var fn string
+	haltingError := false
 	for _, f := range files {
 		fn = filepath.Join(dir, f.Name())
 		if strings.HasSuffix(fn, ".g2p") {
 
 			ruleSet, err := rbg2p.LoadFile(fn)
-			haltingError := false
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+				haltingError = true
+				//fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
+			}
+
 			result := ruleSet.Test()
 			if len(result.Errors) > 0 {
 				for _, e := range result.Errors {
@@ -413,12 +419,6 @@ func main() {
 			}
 
 			if haltingError {
-				os.Exit(1)
-			}
-
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 				continue
 			}
 
@@ -448,6 +448,9 @@ func main() {
 			continue
 		}
 
+	}
+	if haltingError {
+		os.Exit(1)
 	}
 
 	if _, err := listSyllLanguages(); err != nil {

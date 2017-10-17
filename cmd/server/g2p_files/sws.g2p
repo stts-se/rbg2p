@@ -147,7 +147,6 @@ ff -> f
 gg -> g
 jj -> j
 kk -> k
-ck -> k
 ll -> l
 mm -> m
 nn -> n
@@ -178,22 +177,19 @@ r -> r
 d -> d
 s -> s
 l -> l
+h -> h
+t -> t
 
 v -> f / _ VOICELESS
 
 ck -> k
 k -> k
-rt -> rt
 n -> N / _ [kg]
 n -> n
 
 b -> p / _ VOICELESS
 b -> b 
 
-d -> d
-s -> s
-h -> h
-t -> t
 
 c -> s
 p -> p

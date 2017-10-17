@@ -112,6 +112,11 @@ func LoadFile(fName string) (RuleSet, error) {
 		if err != nil {
 			return ruleSet, err
 		}
+		for _, r0 := range ruleSet.Rules {
+			if r0.equalsExceptOutput(r) {
+				return ruleSet, fmt.Errorf("Duplicate rules for input file %s: %s vs. %s", fName, r0, r)
+			}
+		}
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
 	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {

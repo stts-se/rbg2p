@@ -556,3 +556,11 @@ func TestSwsSyllFail(t *testing.T) {
 		t.Errorf("expected error here")
 	}
 }
+
+func TestSwsFail(t *testing.T) {
+	fName := "test_data/sws_test_fail.g2p"
+	_, err := LoadFile(fName)
+	if err == nil {
+		t.Errorf("expected error here")
+	}
+}
