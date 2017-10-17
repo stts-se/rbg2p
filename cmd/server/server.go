@@ -385,6 +385,37 @@ func main() {
 		if strings.HasSuffix(fn, ".g2p") {
 
 			ruleSet, err := rbg2p.LoadFile(fn)
+			haltingError := false
+			result := ruleSet.Test()
+			if len(result.Errors) > 0 {
+				for _, e := range result.Errors {
+					fmt.Printf("ERROR: %v\n", e)
+				}
+				fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fn)
+			}
+			if len(result.Warnings) > 0 {
+				for _, e := range result.Warnings {
+					fmt.Printf("WARNING: %v\n", e)
+				}
+				fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fn)
+			}
+			if len(result.Errors) > 0 {
+				haltingError = true
+			}
+			if len(result.FailedTests) > 0 {
+				for _, e := range result.FailedTests {
+					fmt.Printf("FAILED TEST: %v\n", e)
+				}
+				fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), fn)
+				haltingError = true
+			} else {
+				//fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
+			}
+
+			if haltingError {
+				os.Exit(1)
+			}
+
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%v\n", err)
 				fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
