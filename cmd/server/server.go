@@ -389,6 +389,7 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
 				haltingError = true
+				continue
 				//fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 			}
 
