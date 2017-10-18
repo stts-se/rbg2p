@@ -2,17 +2,31 @@ CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊ�
 //PHONEME_SET|IPA "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ d⁀z t⁀s k⁀s p⁀s"
 PHONEME_SET "a e i o u af ef if av ev iv r p b t d k g f v s z x G m n l T D J C jj j gj c ts dz ks ps ""
 
-
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 
-
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
 
 // Latin
+bb -> b
+dd -> d
+ff -> f
+gg -> g
+hh -> x
+jj -> j
+kk -> k
+ll -> l
+mm -> m
+nn -> n
+pp -> p
+rr -> r
+ss -> s
+tt -> t
+vv -> v
+
 a -> a
 e -> e
 é -> " e
@@ -132,7 +146,14 @@ TEST αμπτ -> (a m t, a m p t)
 ρρ -> r
 λλ -> l
 νν -> n
-
+ππ -> p
+ββ -> v
+κκ -> k
+φφ -> f
+μμ -> m
+ττ -> t
+χχ -> C / _ PALAT
+χχ -> x
 
 
 // ??
