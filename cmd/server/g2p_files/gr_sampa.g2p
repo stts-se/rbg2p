@@ -97,6 +97,23 @@ TEST ογια -> o j a
 
 TEST αμπτ -> (a m t, a m p t)
 
+// dipththongs (not mapped to IPA)
+αυ -> av / _ VOICED
+αυ -> af / _ UNVOICED
+αύ -> " av / _ VOICED
+αύ -> " af / _ UNVOICED
+ευ -> ev / _ VOICED
+ευ -> ef / _ UNVOICED
+εύ -> " ev / _ VOICED
+εύ -> " ef / _ UNVOICED
+
+// ???
+//υο -> iv / _ VOICED
+//υο -> if / _ UNVOICED
+//υο -> " iv / _ VOICED
+//υο -> " if / _ UNVOICED
+
+
 // Double character rules
 αί -> " e
 αι -> e
@@ -116,15 +133,6 @@ TEST αμπτ -> (a m t, a m p t)
 λλ -> l
 νν -> n
 
-// dipththongs (not mapped to IPA)
-αυ -> av / _ VOICED
-αυ -> af / _ UNVOICED
-ευ -> ev / _ VOICED
-ευ -> ef / _ UNVOICED
-αύ -> " av / _ VOICED
-αύ -> " af / _ UNVOICED
-εύ -> " ev / _ VOICED
-εύ -> " ef / _ UNVOICED
 
 
 // ??
@@ -167,10 +175,10 @@ TEST τζη -> dz i
 TEST τση -> ts i
 TEST ογγυ -> o n gj i
 TEST αγγα -> a n g a
-TEST αυκ -> a f k
-TEST αυρ -> a v r
-TEST πευτ -> p e f t
-TEST ρευμ -> r e v m
+TEST αυκ -> af k
+TEST αυρ -> av r
+TEST πευτ -> p ef t
+TEST ρευμ -> r ev m
 
 //
 // Default single character rules
@@ -259,4 +267,4 @@ TEST εϋ -> e i
 TEST πό -> p " o
 TEST ρύ -> r " i
 TEST χώ -> x " o
-TEST Λεύκτρου -> l " e f k . t r u
+TEST λεύκτρου -> l " ef k t r u
