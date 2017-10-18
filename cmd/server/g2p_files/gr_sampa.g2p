@@ -1,0 +1,262 @@
+CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώabcdefghijklmnopqrstuvwxyzé"
+//PHONEME_SET|IPA "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ d⁀z t⁀s k⁀s p⁀s"
+PHONEME_SET "a e i o u af ef if av ev iv r p b t d k g f v s z x G m n l T D J C jj j gj c ts dz ks ps ""
+
+
+DEFAULT_PHONEME "_"
+PHONEME_DELIMITER " "
+
+VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
+
+
+VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
+VAR UNVOICED [δθκξπςστφχψ]
+
+// Latin
+a -> a
+e -> e
+é -> " e
+y -> i
+u -> u
+i -> i
+o -> o
+b -> b
+c -> (s, k)
+d -> d
+f -> f
+g -> g
+h -> x
+j -> j
+k -> k
+l -> l
+m -> m
+n -> n
+p -> p
+q -> k
+r -> r
+s -> s
+t -> t
+v -> v
+w -> v
+x -> ks
+z -> z
+
+
+// ??
+//νιού -> J " u
+//νεια - > J a
+//νειά -> J " a
+//νειo -> J o
+//νειό -> J " o
+
+
+
+// Triple character rules
+
+// ???
+// ιου -> u
+
+λια -> jj a
+λιά -> jj " a
+λιο -> jj o
+λιό -> jj " o
+κκι -> c i
+κκί -> c " i
+κια -> c a
+κιά -> c " a
+κιο -> c o
+κιό -> c " o
+κιω -> c o
+κιώ -> c " o
+νιω -> J o
+νιώ -> J " o
+νια -> J a
+νιά -> J " a
+για -> j a
+γιά -> j " a
+
+μπτ -> (m t , m p t)
+
+
+// Triple character tests
+TEST αγια -> a j a
+TEST λιον -> jj o n
+TEST αλιό -> a jj " o
+TEST λιαν -> jj a n
+TEST κοκκι -> k o c i
+TEST οκκίν -> o c " i n
+TEST ικιαν -> i c a n
+TEST κιοπ -> c o p
+TEST ακιω -> a c o
+TEST ίνιων -> " i J o n
+TEST νιας -> J a s
+TEST ακιό -> a c " o
+TEST ινιάς -> i J " a s
+TEST γιάν -> j " a n
+TEST ογια -> o j a
+
+TEST αμπτ -> (a m t, a m p t)
+
+// Double character rules
+αί -> " e
+αι -> e
+εί -> " i
+ει -> i
+οί -> " i
+οι -> i
+ου -> u
+ού -> " u
+υι -> i
+ύι -> i
+ωι -> o
+σσ -> s
+μπ -> b / # _
+μπ -> m b
+ρρ -> r
+λλ -> l
+νν -> n
+
+// dipththongs (not mapped to IPA)
+αυ -> av / _ VOICED
+αυ -> af / _ UNVOICED
+ευ -> ev / _ VOICED
+ευ -> ef / _ UNVOICED
+αύ -> " av / _ VOICED
+αύ -> " af / _ UNVOICED
+εύ -> " ev / _ VOICED
+εύ -> " ef / _ UNVOICED
+
+
+// ??
+γγ -> n gj /  _ PALAT
+γγ -> n g
+
+γκ -> gj / # _ PALAT
+γκ -> n gj /  _ PALAT
+γκ -> g / # _
+γκ -> n g
+
+ντ -> d / # _
+ντ -> n d
+
+τζ -> dz
+τσ -> ts
+
+
+// Double character tests
+TEST μαί -> m " e
+TEST δαι -> D e
+TEST ρεί -> r " i
+TEST λει -> l i
+TEST φου -> f u
+TEST πού -> p " u
+TEST ποί -> p " i
+TEST τοι -> t i
+TEST ουμπου -> u m b u
+TEST μπου -> b u
+TEST αρρη -> a r i
+TEST υλλο -> i l o
+TEST αννό -> a n " o
+TEST σσης -> s i s
+TEST αγκο -> a n g o
+TEST νταλ -> d a l
+TEST οντο -> o n d o
+TEST ρυι -> r i
+TEST τζα -> dz a
+TEST τζη -> dz i
+TEST τση -> ts i
+TEST ογγυ -> o n gj i
+TEST αγγα -> a n g a
+TEST αυκ -> a f k
+TEST αυρ -> a v r
+TEST πευτ -> p e f t
+TEST ρευμ -> r e v m
+
+//
+// Default single character rules
+//
+
+ΐ -> " i
+ά -> " a
+έ ->  " e
+ή -> " i
+ί -> " i
+ΰ -> " i
+α -> a
+β -> v
+γ -> j / _ PALAT
+γ -> G
+δ -> D
+ε -> e
+ζ -> z
+η -> i
+θ -> T
+ι -> i
+κ -> c / _ PALAT
+κ -> k
+λ -> l
+μ -> m
+ν -> n
+ξ -> ks
+ο -> o
+π -> p
+ρ -> r
+ς -> s
+// Voicing of σ before some voiced consonants
+σ -> z / _ [βγδμνρ]
+σ -> s
+τ -> t
+υ -> i
+φ -> f
+χ -> C / _ PALAT
+χ -> x
+ψ -> ps
+ω -> o
+ϊ -> i
+ϋ -> i
+ό -> " o
+ύ -> " i
+ώ -> " o
+
+// Default single character rule tests
+TEST αΐ -> a " i
+TEST ρά -> r " a
+TEST λέ -> l " e
+TEST ιή -> i " i
+TEST ρί -> r " i
+TEST αΰ -> a " i
+TEST πα -> p a
+TEST βα -> v a
+TEST γη -> j i
+TEST ηγ -> i G
+TEST δε -> D e
+TEST με -> m e
+TEST ζα -> z a
+TEST νη -> n i
+TEST θε -> T e
+TEST ρι -> r i
+TEST κω -> k o
+TEST αλ -> a l
+TEST μα -> m a
+TEST να -> n a
+TEST ξη -> ks i
+TEST ρο -> r o
+TEST πα -> p a
+TEST ρα -> r a
+TEST ης -> i s
+TEST σβήνω -> z v " i n o
+TEST σι -> s i
+TEST τε -> t e
+TEST ρυ -> r i
+TEST φυ ->  f i
+TEST χυ -> C i
+TEST χα -> x a
+TEST ψη -> ps i
+TEST κι -> c i
+TEST κω -> k o
+TEST αϊ -> a i
+TEST εϋ -> e i
+TEST πό -> p " o
+TEST ρύ -> r " i
+TEST χώ -> x " o
+TEST Λεύκτρου -> l " e f k . t r u
