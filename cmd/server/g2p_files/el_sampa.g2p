@@ -143,6 +143,9 @@ TEST αμπτ -> (a m t, a m p t)
 // Double character rules
 
 // TODO rules for ιο ?
+// TODO rules for σι ?
+// TODO rules for στι ?
+// TODO check initial σμ
 
 αί -> " e
 αι -> e
