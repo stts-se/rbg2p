@@ -39,7 +39,7 @@ func g2pMain_Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ping_Handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "rbg2p")
+	fmt.Fprintf(w, "rbg2p\n")
 }
 
 var wSplitRe = regexp.MustCompile(" *, *")
@@ -115,7 +115,7 @@ func syllabify_Handler(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	// fmt.Fprintf(w, string(j))
-	fmt.Fprintf(w, string(res))
+	fmt.Fprintf(w, "%s\n", string(res))
 }
 
 func transcribe(lang string, word string) (Word, int, error) {
@@ -190,7 +190,7 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 
 	if "text" == format || "txt" == format {
 		res := strings.Join(res.Transes, "\n")
-		fmt.Fprintf(w, res)
+		fmt.Fprintf(w, "%s\n", res)
 	} else {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		j, err := json.Marshal(res)
@@ -200,7 +200,7 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintf(w, string(j))
+		fmt.Fprintf(w, "%s\n", string(j))
 	}
 }
 
@@ -241,15 +241,6 @@ func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%s", err), status)
 		return
 	}
-	//<words>
-	//<word orth='apa' word_lang='mk' trans_lang='mk' >" a p a</word>
-	//</words>
-
-	// words := XMLWords{
-	// 	Words: []XMLWord{
-	// 		XMLWord{Orth: word, Trans: res.Transes[0]},
-	// 	},
-	// }
 	words := XMLWords{}
 	for _, t := range res.Transes {
 		words.Words = append(words.Words, XMLWord{Orth: word, Trans: t})
@@ -263,8 +254,7 @@ func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, string(xml))
-	//fmt.Fprintf(w, string(res.Transes[0]))
+	fmt.Fprintf(w, "%s\n", string(xml))
 }
 
 func listG2PLanguages() []string {
@@ -304,7 +294,7 @@ func g2pList_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, string(j))
+	fmt.Fprintf(w, "%s\n", string(j))
 }
 
 func g2pRules_Handler(w http.ResponseWriter, r *http.Request) {
@@ -324,7 +314,7 @@ func g2pRules_Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, res)
+	fmt.Fprintf(w, "%s\n", res)
 }
 
 func syllList_Handler(w http.ResponseWriter, r *http.Request) {
@@ -346,7 +336,7 @@ func syllList_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, string(j))
+	fmt.Fprintf(w, "%s\n", string(j))
 }
 
 // langFromFilePath returns the base file name stripped from any '.g2p' extension
