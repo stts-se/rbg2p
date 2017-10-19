@@ -186,7 +186,7 @@ FLAGS:
 					os.Exit(1)
 				}
 				nTotal = nTotal + 1
-				line := strings.ToLower(sc.Text())
+				line := sc.Text() //strings.ToLower(sc.Text())
 				fs := strings.Split(line, "\t")
 				o, refTranses := fs[0], fs[1:]
 				res := transcribe(ruleSet, strings.ToLower(o))
