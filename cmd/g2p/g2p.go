@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
+	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/stts-se/rbg2p"
@@ -32,10 +35,42 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string) transResult {
 	return transResult{orth: orth, transes: transes, result: true}
 }
 
+var removeStressAndBoundaries = regexp.MustCompile("[.\"%!~] *")
+
+func cleanTransForDiff(t string) string {
+	var res = t
+	res = removeStressAndBoundaries.ReplaceAllString(res, "")
+	res = strings.Replace(res, "'", "", -1)
+	return res
+}
+
+func compareForDiff(old []string, new []string) (string, bool) {
+	for i, s := range old {
+		old[i] = cleanTransForDiff(s)
+	}
+	for i, s := range new {
+		new[i] = cleanTransForDiff(s)
+	}
+	if reflect.DeepEqual(old, new) {
+		return "ALL EQ", true
+	} else if old[0] == new[0] {
+		return "#1 EQ", false
+	} else if len(new) > 1 && old[0] == new[1] {
+		return "ONE EQ", false
+	} else if len(old) > 1 && old[1] == new[0] {
+		return "ONE EQ", false
+	} else if len(old) > 1 && len(new) > 1 && old[1] == new[1] {
+		return "ONE EQ", false
+	} else {
+		return "REALDIFF", false
+	}
+}
+
 func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
 
@@ -43,6 +78,7 @@ func main() {
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
+   -test       bool    test g2p against input file; orth <tab> trans (default: false)
    -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
    -help       bool    print help message`
 
@@ -117,6 +153,11 @@ FLAGS:
 	nTotal := 0
 	nErrs := 0
 	nTrans := 0
+	nTests := 0
+	testRes := make(map[string]int)
+	if *test {
+		fmt.Println("ORTH\tDIFFTAG\tNEW TRANSES\tOLD TRANSES")
+	}
 	for i := 1; i < len(args); i++ {
 		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
@@ -146,20 +187,44 @@ FLAGS:
 				}
 				nTotal = nTotal + 1
 				line := strings.ToLower(sc.Text())
-				res := transcribe(ruleSet, strings.ToLower(line))
-				if res.result {
+				fs := strings.Split(line, "\t")
+				o, refTranses := fs[0], fs[1:]
+				res := transcribe(ruleSet, strings.ToLower(o))
+				if res.result || *force {
 					nTrans = nTrans + 1
-					print(res.orth, res.transes)
-				} else {
-					nErrs = nErrs + 1
-					if *force {
+					if *test {
+						nTests++
+						info, eq := compareForDiff(res.transes, refTranses)
+						testRes[info]++
+						if !eq && info != "REALDIFF" {
+							testRes["SMALLDIFF"]++
+						}
+						outFs := []string{res.orth, info, strings.Join(res.transes, " # "), strings.Join(refTranses, "#")}
+						fmt.Println(strings.Join(outFs, "\t"))
+					} else {
 						print(res.orth, res.transes)
 					}
+				}
+				if !res.result {
+					nErrs = nErrs + 1
 				}
 			}
 		}
 	}
-	l.Printf("TOTAL WORDS: %d", nTotal)
-	l.Printf("ERRORS: %d", nErrs)
-	l.Printf("TRANSCRIBED: %d", nTrans)
+	l.Printf("%-18s: % 7d", "TOTAL WORDS", nTotal)
+	l.Printf("%-18s: % 7d", "ERRORS", nErrs)
+	l.Printf("%-18s: % 7d", "TRANSCRIBED", nTrans)
+	if *test {
+		l.Printf("%-18s: % 7d", "TESTED", nTests)
+		var keys []string
+		for k := range testRes {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, tag := range keys {
+			freq := testRes[tag]
+			s := " > TEST " + tag
+			l.Printf("%-18s: % 7d", s, freq)
+		}
+	}
 }
