@@ -17,17 +17,19 @@ func print(orth string, transes []string) {
 	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "\t"))
 }
 
-func transcribe(ruleSet rbg2p.RuleSet, orth string, force bool) bool {
+type transResult struct {
+	orth    string
+	transes []string
+	result  bool
+}
+
+func transcribe(ruleSet rbg2p.RuleSet, orth string) transResult {
 	transes, err := ruleSet.Apply(orth)
 	if err != nil {
 		l.Printf("Couldn't transcribe '%s' : %s", orth, err)
-		if force {
-			print(orth, transes)
-		}
-		return false
+		return transResult{orth: orth, transes: transes, result: false}
 	}
-	print(orth, transes)
-	return true
+	return transResult{orth: orth, transes: transes, result: true}
 }
 
 func main() {
@@ -119,10 +121,15 @@ FLAGS:
 		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			if transcribe(ruleSet, strings.ToLower(s), *force) {
+			res := transcribe(ruleSet, strings.ToLower(s))
+			if res.result {
 				nTrans = nTrans + 1
+				print(res.orth, res.transes)
 			} else {
 				nErrs = nErrs + 1
+				if *force {
+					print(res.orth, res.transes)
+				}
 			}
 		} else {
 			fh, err := os.Open(s)
@@ -139,10 +146,15 @@ FLAGS:
 				}
 				nTotal = nTotal + 1
 				line := strings.ToLower(sc.Text())
-				if transcribe(ruleSet, line, *force) {
+				res := transcribe(ruleSet, strings.ToLower(line))
+				if res.result {
 					nTrans = nTrans + 1
+					print(res.orth, res.transes)
 				} else {
 					nErrs = nErrs + 1
+					if *force {
+						print(res.orth, res.transes)
+					}
 				}
 			}
 		}
