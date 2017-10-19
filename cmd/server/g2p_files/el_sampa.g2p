@@ -144,7 +144,7 @@ TEST αμπτ -> (a m t, a m p t)
 ωι -> o
 σσ -> s
 μπ -> b / # _
-μπ -> m b
+μπ -> (m b, b)
 ρρ -> r
 λλ -> l
 νν -> n
@@ -167,11 +167,15 @@ TEST αμπτ -> (a m t, a m p t)
 γκ -> g / # _
 γκ -> n g
 
+ντζ -> (n dz, dz)
+ντσ -> (n ts, n dz)
+ντς -> n ts / _ #
 ντ -> d / # _
-ντ -> n d
+ντ -> (n d, d)
 
 τζ -> dz
 τσ -> ts
+τς -> ts / _ #
 
 
 // Double character tests
@@ -183,7 +187,7 @@ TEST φου -> f u
 TEST πού -> p " u
 TEST ποί -> p " i
 TEST τοι -> t i
-TEST ουμπου -> u m b u
+TEST ουμπου -> (u m b u, u b u)
 TEST μπου -> b u
 TEST αρρη -> a r i
 TEST υλλο -> i l o
@@ -191,7 +195,7 @@ TEST αννό -> a n " o
 TEST σσης -> s i s
 TEST αγκο -> a n g o
 TEST νταλ -> d a l
-TEST οντο -> o n d o
+TEST οντο -> (o n d o, o d o)
 TEST ρυι -> r i
 TEST τζα -> dz a
 TEST τζη -> dz i
@@ -291,3 +295,4 @@ TEST πό -> p " o
 TEST ρύ -> r " i
 TEST χώ -> x " o
 TEST λεύκτρου -> l " ef k t r u
+TEST εντζ -> (e n dz, e dz)
