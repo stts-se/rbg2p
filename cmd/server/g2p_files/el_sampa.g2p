@@ -122,6 +122,10 @@ TEST αμπτ -> (a m t, a m p t)
 ευ -> ef / _ UNVOICED
 εύ -> " ev / _ VOICED
 εύ -> " ef / _ UNVOICED
++ηυ -> if / _ UNVOICED
++ηυ -> iv / _ VOICED
++ηύ -> " if / _ UNVOICED
++ηύ -> " iv / _ VOICED
 
 // ???
 //υο -> iv / _ VOICED
