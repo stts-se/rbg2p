@@ -28,6 +28,7 @@ ss -> s
 tt -> t
 vv -> v
 ou -> u
+oo -> u
 
 a -> a
 e -> e
@@ -56,6 +57,15 @@ v -> v
 w -> v
 x -> ks
 z -> z
+
+
+// Quadruple character rules
+λλιά -> jj " a
+λλια -> jj a
+
+// Quadruple character tests
+αλλιά -> a jj " a
+αλλια -> a jj a
 
 
 // ??
@@ -135,6 +145,12 @@ TEST αμπτ -> (a m t, a m p t)
 
 
 // Double character rules
+
+// TODO rules for ιο ?
+// TODO rules for σι ?
+// TODO rules for στι ?
+// TODO check initial σμ
+
 αί -> " e
 αι -> e
 εί -> " i
@@ -170,6 +186,9 @@ TEST αμπτ -> (a m t, a m p t)
 γκ -> n gj /  _ PALAT
 γκ -> g / # _
 γκ -> n g
+
+γχ -> n C / _ PALAT
+γχ -> n x
 
 ντζ -> (n dz, dz)
 ντσ -> (n ts, n dz)
@@ -210,6 +229,8 @@ TEST αυκ -> af k
 TEST αυρ -> av r
 TEST πευτ -> p ef t
 TEST ρευμ -> r ev m
+TEST γχι -> n C i
+TEST γχου -> n x u
 
 //
 // Default single character rules
