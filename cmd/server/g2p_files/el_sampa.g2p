@@ -7,8 +7,12 @@ PHONEME_DELIMITER " "
 
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 
+VAR VOWEL (ΐ|ά|έ|ή|ί|ΰ|α|ε|η|ι||ο|υ|ω|ϊ|ϋ|ό|ύ|ώ)
+VAR CONS (β|γ|δ|ζ|θ|κ|λ|μ|ν|ξ|π|ρ|ς|σ|τ|φ|χ|ψ)
+
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
+
 
 // Latin
 bb -> b
@@ -86,22 +90,39 @@ z -> z
 λιά -> jj " a
 λιο -> jj o
 λιό -> jj " o
+
 κκι -> c i
 κκί -> c " i
+
 κια -> c a
 κιά -> c " a
 κιο -> c o
 κιό -> c " o
 κιω -> c o
 κιώ -> c " o
+
 νιω -> J o
 νιώ -> J " o
 νια -> J a
 νιά -> J " a
+
+// [j] före [e] eller [i]; annars [G]
 για -> j a
 γιά -> j " a
+γαι -> j e
+γεί -> j " i
+γει -> j i
+γοί -> j " i
+γοι -> j i
+γύι -> j " i
+γυι -> j i
+γι -> j / _ VOWEL
+γι -> j i
+γε -> j / _ VOWEL
+γε -> j e
 
-μπτ -> (m t , m p t)
+
+μπτ -> (m p t , m t)
 
 
 // Triple character tests
@@ -121,7 +142,7 @@ TEST ινιάς -> i J " a s
 TEST γιάν -> j " a n
 TEST ογια -> o j a
 
-TEST αμπτ -> (a m t, a m p t)
+TEST αμπτ -> (a m p t, a m t)
 
 // dipththongs (not mapped to IPA)
 αυ -> av / _ VOICED
@@ -132,10 +153,10 @@ TEST αμπτ -> (a m t, a m p t)
 ευ -> ef / _ UNVOICED
 εύ -> " ev / _ VOICED
 εύ -> " ef / _ UNVOICED
-+ηυ -> if / _ UNVOICED
-+ηυ -> iv / _ VOICED
-+ηύ -> " if / _ UNVOICED
-+ηύ -> " iv / _ VOICED
+ηυ -> if / _ UNVOICED
+ηυ -> iv / _ VOICED
+ηύ -> " if / _ UNVOICED
+ηύ -> " iv / _ VOICED
 
 // ???
 //υο -> iv / _ VOICED
@@ -160,7 +181,7 @@ TEST αμπτ -> (a m t, a m p t)
 ου -> u
 ού -> " u
 υι -> i
-ύι -> i
+ύι -> " i
 ωι -> o
 σσ -> s
 μπ -> b / # _
@@ -322,3 +343,13 @@ TEST χώ -> x " o
 TEST λεύκτρου -> l " ef k t r u
 TEST εντζ -> (e n dz, e dz)
 TEST ψιά -> ps i " a
+TEST ογιού -> o j " u
+TEST για -> j a
+TEST γιά -> j " a
+TEST γαι -> j e
+TEST γεί -> j " i
+TEST γει -> j i
+TEST γοί -> j " i
+TEST γοι -> j i
+TEST γύι -> j " i
+TEST γυι -> j i
