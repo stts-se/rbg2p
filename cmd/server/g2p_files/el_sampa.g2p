@@ -6,6 +6,7 @@ DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
+VAR PALATLAT (oi|oí|ai|aí|i|e|í|é)
 
 VAR VOWEL (ΐ|ά|έ|ή|ί|ΰ|α|ε|η|ι||ο|υ|ω|ϊ|ϋ|ό|ύ|ώ)
 VAR CONS (β|γ|δ|ζ|θ|κ|λ|μ|ν|ξ|π|ρ|ς|σ|τ|φ|χ|ψ)
@@ -33,6 +34,17 @@ tt -> t
 vv -> v
 ou -> u
 oo -> u
+th -> T
+ch -> C / _ PALATLAT
+ch -> x
+//nd -> (n d, d)
+//mp -> (m b, b)
+
+ai -> e
+ei -> i
+oi -> i
+iι -> i
+oι -> o
 
 a -> a
 e -> e
@@ -42,10 +54,11 @@ u -> u
 i -> i
 o -> o
 b -> b
-c -> (s, k)
-d -> d
+c -> s / _ PALATLAT
+c -> k
+d -> D
 f -> f
-g -> g
+g -> G
 h -> x
 j -> j
 k -> k
@@ -90,6 +103,8 @@ z -> z
 λιά -> jj " a
 λιο -> jj o
 λιό -> jj " o
+λιω -> jj o
+λιώ -> jj " o
 
 κκι -> c i
 κκί -> c " i
@@ -105,6 +120,17 @@ z -> z
 νιώ -> J " o
 νια -> J a
 νιά -> J " a
+//νιού -> J " u // HL 20171020?
+//νιου -> J u // HL 20171020?
+//νιο -> J o // HL 20171020?
+//νιό -> J " o // HL 20171020?
+
+//χια -> C a // HL 20171020?
+//χιά -> C " a // HL 20171020?
+//χιο -> C o // HL 20171020?
+//χιό -> C " o // HL 20171020?
+//χιω -> C o // HL 20171020?
+//χιώ -> C " o // HL 20171020?
 
 // [j] före [e] eller [i]; annars [G]
 για -> j a
@@ -200,7 +226,7 @@ TEST αμπτ -> (a m p t, a m t)
 
 
 // ??
-γγ -> n gj /  _ PALAT
+//γγ -> n gj /  _ PALAT //? TODO: kolla upp?
 γγ -> n g
 
 γκ -> gj / # _ PALAT
@@ -244,7 +270,7 @@ TEST ρυι -> r i
 TEST τζα -> dz a
 TEST τζη -> dz i
 TEST τση -> ts i
-TEST ογγυ -> o n gj i
+//TEST ογγυ -> o n gj i // ?
 TEST αγγα -> a n g a
 TEST αυκ -> af k
 TEST αυρ -> av r
