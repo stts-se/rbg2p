@@ -12,6 +12,8 @@ import (
 	"strings"
 
 	"github.com/stts-se/rbg2p"
+
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 var l = log.New(os.Stderr, "", 0)
@@ -168,7 +170,7 @@ FLAGS:
 	nTests := 0
 	testRes := make(map[string]int)
 	if *test {
-		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG")
+		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG\t(DIFF)?")
 	}
 	for i := 1; i < len(args); i++ {
 		s := args[i]
@@ -211,6 +213,12 @@ FLAGS:
 						info, _ := compareForDiff(res.transes, refTranses)
 						testRes[info]++
 						outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
+						if info == "DIFF" {
+							dmp := diffmatchpatch.New()
+							diffs := dmp.DiffMain(outFs[1], outFs[2], false)
+							outFs = append(outFs, dmp.DiffPrettyText(diffs))
+						}
+
 						fmt.Println(strings.Join(outFs, "\t"))
 					} else {
 						print(res.orth, res.transes)
