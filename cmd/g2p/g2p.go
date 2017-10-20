@@ -168,7 +168,7 @@ FLAGS:
 	nTests := 0
 	testRes := make(map[string]int)
 	if *test {
-		fmt.Println("ORTH\tDIFFTAG\tNEW TRANSES\tOLD TRANSES")
+		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG")
 	}
 	for i := 1; i < len(args); i++ {
 		s := args[i]
@@ -210,7 +210,7 @@ FLAGS:
 						nTests++
 						info, _ := compareForDiff(res.transes, refTranses)
 						testRes[info]++
-						outFs := []string{res.orth, info, strings.Join(res.transes, " # "), strings.Join(refTranses, "#")}
+						outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
 						fmt.Println(strings.Join(outFs, "\t"))
 					} else {
 						print(res.orth, res.transes)
