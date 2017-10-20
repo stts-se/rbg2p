@@ -197,6 +197,10 @@ FLAGS:
 				}
 				nTotal = nTotal + 1
 				line := sc.Text()
+				if strings.HasPrefix(strings.TrimSpace(line), "#") {
+					l.Println("Skipping line " + line)
+					continue
+				}
 				fs := strings.Split(line, "\t")
 				o, refTranses := fs[0], fs[1:]
 				res := transcribe(ruleSet, strings.ToLower(o))
