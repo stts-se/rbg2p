@@ -216,7 +216,17 @@ FLAGS:
 						if info == "DIFF" {
 							dmp := diffmatchpatch.New()
 							diffs := dmp.DiffMain(outFs[1], outFs[2], false)
+							diffsOnly := []diffmatchpatch.Diff{}
+							diffsOnlyText := []string{}
+							for _, d := range diffs {
+								if d.Type != diffmatchpatch.DiffEqual {
+									diffsOnly = append(diffsOnly, d)
+									diffsOnlyText = append(diffsOnlyText, d.Text)
+								}
+							}
 							outFs = append(outFs, dmp.DiffPrettyText(diffs))
+							outFs = append(outFs, fmt.Sprintf("%v", diffsOnly))
+							outFs = append(outFs, strings.Join(diffsOnlyText, "|"))
 						}
 
 						fmt.Println(strings.Join(outFs, "\t"))
