@@ -17,7 +17,7 @@ import (
 var l = log.New(os.Stderr, "", 0)
 
 func print(orth string, transes []string) {
-	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "\t"))
+
 }
 
 type transResult struct {
@@ -44,6 +44,12 @@ func cleanTransForDiff(t string) string {
 	return res
 }
 
+func cleanTransForIJDiff(t string) string {
+	var res = t
+	res = strings.Replace(res, " i ", " j ", -1)
+	return res
+}
+
 func compareForDiff(old []string, new []string) (string, bool) {
 	for i, s := range old {
 		old[i] = cleanTransForDiff(s)
@@ -51,18 +57,24 @@ func compareForDiff(old []string, new []string) (string, bool) {
 	for i, s := range new {
 		new[i] = cleanTransForDiff(s)
 	}
+	var oldIJ = []string{}
+	var newIJ = []string{}
+	for _, s := range old {
+		oldIJ = append(oldIJ, cleanTransForIJDiff(s))
+	}
+	for _, s := range new {
+		newIJ = append(newIJ, cleanTransForIJDiff(s))
+	}
 	if reflect.DeepEqual(old, new) {
 		return "ALL EQ", true
 	} else if old[0] == new[0] {
 		return "#1 EQ", false
-	} else if len(new) > 1 && old[0] == new[1] {
-		return "ONE EQ", false
-	} else if len(old) > 1 && old[1] == new[0] {
-		return "ONE EQ", false
-	} else if len(old) > 1 && len(new) > 1 && old[1] == new[1] {
-		return "ONE EQ", false
+	} else if reflect.DeepEqual(oldIJ, newIJ) {
+		return "ALL EQ IJ", false
+	} else if oldIJ[0] == newIJ[0] {
+		return "#1 EQ IJ", false
 	} else {
-		return "REALDIFF", false
+		return "DIFF", false
 	}
 }
 
@@ -163,14 +175,12 @@ FLAGS:
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
 			res := transcribe(ruleSet, strings.ToLower(s))
-			if res.result {
+			if res.result || *force {
 				nTrans = nTrans + 1
-				print(res.orth, res.transes)
-			} else {
+				fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
+			}
+			if !res.result {
 				nErrs = nErrs + 1
-				if *force {
-					print(res.orth, res.transes)
-				}
 			}
 		} else {
 			fh, err := os.Open(s)
@@ -186,7 +196,7 @@ FLAGS:
 					os.Exit(1)
 				}
 				nTotal = nTotal + 1
-				line := sc.Text() //strings.ToLower(sc.Text())
+				line := sc.Text()
 				fs := strings.Split(line, "\t")
 				o, refTranses := fs[0], fs[1:]
 				res := transcribe(ruleSet, strings.ToLower(o))
@@ -194,11 +204,8 @@ FLAGS:
 					nTrans = nTrans + 1
 					if *test {
 						nTests++
-						info, eq := compareForDiff(res.transes, refTranses)
+						info, _ := compareForDiff(res.transes, refTranses)
 						testRes[info]++
-						if !eq && info != "REALDIFF" {
-							testRes["SMALLDIFF"]++
-						}
 						outFs := []string{res.orth, info, strings.Join(res.transes, " # "), strings.Join(refTranses, "#")}
 						fmt.Println(strings.Join(outFs, "\t"))
 					} else {
