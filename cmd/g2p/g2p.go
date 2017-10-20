@@ -69,10 +69,10 @@ func compareForDiff(old []string, new []string) (string, bool) {
 		return "ALL EQ", true
 	} else if old[0] == new[0] {
 		return "#1 EQ", false
-	} else if reflect.DeepEqual(oldIJ, newIJ) {
-		return "ALL EQ IJ", false
-	} else if oldIJ[0] == newIJ[0] {
-		return "#1 EQ IJ", false
+		// } else if reflect.DeepEqual(oldIJ, newIJ) {
+		// 	return "ALL EQ IJ", false
+		// } else if oldIJ[0] == newIJ[0] {
+		// 	return "#1 EQ IJ", false
 	} else {
 		return "DIFF", false
 	}
