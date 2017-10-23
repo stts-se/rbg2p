@@ -8,8 +8,8 @@ PHONEME_DELIMITER " "
 VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
 VAR PALATLAT (oi|oí|ai|aí|i|e|í|é)
 
-VAR VOWEL (ΐ|ά|έ|ή|ί|ΰ|α|ε|η|ι||ο|υ|ω|ϊ|ϋ|ό|ύ|ώ)
-VAR CONS (β|γ|δ|ζ|θ|κ|λ|μ|ν|ξ|π|ρ|ς|σ|τ|φ|χ|ψ)
+VAR VOWEL [ΐάέήίΰαεηιουωϊϋόύώ]
+VAR CONS [βγδζθκλμνξπρςστφχψ]
 
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
