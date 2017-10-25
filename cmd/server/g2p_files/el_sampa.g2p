@@ -14,6 +14,8 @@ VAR CONS [βγδζθκλμνξπρςστφχψ]
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
 
+FILTER "n n ([gk])" -> "n $1"
+
 
 // Latin
 bb -> b
@@ -379,3 +381,4 @@ TEST γοί -> j " i
 TEST γοι -> j i
 TEST γύι -> j " i
 TEST γυι -> j i
+TEST ντονγκ -> d o n g
