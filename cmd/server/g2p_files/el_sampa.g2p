@@ -5,7 +5,7 @@ PHONEME_SET "a e i o u af ef if av ev iv r p b t d k g f v s z x G m n l T D J C
 DEFAULT_PHONEME "_"
 PHONEME_DELIMITER " "
 
-VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|υ|ε|έ)
+VAR PALAT (οι|οί|αι|αί|η|ή|ι|ί|ύ|υ|ε|έ)
 VAR PALATLAT (oi|oí|ai|aí|i|e|í|é)
 
 VAR VOWEL [ΐάέήίΰαεηιουωϊϋόύώ]
