@@ -178,7 +178,7 @@ func (rs RuleSet) Test() TestResult {
 		}
 		delim := rs.PhonemeDelimiter
 		if !reflect.DeepEqual(expect, res) {
-			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected /%s/, got /%s/", input, strings.Join(expect, delim), strings.Join(res, delim)))
+			result.FailedTests = append(result.FailedTests, fmt.Sprintf("for '%s', expected /%s/, got /%s/", input, strings.Join(expect, delim), strings.Join(res, "/ + /")))
 		}
 	}
 	return result
