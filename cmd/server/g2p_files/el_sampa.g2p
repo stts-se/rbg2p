@@ -198,7 +198,6 @@ TEST αμπτ -> (a m p t, a m t)
 // TODO rules for ιο ?
 // TODO rules for σι ?
 // TODO rules for στι ?
-// TODO check initial σμ
 
 αί -> " e
 αι -> e
@@ -384,3 +383,7 @@ TEST γυι -> j i
 //TEST ντονγκ -> d o n g
 TEST ντονγκ -> d o n n g
 TEST γαϊδούρι -> G a i D " u r i // FORVO
+TEST σμάραγδος -> z m " a r a G D o s // FORVO
+TEST τηγάνια -> t i G " a J a // ?
+TEST τηγανιά -> t i G a J " a // ?
+TEST Γωνιακό -> G o J a k " o // ?
