@@ -39,8 +39,6 @@ oo -> u
 th -> T
 ch -> C / _ PALATLAT
 ch -> x
-//nd -> (n d, d)
-//mp -> (m b, b)
 
 ai -> e
 ei -> i
@@ -213,7 +211,7 @@ TEST αμπτ -> (a m p t, a m t)
 ωι -> o
 σσ -> s
 μπ -> b / # _
-μπ -> (m b, b)
+μπ -> (b, m b)
 ρρ -> r
 λλ -> l
 νν -> n
@@ -231,19 +229,21 @@ TEST αμπτ -> (a m p t, a m t)
 //γγ -> n gj /  _ PALAT //? TODO: kolla upp?
 γγ -> n g
 
+νγκ -> J gj / # _ PALAT
+νγκ -> n g
 γκ -> gj / # _ PALAT
-γκ -> n gj /  _ PALAT
+γκ -> (gj, J gj) /  _ PALAT
 γκ -> g / # _
-γκ -> n g
+γκ -> (g, n g)
 
 γχ -> n C / _ PALAT
 γχ -> n x
 
-ντζ -> (n dz, dz)
+ντζ -> (dz, n dz)
 ντσ -> (n ts, n dz)
 ντς -> n ts / _ #
 ντ -> d / # _
-ντ -> (n d, d)
+ντ -> (d, n d)
 
 τζ -> dz
 τσ -> ts
@@ -259,15 +259,15 @@ TEST φου -> f u
 TEST πού -> p " u
 TEST ποί -> p " i
 TEST τοι -> t i
-TEST ουμπου -> (u m b u, u b u)
+TEST ουμπου -> (u b u, u m b u)
 TEST μπου -> b u
 TEST αρρη -> a r i
 TEST υλλο -> i l o
 TEST αννό -> a n " o
 TEST σσης -> s i s
-TEST αγκο -> a n g o
+TEST αγκο -> (a g o, a n g o)
 TEST νταλ -> d a l
-TEST οντο -> (o n d o, o d o)
+TEST οντο -> (o d o, o n d o)
 TEST ρυι -> r i
 TEST τζα -> dz a
 TEST τζη -> dz i
@@ -369,7 +369,7 @@ TEST πό -> p " o
 TEST ρύ -> r " i
 TEST χώ -> x " o
 TEST λεύκτρου -> l " ef k t r u
-TEST εντζ -> (e n dz, e dz)
+TEST εντζ -> (e dz, e n dz)
 TEST ψιά -> ps i " a
 TEST ογιού -> (o j i " u, o j " u)
 TEST για -> j a
@@ -381,11 +381,13 @@ TEST γοί -> j " i
 TEST γοι -> j i
 TEST γύι -> j " i
 TEST γυι -> j i
-//TEST ντονγκ -> d o n g
-TEST ντονγκ -> d o n n g
+TEST ντονγκ -> d o n g
+//TEST ντονγκ -> (d o n g, d o n n g)
 TEST γαϊδούρι -> G a i D " u r i // FORVO
 TEST σμάραγδος -> z m " a r a G D o s // FORVO
 TEST τηγάνια -> t i G " a J a // ?
 TEST τηγανιά -> t i G a J " a // ?
 TEST Γωνιακό -> G o J a k " o // ?
-TEST πεντικιούρ -> (p e n d i c " u r, p e d i c " u r)
+TEST πεντικιούρ -> (p e d i c " u r, p e n d i c " u r)
+TEST ανάγκης -> (a n " a gj i s, a n " a J gj i s)
+TEST εστιατόριο -> e s t i a t " o r i o
