@@ -387,8 +387,7 @@ TEST γοί -> j " i
 TEST γοι -> j i
 TEST γύι -> j " i
 TEST γυι -> j i
-TEST ντονγκ -> d o n g
-//TEST ντονγκ -> (d o n g, d o n n g)
+TEST κάμπινγκ -> (k " a m b i n g, k " a b i n g)
 TEST γαϊδούρι -> G a i D " u r i // FORVO
 TEST σμάραγδος -> z m " a r a G D o s // FORVO
 TEST τηγάνια -> t i G " a J a // ?
