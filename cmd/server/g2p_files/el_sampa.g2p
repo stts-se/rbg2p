@@ -111,6 +111,7 @@ z -> z
 
 κια -> c a
 κιά -> c " a
+κιου -> c u
 κιού -> c " u
 κιο -> c o
 κιό -> c " o
@@ -211,6 +212,7 @@ TEST αμπτ -> (a m p t, a m t)
 ωι -> o
 σσ -> s
 μπ -> b / # _
+μπ -> b / CONS _
 μπ -> (m b, b)
 ρρ -> r
 λλ -> l
@@ -232,8 +234,10 @@ TEST αμπτ -> (a m p t, a m t)
 νγκ -> J gj / # _ PALAT
 νγκ -> n g
 γκ -> gj / # _ PALAT
+γκ ->  gj / CONS _ PALAT
 γκ -> (J gj, gj) /  _ PALAT
 γκ -> g / # _
+γκ -> g / CONS _
 γκ -> (n g, g)
 
 γχ -> n C / _ PALAT
@@ -243,7 +247,9 @@ TEST αμπτ -> (a m p t, a m t)
 ντσ -> (n ts, n dz)
 ντς -> n ts / _ #
 ντ -> d / # _
+ντ -> d / CONS _
 ντ -> (n d, d)
+
 
 τζ -> dz
 τσ -> ts
@@ -391,3 +397,6 @@ TEST Γωνιακό -> G o J a k " o // ?
 TEST πεντικιούρ -> (p e n d i c " u r, p e d i c " u r)
 TEST ανάγκης -> (a n " a J gj i s, a n " a gj i s)
 TEST εστιατόριο -> e s t i a t " o r i o
+TEST μπάρμπεκιου -> b " a r b e c u
+TEST άργκε -> " a r gj e
+TEST άργκα -> " a r g a
