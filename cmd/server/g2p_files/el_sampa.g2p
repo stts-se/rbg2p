@@ -14,8 +14,6 @@ VAR CONS [βγδζθκλμνξπρςστφχψ]
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
 
-//FILTER "n n ([gk])" -> "n $1"
-
 
 // Latin
 bb -> b
@@ -43,16 +41,17 @@ ch -> x
 ai -> e
 ei -> i
 oi -> i
-iι -> i
-oι -> o
 
 a -> a
+á -> " a
 e -> e
 é -> " e
 y -> i
 u -> u
 i -> i
+í -> " i
 o -> o
+ó -> " o
 b -> b
 c -> s / _ PALATLAT
 c -> k
@@ -84,7 +83,6 @@ z -> z
 αλλιά -> a jj " a
 αλλια -> a jj a
 
-
 // ??
 //νιού -> J " u
 //νεια - > J a
@@ -99,12 +97,10 @@ z -> z
 // ???
 // ιου -> u
 
-λια -> jj a
-λιά -> jj " a
-λιο -> jj o
-λιό -> jj " o
-λιω -> jj o
-λιώ -> jj " o
+
+λει -> jj / _ VOWEL
+λοι -> jj / _ VOWEL
+λι -> jj / _ VOWEL
 
 κκι -> c i
 κκί -> c " i
@@ -399,3 +395,5 @@ TEST εστιατόριο -> e s t i a t " o r i o
 TEST μπάρμπεκιου -> b " a r b e c u
 TEST άργκε -> " a r gj e
 TEST άργκα -> " a r g a
+TEST λειας -> jj a s
+TEST λιών -> jj " o n
