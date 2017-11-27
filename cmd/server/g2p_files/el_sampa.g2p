@@ -140,7 +140,8 @@ z -> z
 γοι -> j i
 γύι -> j " i
 γυι -> j i
-γι -> (j i, j) / _ VOWEL
+γι -> j / _ VOWEL
+//γι -> (j i, j) / _ VOWEL
 γι -> j i
 γε -> (j e, j) / _ VOWEL
 γε -> j e
@@ -373,7 +374,8 @@ TEST χώ -> x " o
 TEST λεύκτρου -> l " ef k t r u
 TEST εντζ -> (e n dz, e dz)
 TEST ψιά -> ps i " a
-TEST ογιού -> (o j i " u, o j " u)
+//TEST ογιού -> (o j i " u, o j " u)
+TEST ογιού -> o j " u
 TEST για -> j a
 TEST γιά -> j " a
 TEST γαι -> j e
@@ -397,3 +399,4 @@ TEST άργκε -> " a r gj e
 TEST άργκα -> " a r g a
 TEST λειας -> jj a s
 TEST λιών -> jj " o n
+TEST γιού -> j " u
