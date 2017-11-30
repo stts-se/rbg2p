@@ -131,6 +131,8 @@ z -> z
 //χιώ -> C " o // HL 20171020?
 
 // [j] före [e] eller [i]; annars [G]
+γιαι -> j i e
+γιαί -> j i " e
 για -> j a
 γιά -> j " a
 γαι -> j e
@@ -401,3 +403,4 @@ TEST λειας -> jj a s
 TEST λιών -> jj " o n
 TEST γιού -> j " u
 //TEST γιού -> jj " u
+TEST γιαινας -> j i e n a s
