@@ -72,6 +72,7 @@ func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
 
 var commaSplit = regexp.MustCompile(" *, *")
 
+// Contains checks whether a slice of strings contains a specific string
 func Contains(slice []string, value string) bool {
 	for _, s := range slice {
 		if s == value {

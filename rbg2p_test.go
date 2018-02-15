@@ -105,7 +105,7 @@ func TestNewTest(t *testing.T) {
 
 }
 
-func test_CompileRegexp(s string) *regexp2.Regexp {
+func testCompileRegexp(s string) *regexp2.Regexp {
 	return regexp2.MustCompile("$", regexp2.None)
 }
 
@@ -117,7 +117,7 @@ func TestNewRule(t *testing.T) {
 		"sch -> (x, S) / _ #": {Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
-			RightContext: Context{"#", test_CompileRegexp("$")}},
+			RightContext: Context{"#", testCompileRegexp("$")}},
 		"sch -> (x, S)": {Input: "sch",
 			Output:       []string{"x", "S"},
 			LeftContext:  Context{},
@@ -129,11 +129,11 @@ func TestNewRule(t *testing.T) {
 		"a -> A / _ VOICED": {Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{"VOICED", test_CompileRegexp("[dgjlvbnm]")}},
+			RightContext: Context{"VOICED", testCompileRegexp("[dgjlvbnm]")}},
 		"a -> A / _ VOICED #": {Input: "a",
 			Output:       []string{"A"},
 			LeftContext:  Context{},
-			RightContext: Context{"VOICED #", test_CompileRegexp("[dgjlvbnm]$")}},
+			RightContext: Context{"VOICED #", testCompileRegexp("[dgjlvbnm]$")}},
 	}
 	invalidLines := map[string]Rule{}
 	failLines := []string{
