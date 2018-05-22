@@ -176,7 +176,7 @@ FLAGS:
 		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			res := transcribe(ruleSet, strings.ToLower(s))
+			res := transcribe(ruleSet, s)
 			if res.result || *force {
 				nTrans = nTrans + 1
 				fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
@@ -205,7 +205,7 @@ FLAGS:
 				}
 				fs := strings.Split(line, "\t")
 				o, refTranses := fs[0], fs[1:]
-				res := transcribe(ruleSet, strings.ToLower(o))
+				res := transcribe(ruleSet, o)
 				if res.result || *force {
 					nTrans = nTrans + 1
 					if *test {

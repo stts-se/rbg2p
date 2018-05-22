@@ -168,7 +168,8 @@ func (rs RuleSet) Test() TestResult {
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		res0, err := rs.Apply(strings.ToLower(input))
+		//res0, err := rs.Apply(strings.ToLower(input))
+		res0, err := rs.Apply(input)
 		res := []string{}
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
@@ -238,8 +239,7 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 			if err != nil {
 				return []string{}, fmt.Errorf("couldn't execute regexp /%s/ : %s", rule.LeftContext.Regexp, err)
 			}
-			if strings.HasPrefix(ss, rule.Input) &&
-				leftMatch {
+			if strings.HasPrefix(ss, rule.Input) && leftMatch {
 				ruleInputLen := len([]rune(rule.Input))
 				right := string(s0[i+ruleInputLen:])
 				rightMatch, err := rule.RightContext.Matches(right)
