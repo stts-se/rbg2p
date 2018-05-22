@@ -19,13 +19,13 @@ type tVar struct {
 
 func TestNewVar(t *testing.T) {
 	validLines := map[string]tVar{
-		"VAR VOICED_PLOSIVE [dgb]":      {name: "VOICED_PLOSIVE", value: "[dgb]"},
+		"VAR VOICEDPLOSIVE [dgb]":       {name: "VOICEDPLOSIVE", value: "[dgb]"},
 		"VAR VOWEL [aoiuye]":            {name: "VOWEL", value: "[aoiuye]"},
 		"VAR VOICELESS [p|k|t|f|s|h|c]": {name: "VOICELESS", value: "[p|k|t|f|s|h|c]"},
 	}
 	invalidLines := map[string]tVar{
-		"VAR VOICED_PLOSIVE [dgb]": {name: "VOICED_PLOSIVE", value: "dgb"},
-		"VAR VOWEL [aoiuye]":       {name: "VOWEL", value: "[aoiuye"},
+		"VAR VOICEDPLOSIVE [dgb]": {name: "VOICEDPLOSIVE", value: "dgb"},
+		"VAR VOWEL [aoiuye]":      {name: "VOWEL", value: "[aoiuye"},
 	}
 	failLines := []string{
 		"VAR VOICED_PLOSIVE",

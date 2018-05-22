@@ -36,7 +36,7 @@ Examples:
 
 VARIABLES
 
-Regexp variables prefixed by VAR, that can be used in the rule context as exemplified below.
+Regexp variables prefixed by VAR, that can be used in the rule context as exemplified below. The variable names must not contain underscore (_).
      VAR <NAME> <VALUE>
 
 Examples:

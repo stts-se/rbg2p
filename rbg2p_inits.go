@@ -158,13 +158,16 @@ func newVar(s string) (string, string, error) {
 	// VAR NAME VALUE
 	matchRes := varRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return "", "", fmt.Errorf("invalid var definition: " + s)
+		return "", "", fmt.Errorf("invalid VAR definition: " + s)
 	}
 	name := matchRes[1]
 	value := matchRes[2]
 	_, err := regexp2.Compile(value, regexp2.None)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid var in input (regular expression failed) for /%s/: %s", s, err)
+		return "", "", fmt.Errorf("invalid VAR input for %s (regular expression failed): %s", s, err)
+	}
+	if strings.Contains(name, "_") {
+		return "", "", fmt.Errorf("invalid VAR input for %s: var names cannot contain underscore", s)
 	}
 	return name, value, nil
 }
@@ -181,12 +184,12 @@ func newTest(s string) (Test, error) {
 	} else {
 		matchRes = testReVariants.FindStringSubmatch(s)
 		if matchRes == nil {
-			return Test{}, fmt.Errorf("invalid test definition: " + s)
+			return Test{}, fmt.Errorf("invalid TEST definition: " + s)
 		}
 		outputS = matchRes[2]
 	}
 	if strings.Contains(outputS, "->") {
-		return Test{}, fmt.Errorf("invalid test definition: " + s)
+		return Test{}, fmt.Errorf("invalid TEST definition: " + s)
 	}
 	input := matchRes[1]
 	output := commaSplit.Split(outputS, -1)
@@ -198,16 +201,16 @@ var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.+)\"$")
 func newFilter(s string) (Filter, error) {
 	matchRes := filterRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Filter{}, fmt.Errorf("invalid filter definition: " + s)
+		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
 	input := matchRes[1]
 	output := strings.Replace(matchRes[2], "\\\"", "\"", -1)
 	if strings.Contains(output, "->") {
-		return Filter{}, fmt.Errorf("invalid filter definition: " + s)
+		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
 	re, err := regexp2.Compile(input, regexp2.None)
 	if err != nil {
-		return Filter{}, fmt.Errorf("invalid regexp in filter definition input /%s/ : %s", s, err)
+		return Filter{}, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %s", s, err)
 	}
 	return Filter{Regexp: re, Output: output}, nil
 }
