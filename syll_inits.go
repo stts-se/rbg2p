@@ -163,6 +163,8 @@ func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 	}
 	name := matchRes[1]
 	value := strings.Replace(strings.TrimSpace(matchRes[2]), "\\\"", "\"", -1)
+	value = strings.Replace(value, "?", "\\?", -1)
+	value = strings.Replace(value, "\\", "\\\\", -1)
 	_, err := regexp.Compile(value)
 	if err != nil {
 		return fmt.Errorf("invalid sylldef input (regular expression failed) for /%s/: %s", s, err)
