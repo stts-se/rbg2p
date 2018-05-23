@@ -15,7 +15,7 @@ type TestResult struct {
 
 // Failed returns true if the test result has any errors or failed tests
 func (tr TestResult) Failed() bool {
-	return (len(tr.Errors) == 0 && len(tr.FailedTests) == 0)
+	return (len(tr.Errors) >= 0 || len(tr.FailedTests) >= 0)
 }
 
 // AllMessages returns one single slice with all errors and test results (if any). Each message is prefixed by its type (ERROR/FAILED TESTS).
