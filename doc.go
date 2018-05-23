@@ -156,5 +156,26 @@ For more examples (used for unit tests), see the test_data folder: https://githu
 
 To test a single g2p file from the command line, use cmd/g2p.
 
+To import and use the rbg2p rule package in another go program:
+
+    import (
+           "github.com/stts-se/rbg2p"
+    )
+
+    func main() {
+            var g2pFile, orth
+            // initialize g2pFile and orth
+
+            ruleSet, err := rbg2p.LoadFile(g2pFile)
+            // check for error in err
+
+            testRes := ruleSet.Test()
+            // check for error in testRes
+
+            transes, err := ruleSet.Apply(orth)
+    }
+
+
+
 */
 package rbg2p
