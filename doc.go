@@ -163,15 +163,18 @@ To import and use the rbg2p rule package in another go program:
     )
 
     func main() {
-            var g2pFile, orth
-            // initialize g2pFile and orth
+            // TODO: initialize g2pFile and orth
+            var g2pFile = "", orth = ""
 
+            // Load rule file
             ruleSet, err := rbg2p.LoadFile(g2pFile)
-            // check for error in err
+            // TODO: check for error in err
 
+            // Test rules
             testRes := ruleSet.Test()
-            // check for error in testRes
+            // TODO: check for error in testRes
 
+            // Transcribe an input word
             transes, err := ruleSet.Apply(orth)
     }
 
