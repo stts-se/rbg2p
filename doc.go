@@ -26,6 +26,7 @@ Available variables (* means required):
       - used for input input (orthographic) symbols
      PHONEME_DELIMITER  (default: " ")
       - used to concatenate phonemes into a transcriptions
+     DOWNCASE_INPUT     (default: true)
 
 Examples:
      CHARACTER_SET "abcdefghijklmnopqrstuvwxyzåäö"

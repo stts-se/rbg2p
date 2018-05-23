@@ -22,7 +22,8 @@ func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
 }
 
-var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
+//var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
+var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|DOWNCASE_INPUT) .*")
 
 func isG2PLine(s string) bool {
 	return g2pLineRe.MatchString(s) || ruleRe.MatchString(s)
@@ -126,8 +127,10 @@ func LoadFile(fName string) (RuleSet, error) {
 	return ruleSet, nil
 }
 
-var constRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME) +\"(.*)\"$")
-var isConstRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME) .*")
+var constRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME|DOWNCASE_INPUT) (?:\"(.+)\"|([^\"]+))$")
+var isConstRe = regexp.MustCompile("^(CHARACTER_SET|DEFAULT_PHONEME|DOWNCASE_INPUT) .*")
+var isTrueRe = regexp.MustCompile("^(true|TRUE|1)$")
+var isFalseRe = regexp.MustCompile("^(false|FALSE|0)$")
 
 func isConst(s string) bool {
 	return isConstRe.MatchString(s)
@@ -136,18 +139,35 @@ func isConst(s string) bool {
 func parseConst(s string, ruleSet *RuleSet) error {
 	var matchRes []string
 	matchRes = constRe.FindStringSubmatch(s)
+	var downcaseInputIsSet = false
 	if matchRes != nil {
 		name := matchRes[1]
 		value := matchRes[2]
+		if value == "" {
+			value = matchRes[3]
+		}
 		if name == "CHARACTER_SET" {
 			ruleSet.CharacterSet = strings.Split(value, "")
 		} else if name == "DEFAULT_PHONEME" {
 			ruleSet.DefaultPhoneme = value
+		} else if name == "DOWNCASE_INPUT" {
+			if isTrueRe.MatchString(value) {
+				ruleSet.DowncaseInput = true
+				downcaseInputIsSet = true
+			} else if isFalseRe.MatchString(value) {
+				ruleSet.DowncaseInput = false
+				downcaseInputIsSet = true
+			} else {
+				return fmt.Errorf("invalid boolean value for " + name + ": " + value)
+			}
 		} else {
 			return fmt.Errorf("invalid const definition: " + s)
 		}
 	} else {
 		return fmt.Errorf("invalid const definition: " + s)
+	}
+	if !downcaseInputIsSet {
+		ruleSet.DowncaseInput = true
 	}
 	return nil
 }

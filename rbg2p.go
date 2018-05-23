@@ -112,6 +112,7 @@ type RuleSet struct {
 	PhonemeDelimiter  string
 	SyllableDelimiter string
 	DefaultPhoneme    string
+	DowncaseInput     bool
 	Vars              map[string]string
 	Rules             []Rule
 	Tests             []Test
@@ -168,7 +169,9 @@ func (rs RuleSet) Test() TestResult {
 	for _, test := range rs.Tests {
 		input := test.Input
 		expect := test.Output
-		//res0, err := rs.Apply(strings.ToLower(input))
+		if rs.DowncaseInput {
+			input = strings.ToLower(input)
+		}
 		res0, err := rs.Apply(input)
 		res := []string{}
 		if err != nil {
@@ -226,6 +229,9 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	var i = 0
+	if rs.DowncaseInput {
+		s = strings.ToLower(s)
+	}
 	var s0 = []rune(s)
 	res := []g2p{}
 	var couldntMap = []string{}

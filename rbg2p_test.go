@@ -557,10 +557,28 @@ func TestSwsSyllFail(t *testing.T) {
 	}
 }
 
-func TestSwsFail(t *testing.T) {
+func TestSwsFail1(t *testing.T) {
 	fName := "test_data/sws_test_fail.g2p"
 	_, err := LoadFile(fName)
+	expectErr := "Duplicate rules for input file"
+	errS := fmt.Sprintf("%s", err)
 	if err == nil {
 		t.Errorf("expected error here")
+	} else if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
+	}
+}
+
+func TestSwsFailCase1(t *testing.T) {
+	fName := "test_data/sws_test_fail_case1.g2p"
+	rs, err := LoadFile(fName)
+	result := rs.Test()
+	if err != nil {
+		t.Errorf("didn't expect error for input file %s : %s", fName, err)
+	}
+	expectErr := "Found unmappable symbol(s) in input string"
+	errS := fmt.Sprintf("%s", result)
+	if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
 }

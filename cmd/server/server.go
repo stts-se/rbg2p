@@ -179,7 +179,7 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
-	word = strings.ToLower(word)
+	//word = strings.ToLower(word)
 
 	res, status, err := transcribe(lang, word)
 	if err != nil {
@@ -234,7 +234,7 @@ func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
-	word = strings.ToLower(word)
+	//word = strings.ToLower(word)
 	res, status, err := transcribe(lang, word)
 	if err != nil {
 		log.Printf("%s\n", err)
