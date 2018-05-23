@@ -13,8 +13,21 @@ type TestResult struct {
 	FailedTests []string
 }
 
-func (tr TestResult) IsEmpty() bool {
-	return (len(tr.Errors) == 0 && len(tr.Warnings) == 0 && len(tr.FailedTests) == 0)
+// Failed returns true if the test result has any errors or failed tests
+func (tr TestResult) Failed() bool {
+	return (len(tr.Errors) == 0 && len(tr.FailedTests) == 0)
+}
+
+// AllMessages returns one single slice with all errors and test results (if any). Each message is prefixed by its type (ERROR/FAILED TESTS).
+func (tr TestResult) AllErrors() []string {
+	res := []string{}
+	for _, s := range tr.Errors {
+		res = append(res, fmt.Sprintf("ERROR: %s", s))
+	}
+	for _, s := range tr.FailedTests {
+		res = append(res, fmt.Sprintf("FAILED TEST: %s", s))
+	}
+	return res
 }
 
 // AllMessages returns one single slice with all errors, warnings and test results (if any). Each message is prefixed by its type (ERROR/WARNING/FAILED TESTS).
