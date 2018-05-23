@@ -170,9 +170,12 @@ To import and use the rbg2p rule package in another go program:
             ruleSet, err := rbg2p.LoadFile(g2pFile)
             // TODO: check for error in err
 
-            // Test rules
+            // Test rule set
             testRes := ruleSet.Test()
             // TODO: check for error in testRes
+            // testRes is an instance of rbg2p.TestResult, containing the fields Errors, Warnings and FailedTests
+            // - you can do a quick check using testRes.IsEmpty()
+            // - you can retrieve all errors/warnings using testRes.AllMessages()
 
             // Transcribe an input word
             transes, err := ruleSet.Apply(orth)

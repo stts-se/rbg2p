@@ -13,6 +13,25 @@ type TestResult struct {
 	FailedTests []string
 }
 
+func (tr TestResult) IsEmpty() bool {
+	return (len(tr.Errors) == 0 && len(tr.Warnings) == 0 && len(tr.FailedTests) == 0)
+}
+
+// AllMessages returns one single slice with all errors, warnings and test results (if any). Each message is prefixed by its type (ERROR/WARNING/FAILED TESTS).
+func (tr TestResult) AllMessages() []string {
+	res := []string{}
+	for _, s := range tr.Errors {
+		res = append(res, fmt.Sprintf("ERROR: %s", s))
+	}
+	for _, s := range tr.Warnings {
+		res = append(res, fmt.Sprintf("WARNING: %s", s))
+	}
+	for _, s := range tr.FailedTests {
+		res = append(res, fmt.Sprintf("FAILED TEST: %s", s))
+	}
+	return res
+}
+
 func isSyllDefLine(s string) bool {
 	return strings.HasPrefix(s, "SYLLDEF ")
 }
