@@ -44,6 +44,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	s := bufio.NewScanner(fh)
 	var inputLines []string
 	var ruleLines []string
+	var filterLines []string
 	var phonemeSetLine string
 	for s.Scan() {
 		if err := s.Err(); err != nil {
@@ -76,11 +77,7 @@ func LoadFile(fName string) (RuleSet, error) {
 		} else if isSyllDefLine(l) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
-			t, err := newFilter(l)
-			if err != nil {
-				return ruleSet, err
-			}
-			ruleSet.Filters = append(ruleSet.Filters, t)
+			filterLines = append(filterLines, l)
 		} else if isTest(l) {
 			t, err := newTest(l)
 			if err != nil {
@@ -91,6 +88,10 @@ func LoadFile(fName string) (RuleSet, error) {
 			ruleLines = append(ruleLines, l)
 		}
 
+	}
+	for k, v := range ruleSet.Vars {
+		v = expandVarsWithBrackets(v, ruleSet.Vars)
+		ruleSet.Vars[k] = v
 	}
 	if len(phonemeSetLine) > 0 {
 		phnSet, err := parsePhonemeSet(phonemeSetLine, ruleSet.PhonemeDelimiter)
@@ -108,6 +109,13 @@ func LoadFile(fName string) (RuleSet, error) {
 		ruleSet.Syllabifier = Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement, PhonemeSet: ruleSet.PhonemeSet}
 	}
 
+	for _, l := range filterLines {
+		t, err := newFilter(l, ruleSet.Vars)
+		if err != nil {
+			return ruleSet, err
+		}
+		ruleSet.Filters = append(ruleSet.Filters, t)
+	}
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
 		if err != nil {
@@ -172,7 +180,8 @@ func parseConst(s string, ruleSet *RuleSet) error {
 	return nil
 }
 
-var varRe = regexp.MustCompile("^VAR +([^ \"]+) +([^ \"]+)$")
+var varRe = regexp.MustCompile("^VAR +([^ \"]+) +([^ \"]+|[^ ].*[^ ])$")
+var varReQuoteFix = regexp.MustCompile(`^"(.*)"$`)
 
 func newVar(s string) (string, string, error) {
 	// VAR NAME VALUE
@@ -184,10 +193,18 @@ func newVar(s string) (string, string, error) {
 	value := matchRes[2]
 	_, err := regexp2.Compile(value, regexp2.None)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid VAR input for %s (regular expression failed): %s", s, err)
+		msg := fmt.Sprintf("invalid VAR input - regular expression failed: %s : %v", s, err)
+		return "", "", fmt.Errorf(msg)
 	}
 	if strings.Contains(name, "_") {
-		return "", "", fmt.Errorf("invalid VAR input for %s: var names cannot contain underscore", s)
+		return "", "", fmt.Errorf("invalid VAR input - var names cannot contain underscore: %s", s)
+	}
+	if strings.HasPrefix(strings.TrimSpace(value), "=") {
+		return "", "", fmt.Errorf("invalid VAR input - var names cannot start with equal sign: %s", s)
+	}
+	quoteFix := varReQuoteFix.FindStringSubmatch(value)
+	if quoteFix != nil {
+		value = quoteFix[1]
 	}
 	return name, value, nil
 }
@@ -218,7 +235,7 @@ func newTest(s string) (Test, error) {
 
 var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.+)\"$")
 
-func newFilter(s string) (Filter, error) {
+func newFilter(s string, vars map[string]string) (Filter, error) {
 	matchRes := filterRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
@@ -228,11 +245,21 @@ func newFilter(s string) (Filter, error) {
 	if strings.Contains(output, "->") {
 		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
+	input = expandVarsWithBrackets(input, vars)
 	re, err := regexp2.Compile(input, regexp2.None)
 	if err != nil {
 		return Filter{}, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %s", s, err)
 	}
 	return Filter{Regexp: re, Output: output}, nil
+}
+
+func expandVarsWithBrackets(re0 string, vars map[string]string) string {
+	re := re0
+	for k, v := range vars {
+		k = fmt.Sprintf("{%s}", k)
+		re = strings.Replace(re, k, v, -1)
+	}
+	return re
 }
 
 func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {

@@ -37,7 +37,7 @@ Examples:
 
 VARIABLES
 
-Regexp variables prefixed by VAR, that can be used in the rule context as exemplified below. The variable names must not contain underscore (_).
+Regexp variables prefixed by VAR, that can be used in the rule context and filters as exemplified below. The variable names must not contain underscore (_).
      VAR <NAME> <VALUE>
 
 Examples:
@@ -102,8 +102,9 @@ Examples:
 
 FILTERS
 
-Regexp replacement filters for transcriptions. The filters are applied after the g2p rules. Pre-defined variables (see above) cannot be used in the filters for now.
+Regexp replacement filters for transcriptions. The filters are applied after the g2p rules.  Pre-defined variables (above) can be use in the input regexp surrounded by curly brackets.
      FILTER "<FROM RE>" -> "<TO RE>"
+     FILTER "<FROM RE WITH {VARIABLENAME}>" -> "<TO RE>"
 
 Example:
      FILTER "^" -> "\" " // place stress first in transcription
