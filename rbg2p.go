@@ -222,6 +222,8 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 		if err != nil {
 			return res, fmt.Errorf("couldn't execute regexp : %s", err)
 		}
+		//HB
+		//fmt.Printf("FILTER: %s\nRES: %s\n", f, res)
 	}
 	return res, nil
 }
