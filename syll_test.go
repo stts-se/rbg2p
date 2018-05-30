@@ -52,6 +52,7 @@ func TestMOPValidOnset(t *testing.T) {
 	def := MOPSyllDef{
 		Onsets: []string{
 			"p",
+			"?",
 			"t",
 			"k",
 			"r",
@@ -64,6 +65,7 @@ func TestMOPValidOnset(t *testing.T) {
 	}
 	testMOPValidOnset(t, def, "p r", true)
 	testMOPValidOnset(t, def, "", true)
+	testMOPValidOnset(t, def, "?", true)
 }
 
 func TestSylledTransString(t *testing.T) {

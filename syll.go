@@ -85,7 +85,6 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 
 // ValidSplit is called by Syllabifier.Syllabify to test where to put the boundaries
 func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
-
 	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
 		return false
 	}
