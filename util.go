@@ -13,6 +13,15 @@ type TestResult struct {
 	FailedTests []string
 }
 
+// Strings returns all messages as strings
+func (tr TestResult) Strings() []string {
+	res := []string{}
+	for _, e := range tr.AllErrors() {
+		res = append(res, fmt.Sprintf("%s", e))
+	}
+	return res
+}
+
 // Failed returns true if the test result has any errors or failed tests
 func (tr TestResult) Failed() bool {
 	return (len(tr.Errors) > 0 || len(tr.FailedTests) > 0)
