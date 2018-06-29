@@ -112,7 +112,7 @@ Example:
 
 COMMENTS
 
-Comments are prefixed by //
+Comments are prefixed by // or #
 
 
 TESTS

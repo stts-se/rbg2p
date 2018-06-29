@@ -67,7 +67,7 @@ func trimComment(s string) string {
 }
 
 func isComment(s string) bool {
-	return strings.HasPrefix(s, "//")
+	return strings.HasPrefix(s, "//") || strings.HasPrefix(s, "#")
 }
 
 func isBlankLine(s string) bool {
