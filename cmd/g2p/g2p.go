@@ -84,6 +84,7 @@ func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
@@ -92,6 +93,7 @@ func main() {
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
+   -quiet      bool    inhibit warnings (default: false)
    -test       bool    test g2p against input file; orth <tab> trans (default: false)
    -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
    -help       bool    print help message`
@@ -143,8 +145,10 @@ FLAGS:
 		l.Printf("ERROR: %v\n", e)
 	}
 	l.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), g2pFile)
-	for _, e := range result.Warnings {
-		l.Printf("WARNING: %v\n", e)
+	if !*quiet {
+		for _, e := range result.Warnings {
+			l.Printf("WARNING: %v\n", e)
+		}
 	}
 	l.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), g2pFile)
 	if len(result.Errors) > 0 {
