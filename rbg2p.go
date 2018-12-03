@@ -273,8 +273,8 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 	transes := []string{}
 	for _, t := range expanded {
 		if rs.Syllabifier.IsDefined() {
-			s := rs.Syllabifier.syllabify(t)
-			transes = append(transes, s.string(rs.PhonemeDelimiter, rs.SyllableDelimiter))
+			s := rs.Syllabifier.syllabifyToString(t)
+			transes = append(transes, s)
 		} else {
 			transes = append(transes, t.string(rs.PhonemeDelimiter))
 		}
