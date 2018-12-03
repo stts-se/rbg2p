@@ -1,0 +1,13 @@
+PHONEME_SET "a e i o u af ef if av ev iv r p b t d k g f v s z x G m n l T D J C jj j gj c ts dz ks ps " ."
+
+PHONEME_DELIMITER " "
+
+// Syllabification
+SYLLDEF TYPE MOP
+SYLLDEF ONSETS "ts, dz, ks, ps, jj, gj, r, p, b, t, d, k, g, f, v, s, z, x, G, m, n, l, T, D, J, C, j, c, j', C', D j', T j', D r , D r, G D, G jj , G l, G n, G r, D r j', T r j', G r j', t r j', d r j', b r j', p r j', v r j', g r j', k r j', x r j', T C', T n, T r, b j', b jj, b l, b r, d r, dz j', f C', f l, f r, f t, g r, k l, k n, k r, k t, l j', m J , m j', m n, n j', p C', p l, p n, p r, p t, r j', s C, s C', s T, s c, s f, s k l, s k l, s k, s m, s p, s t C', s t r, s t, s x, t C', t m, t r, ts C', v D, v G, v j', v j', v l, v r, x T, x t, x l, x l, x n, x r , x r, z G, z j', z m, z m, z v, f T, f T, v D, v j, v l, v l, v r, v r, c l, t C', D j', s m i, ks C', ps C', ts C', G jj, T C', f C', dz j', D r, m j', G D j', m J o, x r i, s t C', z j', n j', T l, t C', m J, s t r j', b j', s m, ks C', m J, f jj, g l, d j', k jj, D r j', f l j'"
+SYLLDEF SYLLABIC "a e i o u af ef if av ev iv"
+SYLLDEF STRESS "\" %"
+SYLLDEF DELIMITER "."
+SYLLDEF STRESS_PLACEMENT FirstInSyllable
+
+SYLLDEF TEST a n " a J gj i s  -> a . " n a . gj i s
