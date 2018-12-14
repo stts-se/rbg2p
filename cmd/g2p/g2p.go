@@ -19,7 +19,7 @@ import (
 var l = log.New(os.Stderr, "", 0)
 
 func print(orth string, transes []string) {
-
+	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "  #  "))
 }
 
 type transResult struct {
@@ -201,12 +201,16 @@ FLAGS:
 					l.Println(err)
 					os.Exit(1)
 				}
-				nTotal = nTotal + 1
 				line := sc.Text()
+				if strings.TrimSpace(line) == "" {
+					l.Println("Skipping empty line")
+					continue
+				}
 				if strings.HasPrefix(strings.TrimSpace(line), "#") {
 					l.Println("Skipping line " + line)
 					continue
 				}
+				nTotal = nTotal + 1
 				fs := strings.Split(line, "\t")
 				o, refTranses := fs[0], fs[1:]
 				res := transcribe(ruleSet, o)
