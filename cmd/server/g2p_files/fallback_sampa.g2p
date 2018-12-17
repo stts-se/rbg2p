@@ -1,11 +1,12 @@
 // Specs
 
-CHARACTER_SET "aábcçdeéfghiíjklmnñoópqrstuúvwxyzåäöæ'"
+CHARACTER_SET "´-;.'&+–0123456789aáàâåäãāæbcćčçdďðeéèěëęfgğhiíîïījkķlľłmnňñoóôöőøōpqrřsśšştťuúůüűvwxyýzžżþαάβγδεέζηήθιίϊκλμνξοόπρστυύφχψωώабвгдежзийклмнопрстуфхцчшщъьюя"
+#CHARACTER_SET "aábcçdeéfghiíjklmnñoópqrstuúvwxyzåäöæ'"
 PHONEME_SET "au eu ou ai ei oi ui a e i o u y { 2 a: e: i: o: u: y: {: 2: j w p b t d k g tS dZ s z T D S Z N v f m n l r h p: b: t: d: k: g: s: z: S: v: f: m: n: l: r: j: J @ " %" 
 # ts dz
 
 PHONEME_DELIMITER " "
-DEFAULT_PHONEME "_"
+DEFAULT_PHONEME "∅"
 
 // Variables: none
 
@@ -16,6 +17,8 @@ VAR VOWEL "[aoueieyéáúíóèàùòìỳäëüïöâêŷûîôåäöæø]"
 FILTER "^" -> "\" " // simple filter to put stress on first syllable
 #FILTER "([ptkbdgfjlmnrsvz]) \1" -> "$1:" // double consonant > single long
 
+FILTER "( *)∅( *)" -> "$1$2"
+FILTER "  " -> " "
 
 // Rules
 
@@ -205,3 +208,4 @@ TEST guran -> " g u r a n
 TEST innkeeper -> " i n: k e: p e r
 TEST gjiro -> " g j i r o
 TEST schlaug -> " S l a u g
+TEST 4a -> " a
