@@ -1,4 +1,4 @@
-CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώabcdefghijklmnopqrstuvwxyzé"
+CHARACTER_SET "ΐάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώabcdefghijklmnopqrstuvwxyzéáíó'"
 //PHONEME_SET|IPA "a b c d e f g i k l m n o p r s t u v x z ç ð ɟ ɣ ɲ ʎ ʝ ˈ ˌ θ d⁀z t⁀s k⁀s p⁀s"
 PHONEME_SET "a e i o u af ef if av ev iv r p b t d k g f v s z x G m n l T D J C jj j gj c ts dz ks ps ""
 
@@ -13,6 +13,8 @@ VAR CONS [βγδζθκλμνξπρςστφχψ]
 
 VAR VOICED [ΐάέήίΰαβγεζηιλμνορυωϊϋόύώ]
 VAR UNVOICED [δθκξπςστφχψ]
+
+' -> ∅
 
 
 // Latin

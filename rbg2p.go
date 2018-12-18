@@ -3,6 +3,7 @@ package rbg2p
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/dlclark/regexp2"
@@ -128,8 +129,28 @@ func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualCh
 			errors = append(errors, char)
 		}
 	}
+	sort.Strings(errors)
 	if len(errors) > 0 {
 		validation.Errors = append(validation.Errors, fmt.Sprintf("no default rule for character(s): %s", strings.Join(errors, ",")))
+	}
+}
+
+func (rs RuleSet) checkForUndefinedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
+	var definedChars = make(map[string]bool)
+	var errors = []string{}
+	for _, char := range rs.CharacterSet {
+		definedChars[char] = true
+	}
+	for char := range individualChars {
+		for _, ch := range strings.Split(char, "") {
+			if _, ok := definedChars[ch]; !ok {
+				errors = append(errors, ch)
+			}
+		}
+	}
+	sort.Strings(errors)
+	if len(errors) > 0 {
+		validation.Errors = append(validation.Errors, fmt.Sprintf("undefined character(s) used in rule set: %s", strings.Join(errors, ",")))
 	}
 }
 
@@ -152,6 +173,7 @@ func (rs RuleSet) Test() TestResult {
 		}
 	}
 	rs.checkForUnusedChars(coveredChars, individualChars, &result)
+	rs.checkForUndefinedChars(coveredChars, individualChars, &result)
 
 	if rs.hasPhonemeSet() {
 		validation, err := compareToPhonemeSet(rs)
