@@ -352,96 +352,97 @@ func langFromFilePath(p string) string {
 
 func main() {
 
-	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "server <G2P FILES DIR>\n")
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "server <G2P FILES DIRS>\n")
 		os.Exit(0)
 	}
 
 	// g2p file dir. Each file in dir with .g2p extension
 	// is treated as a g2p file
-	var dir = os.Args[1]
+	for _, dir := range os.Args[1:] {
 
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(0)
-	}
+		files, err := ioutil.ReadDir(dir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(0)
+		}
 
-	// populate map of g2p rules from files.
-	// The base file name minus '.g2p' is the language name.
-	var fn string
-	haltingError := false
-	for _, f := range files {
-		fn = filepath.Join(dir, f.Name())
-		if strings.HasSuffix(fn, ".g2p") {
+		// populate map of g2p rules from files.
+		// The base file name minus '.g2p' is the language name.
+		var fn string
+		haltingError := false
+		for _, f := range files {
+			fn = filepath.Join(dir, f.Name())
+			if strings.HasSuffix(fn, ".g2p") {
 
-			ruleSet, err := rbg2p.LoadFile(fn)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
-				haltingError = true
-				continue
-				//fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
-			}
-
-			result := ruleSet.Test()
-			if len(result.Errors) > 0 {
-				for _, e := range result.Errors {
-					fmt.Printf("ERROR: %v\n", e)
+				ruleSet, err := rbg2p.LoadFile(fn)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "ERROR: %v\n", err)
+					haltingError = true
+					continue
+					//fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 				}
-				fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fn)
-			}
-			if len(result.Warnings) > 0 {
-				for _, e := range result.Warnings {
-					fmt.Printf("WARNING: %v\n", e)
+
+				result := ruleSet.Test()
+				if len(result.Errors) > 0 {
+					for _, e := range result.Errors {
+						fmt.Printf("ERROR: %v\n", e)
+					}
+					fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fn)
 				}
-				fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fn)
-			}
-			if len(result.Errors) > 0 {
-				haltingError = true
-			}
-			if len(result.FailedTests) > 0 {
-				for _, e := range result.FailedTests {
-					fmt.Printf("FAILED TEST: %v\n", e)
+				if len(result.Warnings) > 0 {
+					for _, e := range result.Warnings {
+						fmt.Printf("WARNING: %v\n", e)
+					}
+					fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fn)
 				}
-				fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), fn)
-				haltingError = true
+				if len(result.Errors) > 0 {
+					haltingError = true
+				}
+				if len(result.FailedTests) > 0 {
+					for _, e := range result.FailedTests {
+						fmt.Printf("FAILED TEST: %v\n", e)
+					}
+					fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), fn)
+					haltingError = true
+				} else {
+					//fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
+				}
+
+				if haltingError {
+					continue
+				}
+
+				lang := langFromFilePath(fn)
+				g2pM.mutex.Lock()
+				g2pM.g2ps[lang] = ruleSet
+				g2pM.mutex.Unlock()
+				fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
+
+			} else if strings.HasSuffix(fn, ".syll") {
+
+				syll, err := rbg2p.LoadSyllFile(fn)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "%v\n", err)
+					fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
+					continue
+				}
+
+				lang := langFromFilePath(fn)
+				g2pM.mutex.Lock()
+				g2pM.sylls[lang] = syll
+				g2pM.mutex.Unlock()
+				fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
+
 			} else {
-				//fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
-			}
-
-			if haltingError {
-				continue
-			}
-
-			lang := langFromFilePath(fn)
-			g2pM.mutex.Lock()
-			g2pM.g2ps[lang] = ruleSet
-			g2pM.mutex.Unlock()
-			fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
-
-		} else if strings.HasSuffix(fn, ".syll") {
-
-			syll, err := rbg2p.LoadSyllFile(fn)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
 				fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 				continue
 			}
 
-			lang := langFromFilePath(fn)
-			g2pM.mutex.Lock()
-			g2pM.sylls[lang] = syll
-			g2pM.mutex.Unlock()
-			fmt.Fprintf(os.Stderr, "server: loaded file '%s'\n", fn)
-
-		} else {
-			fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
-			continue
 		}
-
-	}
-	if haltingError {
-		os.Exit(1)
+		if haltingError {
+			os.Exit(1)
+		}
 	}
 
 	if _, err := listSyllLanguages(); err != nil {
@@ -477,7 +478,7 @@ func main() {
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
-	err = http.ListenAndServe(port, r)
+	err := http.ListenAndServe(port, r)
 	if err != nil {
 
 		log.Fatalf("no fun: %v\n", err)
