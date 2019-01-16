@@ -233,7 +233,7 @@ func newTest(s string) (Test, error) {
 	return Test{Input: input, Output: output}, nil
 }
 
-var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.+)\"$")
+var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.*)\"$")
 
 func newFilter(s string, vars map[string]string) (Filter, error) {
 	matchRes := filterRe.FindStringSubmatch(s)
