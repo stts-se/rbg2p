@@ -23,6 +23,13 @@ FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou"]+)*)$" -> "$1\" $2$3" // sim
 
 // Rules
 
+// Foreign
+ü -> i
+ö -> o
+ã -> a
+ck -> k
+
+
 b -> b / VOWEL _ VOWEL
 d -> d / VOWEL _ VOWEL
 g -> g / VOWEL _ VOWEL
@@ -102,12 +109,6 @@ x -> S
 y -> i
 z -> s`
 
-// Foreign
-ü -> i
-ö -> o
-ã -> a
-ck -> k
-
 // Tests
 
 //source: http://www.101languages.net/basque/basics.html
@@ -169,3 +170,4 @@ TEST bárkatu -> b " a rr k a t u // constructed
 TEST test -> t " e s t
 TEST tes -> t " e s
 TEST hue -> w " e
+TEST ackaba -> a k " a b a
