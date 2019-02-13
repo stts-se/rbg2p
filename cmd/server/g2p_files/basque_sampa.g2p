@@ -23,9 +23,14 @@ FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou"]+)*)$" -> "$1\" $2$3" // sim
 
 // Rules
 
-b -> (b, B) / VOWEL _ VOWEL
-g -> (g, G) / VOWEL _ VOWEL
-d -> (d, D) / VOWEL _ VOWEL
+b -> b / VOWEL _ VOWEL
+d -> d / VOWEL _ VOWEL
+g -> g / VOWEL _ VOWEL
+
+//b -> (b, B) / VOWEL _ VOWEL
+//g -> (g, G) / VOWEL _ VOWEL
+//d -> (d, D) / VOWEL _ VOWEL
+
 r -> r / VOWEL _ VOWEL
 
 i -> j / VOWEL _
@@ -88,6 +93,7 @@ q -> k
 r -> rr
 s -> s
 t -> t
+u -> w / _ VOWEL
 u -> u
 ú -> " u
 v -> B
@@ -100,7 +106,7 @@ z -> s`
 ü -> i
 ö -> o
 ã -> a
-
+ck -> k
 
 // Tests
 
@@ -109,7 +115,8 @@ z -> s`
 TEST kaixo -> k a j S " o
 TEST epa -> e p " a
 TEST zer -> s` " e rr
-TEST moduz -> (m o d " u s`, m o D " u s`)
+//TEST moduz -> (m o d " u s`, m o D " u s`)
+TEST moduz -> m o d " u s`
 TEST ondo -> o n d " o
 TEST eskerrik -> e s k " e rr i k
 TEST asko -> a s k " o
@@ -118,35 +125,47 @@ TEST zara -> s` a r " a
 TEST pozten -> p o s` t " e n
 TEST naiz -> n " a j s`
 TEST zu -> s` " u
-TEST ezagutzeaz -> (e s` " a g u ts` e a s`, e s` " a G u ts` e a s`)
-TEST mesedez -> (m e s " e d e s`, m e s " e D e s`)
+//TEST ezagutzeaz -> (e s` " a g u ts` e a s`, e s` " a G u ts` e a s`)
+TEST ezagutzeaz -> e s` " a g u ts` e a s`
+//TEST mesedez -> (m e s " e d e s`, m e s " e D e s`)
+TEST mesedez -> m e s " e d e s`
 TEST ongi -> o n g " i
 TEST etorri -> e t " o rr i
 TEST bai  -> b " a j
 TEST ez -> " e s`
 TEST aizu -> a j s` " u
 TEST barkatu -> b a rr k " a t u
-TEST agur -> (a g " u rr, a G " u rr)
+//TEST agur -> (a g " u rr, a G " u rr)
+TEST agur -> a g " u rr
 TEST aio -> a j " o
 TEST dakit -> d a k " i t
 TEST euskaraz -> e w s k " a r a s`
 //TEST hitz -> (i ts`, h i ts`)
 TEST hitz -> " i ts`
-TEST egitea -> (e g " i c e a, e G " i c e a)
+//TEST egitea -> (e g " i c e a, e G " i c e a)
+TEST egitea -> e g " i c e a
 TEST ingelesez -> i n g " e l e s e s`
-TEST egiten -> (e g " i c e n, e G " i c e n)
+//TEST egiten -> (e g " i c e n, e G " i c e n)
+TEST egiten -> e g " i c e n
 TEST al -> " a l
 TEST duzu -> d u s` " u
 TEST norbaitek -> n o rr b " a j c e k
-TEST lagundu -> (l a g " u n d u, l a G " u n d u)
-TEST egunon -> (e g " u n o n, e G " u n o n)
+//TEST lagundu -> (l a g " u n d u, l a G " u n d u)
+//TEST egunon -> (e g " u n o n, e G " u n o n)
+TEST lagundu -> l a g " u n d u
+TEST egunon -> e g " u n o n
 
 //Source: https://en.wikipedia.org/wiki/Basque_language
-TEST egin -> (e g " i n, e G " i n)
-TEST egina -> (e g " i J a, e G " i J a)
-TEST egines -> (e g " i J e s, e G " i J e s)
-TEST agada -> (a g " a d a, a g " a D a, a G " a d a, a G " a D a)
+// TEST egin -> (e g " i n, e G " i n)
+// TEST egina -> (e g " i J a, e G " i J a)
+// TEST egines -> (e g " i J e s, e G " i J e s)
+TEST egin -> e g " i n
+TEST egina -> e g " i J a
+TEST egines -> e g " i J e s
+//TEST agada -> (a g " a d a, a g " a D a, a G " a d a, a G " a D a)
+TEST agada -> a g " a d a
 TEST fragráncia -> f rr a g rr " a n s i a
 TEST bárkatu -> b " a rr k a t u // constructed
 TEST test -> t " e s t
 TEST tes -> t " e s
+TEST hue -> w " e
