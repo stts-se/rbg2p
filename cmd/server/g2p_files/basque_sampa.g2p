@@ -28,6 +28,7 @@ FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou"]+)*)$" -> "$1\" $2$3" // sim
 ö -> o
 ã -> a
 ck -> k
+ch -> tS
 
 
 //default rules for digraphs
@@ -78,7 +79,8 @@ l -> L / i _ VOWEL
 a -> a
 á -> " a
 b -> b
-c -> s
+c -> s / _ [ei]
+c -> k
 ç -> s
 d -> d
 e -> e
@@ -183,3 +185,6 @@ TEST tes -> t " e s
 TEST hue -> w " e
 TEST ackaba -> a k " a b a
 TEST ackabba -> a k " a b a
+TEST comodoro -> k o m " o d o r o
+TEST cigli -> s i g l " i
+TEST winchester -> w i n tS " e s t e rr
