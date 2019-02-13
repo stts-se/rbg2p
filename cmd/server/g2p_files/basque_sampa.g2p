@@ -1,6 +1,6 @@
 // Specs
 
-CHARACTER_SET "aábcçdeéfghiíjklmnñoópqrstuúvwxyz"
+CHARACTER_SET "aábcçdeéfghiíjklmnñoópqrstuúvwxyzüö"
 PHONEME_SET "a e i o u j w p b t d c gj k g ts ts` tS s s` S jj f B D G x m n J l L rr r "" 
 PHONEME_DELIMITER " "
 DEFAULT_PHONEME "_"
@@ -63,6 +63,9 @@ e -> e
 é -> " e
 f -> f
 g -> g
+
+ü -> i
+ö -> o
 
 //The letter ⟨h⟩ is silent in the Southern dialects, but pronounced (although vanishing) in the Northern ones
 //Source: https://en.wikipedia.org/wiki/Basque_language
