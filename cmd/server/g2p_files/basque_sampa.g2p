@@ -30,10 +30,34 @@ FILTER "^((?:[^aeiou" ]+ )*)([aeiou])( *(?:[^aeiou"]+)*)$" -> "$1\" $2$3" // sim
 ck -> k
 
 
+//default rules for digraphs
+dd -> gj
+ll -> L
+rr -> rr
+ts -> ts
+tt -> c
+tx -> tS
+tz -> ts`
+
+nn -> n
+mm -> m
+ss -> s
+bb -> b
+
+pp -> p
+ff -> f
+gg -> g
+kk -> k
+zz -> s`
+xx -> S
+cc -> s
+vv -> v
+
+
+// bdg
 b -> b / VOWEL _ VOWEL
 d -> d / VOWEL _ VOWEL
 g -> g / VOWEL _ VOWEL
-
 //b -> (b, B) / VOWEL _ VOWEL
 //g -> (g, G) / VOWEL _ VOWEL
 //d -> (d, D) / VOWEL _ VOWEL
@@ -49,20 +73,6 @@ d -> gj / i _ VOWEL
 t -> c / i _ VOWEL
 l -> L / i _ VOWEL
 
-
-//default rules for digraphs
-dd -> gj
-ll -> L
-rr -> rr
-ts -> ts
-tt -> c
-tx -> tS
-tz -> ts`
-
-nn -> n
-mm -> m
-ss -> s
-bb -> b
 
 //default rules for letters
 a -> a
@@ -86,6 +96,7 @@ i -> i
 
 //The letter ⟨j⟩ has a variety of realizations according to the regional dialect: [j, dʒ, x, ʃ, ɟ, ʝ], as pronounced from west to east in south Bizkaia and coastal Lapurdi, central Bizkaia, east Bizkaia and Gipuzkoa, south Navarre, inland Lapurdi and Low Navarre, and Zuberoa, respectively. 
 //Source: https://en.wikipedia.org/wiki/Basque_language
+jj -> (j, x, S, gj, jj)
 j -> (j, x, S, gj, jj)
 
 k -> k
@@ -171,3 +182,4 @@ TEST test -> t " e s t
 TEST tes -> t " e s
 TEST hue -> w " e
 TEST ackaba -> a k " a b a
+TEST ackabba -> a k " a b a
