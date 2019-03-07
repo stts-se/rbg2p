@@ -116,6 +116,7 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 		ruleSet.Filters = append(ruleSet.Filters, t)
 	}
+	//ruleSet.Rules = append(ruleSet.Rules, Rule{Input: " ", Output: []string{" "}})
 	for _, l := range ruleLines {
 		r, err := newRule(l, ruleSet.Vars)
 		if err != nil {
@@ -347,6 +348,9 @@ func newRule(s string, vars map[string]string) (Rule, error) {
 		return Rule{}, fmt.Errorf("invalid rule definition: " + s)
 	}
 	input := matchRes[1]
+	if input == "\u00a0" { // nbsp
+		input = " "
+	}
 	output, err := newRuleOutput(matchRes[2], s)
 	if err != nil {
 		return Rule{}, err

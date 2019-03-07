@@ -18,8 +18,8 @@ import (
 
 var l = log.New(os.Stderr, "", 0)
 
-func print(orth string, transes []string) {
-	fmt.Printf("%s\t%s\n", orth, strings.Join(transes, "  #  "))
+func print(input string, orth string, transes []string) {
+	fmt.Printf("%s\t%s\n", input, strings.Join(transes, "  #  "))
 }
 
 type transResult struct {
@@ -84,6 +84,7 @@ func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
@@ -93,6 +94,7 @@ func main() {
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
+   -column     string  only convert specified column (default: first field)
    -quiet      bool    inhibit warnings (default: false)
    -test       bool    test g2p against input file; orth <tab> trans (default: false)
    -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
@@ -176,15 +178,15 @@ FLAGS:
 	if *test {
 		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG\t(DIFF)?")
 	}
-
 	var processString = func(s string) {
 		nTotal = nTotal + 1
 		fs := strings.Split(s, "\t")
-		o, refTranses := fs[0], fs[1:]
+		o := fs[*column]
 		res := transcribe(ruleSet, o)
 		if res.result || *force {
 			nTrans = nTrans + 1
 			if *test {
+				refTranses := fs[(*column + 1):]
 				nTests++
 				info, _ := compareForDiff(res.transes, refTranses)
 				testRes[info]++
@@ -207,28 +209,28 @@ FLAGS:
 
 				fmt.Println(strings.Join(outFs, "\t"))
 			} else {
-				print(res.orth, res.transes)
+				print(s, res.orth, res.transes)
 			}
 		}
 		if !res.result {
 			nErrs = nErrs + 1
 		}
-
 	}
 
 	if len(args) > 1 {
 		for i := 1; i < len(args); i++ {
 			s := args[i]
 			if _, err := os.Stat(s); os.IsNotExist(err) {
-				nTotal = nTotal + 1
-				res := transcribe(ruleSet, s)
-				if res.result || *force {
-					nTrans = nTrans + 1
-					fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
-				}
-				if !res.result {
-					nErrs = nErrs + 1
-				}
+				processString(s)
+				// nTotal = nTotal + 1
+				// res := transcribe(ruleSet, s)
+				// if res.result || *force {
+				// 	nTrans = nTrans + 1
+				// 	fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
+				// }
+				// if !res.result {
+				// 	nErrs = nErrs + 1
+				// }
 			} else {
 				fh, err := os.Open(s)
 				defer fh.Close()
@@ -306,7 +308,7 @@ FLAGS:
 			processString(line)
 		}
 	}
-	l.Printf("%-18s: % 7d", "TOTAL WORDS", nTotal)
+	l.Printf("%-18s: % 7d", "TOTAL INPUT", nTotal)
 	l.Printf("%-18s: % 7d", "ERRORS", nErrs)
 	l.Printf("%-18s: % 7d", "TRANSCRIBED", nTrans)
 	if *test {
