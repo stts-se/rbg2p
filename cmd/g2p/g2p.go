@@ -176,76 +176,134 @@ FLAGS:
 	if *test {
 		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG\t(DIFF)?")
 	}
-	for i := 1; i < len(args); i++ {
-		s := args[i]
-		if _, err := os.Stat(s); os.IsNotExist(err) {
-			nTotal = nTotal + 1
-			res := transcribe(ruleSet, s)
-			if res.result || *force {
-				nTrans = nTrans + 1
-				fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
-			}
-			if !res.result {
-				nErrs = nErrs + 1
-			}
-		} else {
-			fh, err := os.Open(s)
-			defer fh.Close()
-			if err != nil {
-				l.Println(err)
-				os.Exit(1)
-			}
-			sc := bufio.NewScanner(fh)
-			for sc.Scan() {
-				if err := sc.Err(); err != nil {
-					l.Println(err)
-					os.Exit(1)
+
+	var processString = func(s string) {
+		nTotal = nTotal + 1
+		fs := strings.Split(s, "\t")
+		o, refTranses := fs[0], fs[1:]
+		res := transcribe(ruleSet, o)
+		if res.result || *force {
+			nTrans = nTrans + 1
+			if *test {
+				nTests++
+				info, _ := compareForDiff(res.transes, refTranses)
+				testRes[info]++
+				outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
+				if info == "DIFF" {
+					dmp := diffmatchpatch.New()
+					diffs := dmp.DiffMain(outFs[1], outFs[2], false)
+					diffsOnly := []diffmatchpatch.Diff{}
+					diffsOnlyText := []string{}
+					for _, d := range diffs {
+						if d.Type != diffmatchpatch.DiffEqual {
+							diffsOnly = append(diffsOnly, d)
+							diffsOnlyText = append(diffsOnlyText, d.Text)
+						}
+					}
+					outFs = append(outFs, dmp.DiffPrettyText(diffs))
+					outFs = append(outFs, fmt.Sprintf("%v", diffsOnly))
+					outFs = append(outFs, strings.Join(diffsOnlyText, "|"))
 				}
-				line := sc.Text()
-				if strings.TrimSpace(line) == "" {
-					l.Println("Skipping empty line")
-					continue
-				}
-				if strings.HasPrefix(strings.TrimSpace(line), "#") {
-					l.Println("Skipping line " + line)
-					continue
-				}
+
+				fmt.Println(strings.Join(outFs, "\t"))
+			} else {
+				print(res.orth, res.transes)
+			}
+		}
+		if !res.result {
+			nErrs = nErrs + 1
+		}
+
+	}
+
+	if len(args) > 1 {
+		for i := 1; i < len(args); i++ {
+			s := args[i]
+			if _, err := os.Stat(s); os.IsNotExist(err) {
 				nTotal = nTotal + 1
-				fs := strings.Split(line, "\t")
-				o, refTranses := fs[0], fs[1:]
-				res := transcribe(ruleSet, o)
+				res := transcribe(ruleSet, s)
 				if res.result || *force {
 					nTrans = nTrans + 1
-					if *test {
-						nTests++
-						info, _ := compareForDiff(res.transes, refTranses)
-						testRes[info]++
-						outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
-						if info == "DIFF" {
-							dmp := diffmatchpatch.New()
-							diffs := dmp.DiffMain(outFs[1], outFs[2], false)
-							diffsOnly := []diffmatchpatch.Diff{}
-							diffsOnlyText := []string{}
-							for _, d := range diffs {
-								if d.Type != diffmatchpatch.DiffEqual {
-									diffsOnly = append(diffsOnly, d)
-									diffsOnlyText = append(diffsOnlyText, d.Text)
-								}
-							}
-							outFs = append(outFs, dmp.DiffPrettyText(diffs))
-							outFs = append(outFs, fmt.Sprintf("%v", diffsOnly))
-							outFs = append(outFs, strings.Join(diffsOnlyText, "|"))
-						}
-
-						fmt.Println(strings.Join(outFs, "\t"))
-					} else {
-						print(res.orth, res.transes)
-					}
+					fmt.Printf("%s\t%s\n", s, strings.Join(res.transes, "\t"))
 				}
 				if !res.result {
 					nErrs = nErrs + 1
 				}
+			} else {
+				fh, err := os.Open(s)
+				defer fh.Close()
+				if err != nil {
+					l.Println(err)
+					os.Exit(1)
+				}
+				sc := bufio.NewScanner(fh)
+				for sc.Scan() {
+					if err := sc.Err(); err != nil {
+						l.Println(err)
+						os.Exit(1)
+					}
+					line := sc.Text()
+					if strings.TrimSpace(line) == "" {
+						l.Println("Skipping empty line")
+						continue
+					}
+					if strings.HasPrefix(strings.TrimSpace(line), "#") {
+						l.Println("Skipping line " + line)
+						continue
+					}
+					processString(line)
+					// 	nTotal = nTotal + 1
+					// 	fs := strings.Split(line, "\t")
+					// 	o, refTranses := fs[0], fs[1:]
+					// 	res := transcribe(ruleSet, o)
+					// 	if res.result || *force {
+					// 		nTrans = nTrans + 1
+					// 		if *test {
+					// 			nTests++
+					// 			info, _ := compareForDiff(res.transes, refTranses)
+					// 			testRes[info]++
+					// 			outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
+					// 			if info == "DIFF" {
+					// 				dmp := diffmatchpatch.New()
+					// 				diffs := dmp.DiffMain(outFs[1], outFs[2], false)
+					// 				diffsOnly := []diffmatchpatch.Diff{}
+					// 				diffsOnlyText := []string{}
+					// 				for _, d := range diffs {
+					// 					if d.Type != diffmatchpatch.DiffEqual {
+					// 						diffsOnly = append(diffsOnly, d)
+					// 						diffsOnlyText = append(diffsOnlyText, d.Text)
+					// 					}
+					// 				}
+					// 				outFs = append(outFs, dmp.DiffPrettyText(diffs))
+					// 				outFs = append(outFs, fmt.Sprintf("%v", diffsOnly))
+					// 				outFs = append(outFs, strings.Join(diffsOnlyText, "|"))
+					// 			}
+
+					// 			fmt.Println(strings.Join(outFs, "\t"))
+					// 		} else {
+					// 			print(res.orth, res.transes)
+					// 		}
+					// 	}
+					// 	if !res.result {
+					// 		nErrs = nErrs + 1
+					// 	}
+				}
 			}
+		}
+	} else {
+		fmt.Fprintf(os.Stderr, "Reading input from stdin...\n")
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.TrimSpace(line) == "" {
+				l.Println("Skipping empty line")
+				continue
+			}
+			if strings.HasPrefix(strings.TrimSpace(line), "#") {
+				l.Println("Skipping line " + line)
+				continue
+			}
+			processString(line)
 		}
 	}
 	l.Printf("%-18s: % 7d", "TOTAL WORDS", nTotal)
