@@ -208,9 +208,7 @@ func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []trans) []trans {
 		for _, add := range head.p {
 			appendRange := []g2p{}
 			// build prefix from previous rounds
-			for _, g2p := range acc[i].phonemes {
-				appendRange = append(appendRange, g2p)
-			}
+			appendRange = append(appendRange, acc[i].phonemes...)
 			// append current phonemes
 			g2p := g2p{g: head.g, p: strings.Split(add, rs.PhonemeDelimiter)}
 			appendRange = append(appendRange, g2p)
@@ -302,7 +300,7 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 		filtered = append(filtered, fted)
 	}
 	if len(couldntMap) > 0 {
-		return filtered, fmt.Errorf("Found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
+		return filtered, fmt.Errorf("found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
 	return filtered, nil
 }
@@ -349,8 +347,6 @@ func compareToPhonemeSet(ruleSet RuleSet) (TestResult, error) {
 
 		}
 	}
-	for _, warn := range checkForUnusedSymbols(usedSymbols, ruleSet.PhonemeSet) {
-		validation.Warnings = append(validation.Warnings, warn)
-	}
+	validation.Warnings = append(validation.Warnings, checkForUnusedSymbols(usedSymbols, ruleSet.PhonemeSet)...)
 	return validation, nil
 }

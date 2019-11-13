@@ -37,10 +37,10 @@ func LoadFile(fName string) (RuleSet, error) {
 	ruleSet.PhonemeDelimiter = " "
 	syllDefLines := []string{}
 	fh, err := os.Open(filepath.Clean(fName))
-	defer fh.Close()
 	if err != nil {
 		return ruleSet, err
 	}
+	defer fh.Close()
 	n := 0
 	s := bufio.NewScanner(fh)
 	var inputLines []string
@@ -125,13 +125,13 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 		for _, r0 := range ruleSet.Rules {
 			if r0.equalsExceptOutput(r) {
-				return ruleSet, fmt.Errorf("Duplicate rules for input file %s: %s vs. %s", fName, r0, r)
+				return ruleSet, fmt.Errorf("duplicate rules for input file %s: %s vs. %s", fName, r0, r)
 			}
 		}
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
 	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {
-		return ruleSet, fmt.Errorf("No character set defined for input file %s", fName)
+		return ruleSet, fmt.Errorf("no character set defined for input file %s", fName)
 	}
 	ruleSet.Content = strings.Join(inputLines, "\n")
 	return ruleSet, nil
@@ -147,8 +147,7 @@ func isConst(s string) bool {
 }
 
 func parseConst(s string, ruleSet *RuleSet) error {
-	var matchRes []string
-	matchRes = constRe.FindStringSubmatch(s)
+	matchRes := constRe.FindStringSubmatch(s)
 	var downcaseInputIsSet = false
 	if matchRes != nil {
 		name := matchRes[1]

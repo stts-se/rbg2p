@@ -15,10 +15,10 @@ func LoadSyllFile(fName string) (Syllabifier, error) {
 	res := Syllabifier{}
 	phonemeDelimiter := " "
 	fh, err := os.Open(filepath.Clean(fName))
-	defer fh.Close()
 	if err != nil {
 		return res, err
 	}
+	defer fh.Close()
 	n := 0
 	var phonemeSetLine string
 	s := bufio.NewScanner(fh)
@@ -39,6 +39,9 @@ func LoadSyllFile(fName string) (Syllabifier, error) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isPhonemeDelimiter(l) {
 			phonemeDelimiter, err = parsePhonemeDelimiter(l)
+			if err != nil {
+				return res, err
+			}
 		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
 		} else if isG2PLine(l) {
@@ -110,8 +113,7 @@ func isSyllTest(s string) bool {
 var syllTestRe = regexp.MustCompile("^SYLLDEF TEST +(.+) +-> +(.+)$")
 
 func newSyllTest(s string) (SyllTest, error) {
-	var matchRes []string
-	matchRes = syllTestRe.FindStringSubmatch(s)
+	matchRes := syllTestRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return SyllTest{}, fmt.Errorf("invalid test definition: " + s)
 	}

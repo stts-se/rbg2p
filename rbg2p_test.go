@@ -560,7 +560,7 @@ func TestSwsSyllFail(t *testing.T) {
 func TestSwsFail1(t *testing.T) {
 	fName := "test_data/sws_test_fail.g2p"
 	_, err := LoadFile(fName)
-	expectErr := "Duplicate rules for input file"
+	expectErr := "duplicate rules for input file"
 	errS := fmt.Sprintf("%s", err)
 	if err == nil {
 		t.Errorf("expected error here")
@@ -576,7 +576,7 @@ func TestSwsFailCase1(t *testing.T) {
 	if err != nil {
 		t.Errorf("didn't expect error for input file %s : %s", fName, err)
 	}
-	expectErr := "Found unmappable symbol(s) in input string"
+	expectErr := "found unmappable symbol(s) in input string"
 	errS := fmt.Sprintf("%s", result)
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)

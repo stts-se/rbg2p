@@ -110,11 +110,11 @@ FLAGS:
 			}
 		} else {
 			fh, err := os.Open(filepath.Clean(s))
-			defer fh.Close()
 			if err != nil {
 				l.Println(err)
 				os.Exit(1)
 			}
+			defer fh.Close()
 			sc := bufio.NewScanner(fh)
 			for sc.Scan() {
 				if err := sc.Err(); err != nil {
