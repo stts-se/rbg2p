@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -13,7 +14,7 @@ func LoadSyllFile(fName string) (Syllabifier, error) {
 	syllDefLines := []string{}
 	res := Syllabifier{}
 	phonemeDelimiter := " "
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	defer fh.Close()
 	if err != nil {
 		return res, err

@@ -15,11 +15,7 @@ type TestResult struct {
 
 // Strings returns all messages as strings
 func (tr TestResult) Strings() []string {
-	res := []string{}
-	for _, e := range tr.AllErrors() {
-		res = append(res, fmt.Sprintf("%s", e))
-	}
-	return res
+	return tr.AllErrors()
 }
 
 // Failed returns true if the test result has any errors or failed tests
@@ -81,8 +77,7 @@ func isPhonemeDelimiter(s string) bool {
 var phnDelimRe = regexp.MustCompile("^(PHONEME_DELIMITER) +\"(.*)\"$")
 
 func parsePhonemeDelimiter(s string) (string, error) {
-	var matchRes []string
-	matchRes = phnDelimRe.FindStringSubmatch(s)
+	matchRes := phnDelimRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		return "", fmt.Errorf("invalid phoneme delimiter definition: " + s)
 	}
@@ -96,8 +91,7 @@ func isPhonemeSet(s string) bool {
 var phnSetRe = regexp.MustCompile("^(PHONEME_SET) +\"(.*)\"$")
 
 func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
-	var matchRes []string
-	matchRes = phnSetRe.FindStringSubmatch(line)
+	matchRes := phnSetRe.FindStringSubmatch(line)
 	if matchRes == nil {
 		return PhonemeSet{}, fmt.Errorf("invalid phoneme set definition: " + line)
 	}

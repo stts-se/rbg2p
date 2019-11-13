@@ -24,7 +24,7 @@ func splitIntoPhonemes(knownPhonemes []string, transcription string) (phonemes [
 	var known []string
 	// start by discarding any phoneme strings not substrings of transcription
 	for _, ph := range knownPhonemes {
-		if len(ph) > 0 && strings.Index(transcription, ph) > -1 {
+		if len(ph) > 0 && strings.Contains(transcription, ph) {
 			known = append(known, ph)
 		}
 	}

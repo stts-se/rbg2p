@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -34,11 +35,11 @@ func NewPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
 // LoadPhonemeSetFile loads a phoneme set definition from file (one phoneme per line, // for comments)
 func LoadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
 	symbols := []string{}
-	fh, err := os.Open(fName)
-	defer fh.Close()
+	fh, err := os.Open(filepath.Clean(fName))
 	if err != nil {
 		return PhonemeSet{}, err
 	}
+	defer fh.Close()
 	n := 0
 	s := bufio.NewScanner(fh)
 	for s.Scan() {
@@ -82,7 +83,7 @@ func (ps PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 			return []string{}, err
 		}
 		if len(unknown) > 0 {
-			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%v/: %s\n", trans, unknown)
+			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%v/: %s", trans, unknown)
 		}
 		return splitted, nil
 	}

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -35,7 +36,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
 	syllDefLines := []string{}
-	fh, err := os.Open(fName)
+	fh, err := os.Open(filepath.Clean(fName))
 	defer fh.Close()
 	if err != nil {
 		return ruleSet, err

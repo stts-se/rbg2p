@@ -23,9 +23,7 @@ type g2p struct {
 func (t trans) listPhonemes() []string {
 	var phns []string
 	for _, g2p := range t.phonemes {
-		for _, p := range g2p.p {
-			phns = append(phns, p)
-		}
+		phns = append(phns, g2p.p...)
 	}
 	return phns
 }
@@ -99,6 +97,6 @@ func (t sylledTrans) syllables() [][]string {
 }
 
 //listPhonemes returns a slice of phonemes as strings
-func (t sylledTrans) listPhonemes() []string {
-	return t.trans.listPhonemes()
-}
+// func (t sylledTrans) listPhonemes() []string {
+// 	return t.trans.listPhonemes()
+// }

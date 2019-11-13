@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"sort"
@@ -232,7 +233,7 @@ FLAGS:
 				// 	nErrs = nErrs + 1
 				// }
 			} else {
-				fh, err := os.Open(s)
+				fh, err := os.Open(filepath.Clean(s))
 				defer fh.Close()
 				if err != nil {
 					l.Println(err)

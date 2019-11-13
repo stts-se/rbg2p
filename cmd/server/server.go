@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"sort"
 	"strings"
@@ -42,7 +41,7 @@ func ping_Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "rbg2p\n")
 }
 
-var wSplitRe = regexp.MustCompile(" *, *")
+//var wSplitRe = regexp.MustCompile(" *, *")
 
 // Word internal struct for json
 type Word struct {
@@ -85,7 +84,7 @@ func syllabify_Handler(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	lang := vars["lang"]
-	if "" == lang {
+	if lang == "" {
 		msg := "no value for the expected 'lang' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -93,7 +92,7 @@ func syllabify_Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trans := vars["trans"]
-	if "" == trans {
+	if trans == "" {
 		msg := "no value for the expected 'trans' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -134,11 +133,7 @@ func transcribe(lang string, word string) (Word, int, error) {
 		msg := fmt.Sprintf("couldn't transcribe word : %v", err)
 		return Word{}, http.StatusInternalServerError, fmt.Errorf(msg)
 	}
-	tRes := []string{}
-	for _, trans := range transes {
-		tRes = append(tRes, trans)
-	}
-	res := Word{word, tRes}
+	res := Word{word, transes}
 	return res, http.StatusOK, nil
 }
 
@@ -158,14 +153,14 @@ func ruleContent(lang string) (string, int, error) {
 func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 
 	format := r.FormValue("format")
-	if "xml" == format {
+	if format == "xml" {
 		transcribe_AsXml_Handler(w, r)
 		return
 	}
 
 	vars := mux.Vars(r)
 	lang := vars["lang"]
-	if "" == lang {
+	if lang == "" {
 		msg := "no value for the expected 'lang' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -173,7 +168,7 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	word := vars["word"]
-	if "" == word {
+	if word == "" {
 		msg := "no value for the expected 'word' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -188,7 +183,7 @@ func transcribe_Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if "text" == format || "txt" == format {
+	if format == "text" || format == "txt" {
 		res := strings.Join(res.Transes, "\n")
 		fmt.Fprintf(w, "%s\n", res)
 	} else {
@@ -221,14 +216,14 @@ type XMLWord struct {
 func transcribe_AsXml_Handler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	lang := vars["lang"]
-	if "" == lang {
+	if lang == "" {
 		msg := "no value for the expected 'lang' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 	word := vars["word"]
-	if "" == word {
+	if word == "" {
 		msg := "no value for the expected 'word' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -300,7 +295,7 @@ func g2pList_Handler(w http.ResponseWriter, r *http.Request) {
 func g2pRules_Handler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	lang := vars["lang"]
-	if "" == lang {
+	if lang == "" {
 		msg := "no value for the expected 'lang' parameter"
 		log.Println(msg)
 		http.Error(w, msg, http.StatusBadRequest)
@@ -405,9 +400,10 @@ func main() {
 					}
 					fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), fn)
 					haltingError = true
-				} else {
-					//fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
 				}
+				// else {
+				// 	fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
+				// }
 
 				if haltingError {
 					continue
@@ -467,7 +463,7 @@ func main() {
 	r.HandleFunc("/xmltranscribe/{lang}/{word}", transcribe_AsXml_Handler)
 
 	fmt.Println("Serving urls:")
-	r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+	err := r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		t, err := route.GetPathTemplate()
 		if err != nil {
 			return err
@@ -475,12 +471,14 @@ func main() {
 		fmt.Println(t)
 		return nil
 	})
+	if err != nil {
+		log.Fatalf("walk failed: %v\n", err)
+	}
 
 	port := ":6771"
 	log.Printf("starting g2p server at port %s\n", port)
-	err := http.ListenAndServe(port, r)
+	err = http.ListenAndServe(port, r)
 	if err != nil {
-
 		log.Fatalf("no fun: %v\n", err)
 	}
 

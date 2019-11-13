@@ -180,12 +180,8 @@ func (rs RuleSet) Test() TestResult {
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
 		}
-		for _, w := range validation.Warnings {
-			result.Warnings = append(result.Warnings, w)
-		}
-		for _, e := range validation.Errors {
-			result.Errors = append(result.Errors, e)
-		}
+		result.Warnings = append(result.Warnings, validation.Warnings...)
+		result.Errors = append(result.Errors, validation.Errors...)
 	}
 
 	for _, test := range rs.Tests {
@@ -194,13 +190,9 @@ func (rs RuleSet) Test() TestResult {
 		if rs.DowncaseInput {
 			input = strings.ToLower(input)
 		}
-		res0, err := rs.Apply(input)
-		res := []string{}
+		res, err := rs.Apply(input)
 		if err != nil {
 			result.Errors = append(result.Errors, fmt.Sprintf("%v", err))
-		}
-		for _, trans := range res0 {
-			res = append(res, trans)
 		}
 		//delim := rs.PhonemeDelimiter
 		if !reflect.DeepEqual(expect, res) {
