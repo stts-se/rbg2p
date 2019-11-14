@@ -2,7 +2,7 @@
 Utilities for rule based, manually written, grapheme to phoneme rules 
 
 [![GoDoc](https://godoc.org/github.com/stts-se/rbg2p?status.svg)](https://godoc.org/github.com/stts-se/rbg2p) [![Go Report Card](https://goreportcard.com/badge/github.com/stts-se/rbg2p)](https://goreportcard.com/report/github.com/stts-se/rbg2p) [![Build Status](https://travis-ci.org/stts-se/rbg2p.svg?branch=master)](https://travis-ci.org/stts-se/rbg2p)
-[![Github actions workflow status](https://github.com/stts-se/rbnf/workflows/Go/badge.svg)](https://github.org/stts-se/rbg2p/actions)
+[![Github actions workflow status](https://github.com/stts-se/rbnf/workflows/Go/badge.svg)](https://github.com/stts-se/rbg2p/actions)
 
 ## Command line tools
 
