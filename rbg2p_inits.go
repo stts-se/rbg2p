@@ -275,7 +275,8 @@ func expandVarsWithBrackets(re0 string, vars map[string]string) (string, error) 
 	return re, nil
 }
 
-var unexpandedContextVar = regexp.MustCompile("^[A-Z0-9]{2,}$")
+var unexpandedContextVar1 = regexp.MustCompile("^[A-Z0-9]{2,}$")
+var unexpandedContextVar2 = regexp.MustCompile("[A-Z]{2,}")
 
 func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {
 	if isLeft {
@@ -288,7 +289,7 @@ func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2
 		if val, ok := vars[strings.TrimSpace(s)]; ok {
 			splitted[i] = val
 		} else { // if it's not a VAR, it should be valid orthographic
-			if unexpandedContextVar.MatchString(s) {
+			if unexpandedContextVar1.MatchString(s) && unexpandedContextVar1.MatchString(s) {
 				return &regexp2.Regexp{}, fmt.Errorf("Undefined variable %s", s)
 			}
 		}
