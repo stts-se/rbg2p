@@ -91,7 +91,10 @@ func LoadFile(fName string) (RuleSet, error) {
 
 	}
 	for k, v := range ruleSet.Vars {
-		v = expandVarsWithBrackets(v, ruleSet.Vars)
+		v, err = expandVarsWithBrackets(v, ruleSet.Vars)
+		if err != nil {
+			return ruleSet, err
+		}
 		ruleSet.Vars[k] = v
 	}
 	if len(phonemeSetLine) > 0 {
@@ -246,24 +249,35 @@ func newFilter(s string, vars map[string]string) (Filter, error) {
 	if strings.Contains(output, "->") {
 		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
-	input = expandVarsWithBrackets(input, vars)
+	input, err := expandVarsWithBrackets(input, vars)
+	if err != nil {
+		return Filter{}, fmt.Errorf("invalid FILTER definition %s : %v", s, err)
+	}
 	re, err := regexp2.Compile(input, regexp2.None)
 	if err != nil {
-		return Filter{}, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %s", s, err)
+		return Filter{}, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %v", re, err)
 	}
 	return Filter{Regexp: re, Output: output}, nil
 }
 
-func expandVarsWithBrackets(re0 string, vars map[string]string) string {
+var unexpandedBracketVar = regexp.MustCompile(`(?:^|[^\\])({[^},\\]+})`)
+
+func expandVarsWithBrackets(re0 string, vars map[string]string) (string, error) {
 	re := re0
 	for k, v := range vars {
 		k = fmt.Sprintf("{%s}", k)
 		re = strings.Replace(re, k, v, -1)
 	}
-	return re
+	unexpandedMatch := unexpandedBracketVar.FindStringSubmatch(re)
+	if len(unexpandedMatch) > 1 {
+		return "", fmt.Errorf("Undefined variable %s", unexpandedMatch[1])
+	}
+	return re, nil
 }
 
-func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {
+var unexpandedContextVar = regexp.MustCompile("^[A-Z0-9]{2,}$")
+
+func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {
 	if isLeft {
 		s0 = strings.Replace(s0, "#", "^", -1)
 	} else {
@@ -273,6 +287,10 @@ func expandVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp
 	for i, s := range splitted {
 		if val, ok := vars[strings.TrimSpace(s)]; ok {
 			splitted[i] = val
+		} else { // if it's not a VAR, it should be valid orthographic
+			if unexpandedContextVar.MatchString(s) {
+				return &regexp2.Regexp{}, fmt.Errorf("Undefined variable %s", s)
+			}
 		}
 	}
 	if isLeft {
@@ -295,7 +313,7 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 	right := Context{}
 	leftS := strings.TrimSpace(matchRes[1])
 	if len(leftS) > 0 {
-		re, err := expandVars(leftS, true, vars)
+		re, err := expandContextVars(leftS, true, vars)
 		if err != nil {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}
@@ -304,7 +322,7 @@ func newContext(s string, vars map[string]string) (Context, Context, error) {
 	}
 	rightS := strings.TrimSpace(matchRes[2])
 	if len(rightS) > 0 {
-		re, err := expandVars(rightS, false, vars)
+		re, err := expandContextVars(rightS, false, vars)
 		if err != nil {
 			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
 		}

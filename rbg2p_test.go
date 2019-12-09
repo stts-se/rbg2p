@@ -582,3 +582,23 @@ func TestSwsFailCase1(t *testing.T) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
 }
+
+func TestFailForUndefinedBracketVar(t *testing.T) {
+	fName := "test_data/test_specs_fail_bracketvar.g2p"
+	_, err := LoadFile(fName)
+	errS := fmt.Sprintf("%v", err)
+	expectErr := `Undefined variable {FILTERTEST2}`
+	if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
+	}
+}
+
+func TestFailForUndefinedVar(t *testing.T) {
+	fName := "test_data/test_specs_fail_var.g2p"
+	_, err := LoadFile(fName)
+	errS := fmt.Sprintf("%v", err)
+	expectErr := `Undefined variable in VOICELES`
+	if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
+	}
+}
