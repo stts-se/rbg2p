@@ -1,0 +1,71 @@
+// Specific variables
+
+CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
+DEFAULT_PHONEME "_"
+PHONEME_DELIMITER ""
+
+
+// Variables
+
+VAR VOICELESS [p|k|t|f|s|h|c]
+VAR VOICED [b|d|g|z]
+
+
+// Rules
+
+a -> a
+e -> e
+i -> i
+o -> o
+u -> }
+ö -> 2
+å -> o
+ä -> {
+
+skt -> (st, skt) / _
+
+sch -> (S, x) / _ # 
+sch -> S
+
+v -> f / _ VOICELES
+
+ck -> k
+k -> k
+rt -> rt
+
+b -> p / _ VOICELESS
+b -> b 
+
+d -> d
+s -> s
+h -> h
+t -> t
+
+c -> s
+p -> p
+q -> k
+w -> v
+z -> s
+ü -> y
+
+é -> e:
+f -> f
+g -> g
+j -> j
+l -> l
+m -> m
+r -> r
+x -> k s
+y -> y:
+n -> n
+v -> v
+
+// Tests
+
+TEST dusch -> (d}S, d}x)
+TEST duscha -> d}Sa
+TEST borta -> borta
+TEST abt -> apt
+TEST busktdusch -> (b}std}S,  b}std}x,  b}sktd}S,  b}sktd}x)
+TEST havs -> hafs
+TEST haag -> haag
