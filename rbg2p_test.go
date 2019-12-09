@@ -597,7 +597,7 @@ func TestFailForUndefinedVar(t *testing.T) {
 	fName := "test_data/test_specs_fail_var.g2p"
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
-	expectErr := `Undefined variable in VOICELES`
+	expectErr := `Undefined variable VOICELES`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
