@@ -12,15 +12,15 @@ import (
 	"github.com/stts-se/rbg2p"
 )
 
-func syllabify(syller rbg2p.Syllabifier, trans string) bool {
+func syllabify(syller rbg2p.Syllabifier, trans string) (string, bool) {
 	phonemes, err := syller.PhonemeSet.SplitTranscription(trans)
 	if err != nil {
 		l.Printf("%s", err)
-		return false
+		return "", false
 	}
 	sylled := syller.SyllabifyFromPhonemes(phonemes)
-	fmt.Printf("%s\t%s\n", trans, sylled)
-	return true
+	//fmt.Printf("%s\t%s\n", trans, sylled)
+	return sylled, true
 }
 
 var l = log.New(os.Stderr, "", 0)
@@ -28,12 +28,14 @@ var l = log.New(os.Stderr, "", 0)
 func main() {
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
+	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var help = f.Bool("help", false, "print help message")
 
 	var usage = `go run syll.go <FLAGS> <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
+   -column     string  only convert specified column (default: first field)
    -help       bool    print help message`
 
 	f.Usage = func() {
@@ -95,7 +97,6 @@ FLAGS:
 		os.Exit(1)
 	}
 
-	fmt.Println()
 	nTotal := 0
 	nErrs := 0
 	nOK := 0
@@ -103,7 +104,10 @@ FLAGS:
 		s := args[i]
 		if _, err := os.Stat(s); os.IsNotExist(err) {
 			nTotal = nTotal + 1
-			if syllabify(syller, s) {
+			fs := strings.Split(s, "\t")
+			o := fs[*column]
+			if res, ok := syllabify(syller, o); ok {
+				fmt.Printf("%s\t%s\n", s, res)
 				nOK = nOK + 1
 			} else {
 				nErrs = nErrs + 1
@@ -123,7 +127,10 @@ FLAGS:
 				}
 				nTotal = nTotal + 1
 				line := sc.Text()
-				if syllabify(syller, line) {
+				fs := strings.Split(line, "\t")
+				o := fs[*column]
+				if res, ok := syllabify(syller, o); ok {
+					fmt.Printf("%s\t%s\n", line, res)
 					nOK = nOK + 1
 				} else {
 					nErrs = nErrs + 1

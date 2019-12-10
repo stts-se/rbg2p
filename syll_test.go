@@ -628,4 +628,12 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	}
 
+	input = strings.Split("a \" r A: d \"\" g r e: n", " ")
+	expect = "a . r \" A: d . g r \"\" e: n"
+	result = syll.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+
+	}
+
 }
