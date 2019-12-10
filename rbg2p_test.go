@@ -142,7 +142,7 @@ func TestNewRule(t *testing.T) {
 	}
 
 	for l, expect := range validLines {
-		result, err := newRule(l, vars)
+		result, _, err := newRule(l, vars)
 		if err != nil {
 			t.Errorf("didn't expect error for input rule line %s : %s", l, err)
 		} else if !expect.equals(result) {
@@ -151,7 +151,7 @@ func TestNewRule(t *testing.T) {
 	}
 
 	for l, expect := range invalidLines {
-		result, err := newRule(l, vars)
+		result, _, err := newRule(l, vars)
 		if err != nil {
 			t.Errorf("didn't expect error for input rule line %s : %s", l, err)
 		} else if expect.equals(result) {
@@ -160,7 +160,7 @@ func TestNewRule(t *testing.T) {
 	}
 
 	for _, l := range failLines {
-		_, err := newRule(l, vars)
+		_, _, err := newRule(l, vars)
 		if err == nil {
 			t.Errorf("expected error for input rule line %s", l)
 		}
@@ -587,7 +587,7 @@ func TestFailForUndefinedBracketVar(t *testing.T) {
 	fName := "test_data/test_specs_fail_bracketvar.g2p"
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
-	expectErr := `Undefined variable {FILTERTEST2}`
+	expectErr := `Undefined variable FILTERTEST2`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
@@ -598,6 +598,16 @@ func TestFailForUndefinedVar(t *testing.T) {
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
 	expectErr := `Undefined variable VOICELES`
+	if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
+	}
+}
+
+func TestFailForUnusedVar(t *testing.T) {
+	fName := "test_data/test_fail_unused_var.g2p"
+	_, err := LoadFile(fName)
+	errS := fmt.Sprintf("%v", err)
+	expectErr := `Unused variable(s) IMNOTUSED`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/dlclark/regexp2"
@@ -30,8 +31,11 @@ func isG2PLine(s string) bool {
 	return g2pLineRe.MatchString(s) || ruleRe.MatchString(s)
 }
 
+type usedVars map[string]int
+
 // LoadFile loads a g2p rule set from the specified file
 func LoadFile(fName string) (RuleSet, error) {
+	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
@@ -91,7 +95,7 @@ func LoadFile(fName string) (RuleSet, error) {
 
 	}
 	for k, v := range ruleSet.Vars {
-		v, err = expandVarsWithBrackets(v, ruleSet.Vars)
+		v, _, err = expandVarsWithBrackets(v, ruleSet.Vars)
 		if err != nil {
 			return ruleSet, err
 		}
@@ -114,15 +118,18 @@ func LoadFile(fName string) (RuleSet, error) {
 	}
 
 	for _, l := range filterLines {
-		t, err := newFilter(l, ruleSet.Vars)
+		t, usedVarsTmp, err := newFilter(l, ruleSet.Vars)
 		if err != nil {
 			return ruleSet, err
 		}
 		ruleSet.Filters = append(ruleSet.Filters, t)
+		for k, v := range usedVarsTmp {
+			usedVars[k] += v
+		}
 	}
 	//ruleSet.Rules = append(ruleSet.Rules, Rule{Input: " ", Output: []string{" "}})
 	for _, l := range ruleLines {
-		r, err := newRule(l, ruleSet.Vars)
+		r, usedVarsTmp, err := newRule(l, ruleSet.Vars)
 		if err != nil {
 			return ruleSet, err
 		}
@@ -131,12 +138,27 @@ func LoadFile(fName string) (RuleSet, error) {
 				return ruleSet, fmt.Errorf("duplicate rules for input file %s: %s vs. %s", fName, r0, r)
 			}
 		}
+		for k, v := range usedVarsTmp {
+			usedVars[k] += v
+		}
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
 	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {
 		return ruleSet, fmt.Errorf("no character set defined for input file %s", fName)
 	}
 	ruleSet.Content = strings.Join(inputLines, "\n")
+
+	unusedVars := []string{}
+	for vName := range ruleSet.Vars {
+		if _, ok := usedVars[vName]; !ok {
+			unusedVars = append(unusedVars, vName)
+		}
+	}
+	if len(unusedVars) > 0 {
+		sort.Strings(unusedVars)
+		return ruleSet, fmt.Errorf("Unused variable(s) %s in %s", strings.Join(unusedVars, ", "), fName)
+	}
+
 	return ruleSet, nil
 }
 
@@ -239,46 +261,53 @@ func newTest(s string) (Test, error) {
 
 var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.*)\"$")
 
-func newFilter(s string, vars map[string]string) (Filter, error) {
+func newFilter(s string, vars map[string]string) (Filter, usedVars, error) {
 	matchRes := filterRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
+		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
 	input := matchRes[1]
 	output := strings.Replace(matchRes[2], "\\\"", "\"", -1)
 	if strings.Contains(output, "->") {
-		return Filter{}, fmt.Errorf("invalid FILTER definition: " + s)
+		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: " + s)
 	}
-	input, err := expandVarsWithBrackets(input, vars)
+	input, usedVars, err := expandVarsWithBrackets(input, vars)
 	if err != nil {
-		return Filter{}, fmt.Errorf("invalid FILTER definition %s : %v", s, err)
+		return Filter{}, usedVars, fmt.Errorf("invalid FILTER definition %s : %v", s, err)
 	}
 	re, err := regexp2.Compile(input, regexp2.None)
 	if err != nil {
-		return Filter{}, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %v", re, err)
+		return Filter{}, usedVars, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %v", re, err)
 	}
-	return Filter{Regexp: re, Output: output}, nil
+	return Filter{Regexp: re, Output: output}, usedVars, nil
 }
 
-var unexpandedBracketVar = regexp.MustCompile(`(?:^|[^\\])({[^},\\]+})`)
+var unexpandedBracketVar = regexp.MustCompile(`(?:^|[^\\]){([^},\\]+)}`)
 
-func expandVarsWithBrackets(re0 string, vars map[string]string) (string, error) {
+func expandVarsWithBrackets(re0 string, vars map[string]string) (string, usedVars, error) {
+	usedVars := usedVars{}
 	re := re0
 	for k, v := range vars {
+		k0 := k
 		k = fmt.Sprintf("{%s}", k)
+		reTmp := re
 		re = strings.Replace(re, k, v, -1)
+		if re != reTmp {
+			usedVars[k0]++
+		}
 	}
 	unexpandedMatch := unexpandedBracketVar.FindStringSubmatch(re)
 	if len(unexpandedMatch) > 1 {
-		return "", fmt.Errorf("Undefined variable %s", unexpandedMatch[1])
+		return "", usedVars, fmt.Errorf("Undefined variable %s", unexpandedMatch[1])
 	}
-	return re, nil
+	return re, usedVars, nil
 }
 
 var unexpandedContextVar1 = regexp.MustCompile("^[A-Z0-9]{2,}$")
 var unexpandedContextVar2 = regexp.MustCompile("[A-Z]{2,}")
 
-func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, error) {
+func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, usedVars, error) {
+	usedVars := usedVars{}
 	if isLeft {
 		s0 = strings.Replace(s0, "#", "^", -1)
 	} else {
@@ -288,49 +317,59 @@ func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2
 	for i, s := range splitted {
 		if val, ok := vars[strings.TrimSpace(s)]; ok {
 			splitted[i] = val
+			usedVars[s]++
 		} else { // if it's not a VAR, it should be valid orthographic
 			if unexpandedContextVar1.MatchString(s) && unexpandedContextVar1.MatchString(s) {
-				return &regexp2.Regexp{}, fmt.Errorf("Undefined variable %s", s)
+				return &regexp2.Regexp{}, usedVars, fmt.Errorf("Undefined variable %s", s)
 			}
 		}
 	}
 	if isLeft {
-		return regexp2.Compile(strings.Join(splitted, "")+"$", regexp2.None)
+		res, err := regexp2.Compile(strings.Join(splitted, "")+"$", regexp2.None)
+		return res, usedVars, err
 	}
-	return regexp2.Compile("^"+strings.Join(splitted, ""), regexp2.None)
+	res, err := regexp2.Compile("^"+strings.Join(splitted, ""), regexp2.None)
+	return res, usedVars, err
 }
 
 var contextRe = regexp.MustCompile("^ +/ +((?:[^_>]+)?) *_ *((?:[^_>]+)?)$")
 
-func newContext(s string, vars map[string]string) (Context, Context, error) {
+func newContext(s string, vars map[string]string) (Context, Context, usedVars, error) {
+	usedVars := usedVars{}
 	if len(strings.TrimSpace(s)) == 0 {
-		return Context{}, Context{}, nil
+		return Context{}, Context{}, usedVars, nil
 	}
 	matchRes := contextRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Context{}, Context{}, fmt.Errorf("invalid context definition: " + s)
+		return Context{}, Context{}, usedVars, fmt.Errorf("invalid context definition: " + s)
 	}
 	left := Context{}
 	right := Context{}
 	leftS := strings.TrimSpace(matchRes[1])
 	if len(leftS) > 0 {
-		re, err := expandContextVars(leftS, true, vars)
+		re, usedVarsTmp, err := expandContextVars(leftS, true, vars)
 		if err != nil {
-			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
+			return Context{}, Context{}, usedVars, fmt.Errorf("invalid context definition: %s", err)
 		}
 		left.Regexp = re
 		left.Input = leftS
+		for k, v := range usedVarsTmp {
+			usedVars[k] += v
+		}
 	}
 	rightS := strings.TrimSpace(matchRes[2])
 	if len(rightS) > 0 {
-		re, err := expandContextVars(rightS, false, vars)
+		re, usedVarsTmp, err := expandContextVars(rightS, false, vars)
 		if err != nil {
-			return Context{}, Context{}, fmt.Errorf("invalid context definition: %s", err)
+			return Context{}, Context{}, usedVars, fmt.Errorf("invalid context definition: %s", err)
 		}
 		right.Regexp = re
 		right.Input = rightS
+		for k, v := range usedVarsTmp {
+			usedVars[k] += v
+		}
 	}
-	return left, right, nil
+	return left, right, usedVars, nil
 }
 
 var ruleRe = regexp.MustCompile("^([^ ]+) +-> +([^/]+)( +/.*$|$)")
@@ -359,12 +398,13 @@ func newRuleOutput(s string, l string) ([]string, error) {
 	return commaSplit.Split(outputS, -1), nil
 }
 
-func newRule(s string, vars map[string]string) (Rule, error) {
+func newRule(s string, vars map[string]string) (Rule, usedVars, error) {
+	usedVars := usedVars{}
 	// INPUT -> OUTPUT
 	// INPUT -> OUTPUT / LEFTCONTEXT _ RIGHTCONTEXT
 	matchRes := ruleRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Rule{}, fmt.Errorf("invalid rule definition: " + s)
+		return Rule{}, usedVars, fmt.Errorf("invalid rule definition: " + s)
 	}
 	input := matchRes[1]
 	if input == "\u00a0" { // nbsp
@@ -372,11 +412,11 @@ func newRule(s string, vars map[string]string) (Rule, error) {
 	}
 	output, err := newRuleOutput(matchRes[2], s)
 	if err != nil {
-		return Rule{}, err
+		return Rule{}, usedVars, err
 	}
-	left, right, err := newContext(matchRes[3], vars)
+	left, right, usedVars, err := newContext(matchRes[3], vars)
 	if err != nil {
-		return Rule{}, err
+		return Rule{}, usedVars, err
 	}
-	return Rule{Input: input, Output: output, LeftContext: left, RightContext: right}, nil
+	return Rule{Input: input, Output: output, LeftContext: left, RightContext: right}, usedVars, nil
 }

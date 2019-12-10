@@ -1,27 +1,29 @@
-// Specific variables
+// Specs
 
 CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöü"
 DEFAULT_PHONEME "_"
-PHONEME_DELIMITER ""
+PHONEME_DELIMITER " "
 
 
 // Variables
 
 VAR VOICELESS [p|k|t|f|s|h|c]
-#VAR VOICED [b|d|g|z]
+VAR IMNOTUSED [bgk]
 
 // Rules
 
+nn -> n
+
 a -> a
 e -> e
-i -> i
-o -> o
-u -> }
+i -> I
+o -> O
+u -> u0
 ö -> 2
-å -> o
+å -> O
 ä -> {
 
-skt -> (st, skt) / _
+skt -> (s t, s k t) / _
 
 sch -> (S, x) / _# 
 sch -> S
@@ -31,13 +33,15 @@ v -> f / _ VOICELESS
 ck -> k
 k -> k
 rt -> rt
+n -> N / _ [kg]
+n -> n
 
 b -> p / _ VOICELESS
 b -> b 
 
 d -> d
 s -> s
-h -> h
+h -> ∅ // test mapping to empty phoneme
 t -> t
 
 c -> s
@@ -56,13 +60,14 @@ m -> m
 r -> r
 x -> k s
 y -> y:
-n -> n
 v -> v
+
 
 // Tests
 
-TEST dusch -> (d}S, d}x)
-TEST duscha -> d}Sa
-TEST borta -> borta
-TEST abt -> apt
-TEST busktdusch -> (b}std}S,  b}std}x,  b}sktd}S,  b}sktd}x)
+TEST dusch -> (d u0 S, d u0 x)
+TEST duscha -> d u0 S a
+TEST borta -> b O rt a
+TEST abt -> a p t
+TEST busktdusch -> (b u0 s t d u0 S,  b u0 s t d u0 x,  b u0 s k t d u0 S,  b u0 s k t d u0 x)
+TEST hanna -> a n a
