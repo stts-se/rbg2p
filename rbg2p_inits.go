@@ -3,6 +3,7 @@ package rbg2p
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,30 +34,45 @@ func isG2PLine(s string) bool {
 
 type usedVars map[string]int
 
+// LoadURL loads a g2p rule set from an URL
+func LoadURL(url string) (RuleSet, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return RuleSet{}, err
+	}
+	defer resp.Body.Close()
+	scanner := bufio.NewScanner(resp.Body)
+	return load(scanner, url)
+}
+
 // LoadFile loads a g2p rule set from the specified file
 func LoadFile(fName string) (RuleSet, error) {
+	fh, err := os.Open(filepath.Clean(fName))
+	if err != nil {
+		return RuleSet{}, err
+	}
+	defer fh.Close()
+	scanner := bufio.NewScanner(fh)
+	return load(scanner, fName)
+}
+
+func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
 	syllDefLines := []string{}
-	fh, err := os.Open(filepath.Clean(fName))
-	if err != nil {
-		return ruleSet, err
-	}
-	defer fh.Close()
-	n := 0
-	s := bufio.NewScanner(fh)
 	var inputLines []string
 	var ruleLines []string
 	var filterLines []string
 	var phonemeSetLine string
-	for s.Scan() {
-		if err := s.Err(); err != nil {
+	var n = 0
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
 			return ruleSet, err
 		}
 		n++
-		lOrig := strings.TrimSpace(s.Text())
+		lOrig := strings.TrimSpace(scanner.Text())
 		l := trimComment(lOrig)
 		inputLines = append(inputLines, lOrig)
 		if isBlankLine(l) || isComment(l) {
@@ -95,7 +111,7 @@ func LoadFile(fName string) (RuleSet, error) {
 
 	}
 	for k, v := range ruleSet.Vars {
-		v, _, err = expandVarsWithBrackets(v, ruleSet.Vars)
+		v, _, err := expandVarsWithBrackets(v, ruleSet.Vars)
 		if err != nil {
 			return ruleSet, err
 		}
@@ -135,7 +151,7 @@ func LoadFile(fName string) (RuleSet, error) {
 		}
 		for _, r0 := range ruleSet.Rules {
 			if r0.equalsExceptOutput(r) {
-				return ruleSet, fmt.Errorf("duplicate rules for input file %s: %s vs. %s", fName, r0, r)
+				return ruleSet, fmt.Errorf("duplicate rules for input file %s: %s vs. %s", inputPath, r0, r)
 			}
 		}
 		for k, v := range usedVarsTmp {
@@ -144,7 +160,7 @@ func LoadFile(fName string) (RuleSet, error) {
 		ruleSet.Rules = append(ruleSet.Rules, r)
 	}
 	if ruleSet.CharacterSet == nil || len(ruleSet.CharacterSet) == 0 {
-		return ruleSet, fmt.Errorf("no character set defined for input file %s", fName)
+		return ruleSet, fmt.Errorf("no character set defined for input file %s", inputPath)
 	}
 	ruleSet.Content = strings.Join(inputLines, "\n")
 
@@ -156,7 +172,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	}
 	if len(unusedVars) > 0 {
 		sort.Strings(unusedVars)
-		return ruleSet, fmt.Errorf("Unused variable(s) %s in %s", strings.Join(unusedVars, ", "), fName)
+		return ruleSet, fmt.Errorf("Unused variable(s) %s in %s", strings.Join(unusedVars, ", "), inputPath)
 	}
 
 	return ruleSet, nil

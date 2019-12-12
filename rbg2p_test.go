@@ -223,8 +223,48 @@ func loadAndTest(t *testing.T, fName string) (RuleSet, error) {
 	return rs, nil
 }
 
+func loadAndTestURL(t *testing.T, url string) (RuleSet, error) {
+	rs, err := LoadURL(url)
+	if err != nil {
+		return rs, fmt.Errorf("didn't expect error for input file %s : %s", url, err)
+	}
+
+	result := rs.Test()
+	if len(result.Errors) > 0 {
+		for _, e := range result.Errors {
+			fmt.Printf("ERROR: %v\n", e)
+		}
+		fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), url)
+	}
+	if len(result.Warnings) > 0 {
+		for _, e := range result.Warnings {
+			fmt.Printf("WARNING: %v\n", e)
+		}
+		fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), url)
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			fmt.Printf("FAILED TEST: %v\n", e)
+		}
+		fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(rs.Tests), url)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(rs.Tests), url)
+	}
+	if len(result.Errors) > 0 || len(result.FailedTests) > 0 {
+		return rs, fmt.Errorf("Init/tests failed for %s", url)
+	}
+	return rs, nil
+}
+
 func TestSws(t *testing.T) {
 	_, err := loadAndTest(t, "test_data/sws_test.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func TestSwsFromURL(t *testing.T) {
+	_, err := loadAndTestURL(t, "https://raw.githubusercontent.com/stts-se/rbg2p/master/test_data/sws_test.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
