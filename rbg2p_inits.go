@@ -57,6 +57,7 @@ func LoadFile(fName string) (RuleSet, error) {
 }
 
 func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
+	var err error
 	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
 	ruleSet.DefaultPhoneme = "_"
@@ -68,7 +69,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	var phonemeSetLine string
 	var n = 0
 	for scanner.Scan() {
-		if err := scanner.Err(); err != nil {
+		if err = scanner.Err(); err != nil {
 			return ruleSet, err
 		}
 		n++
@@ -85,7 +86,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 		} else if isPhonemeSet(l) {
 			phonemeSetLine = l
 		} else if isConst(l) {
-			err := parseConst(l, &ruleSet)
+			err = parseConst(l, &ruleSet)
 			if err != nil {
 				return ruleSet, err
 			}

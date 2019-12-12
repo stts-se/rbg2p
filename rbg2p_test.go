@@ -582,6 +582,38 @@ func loadAndTestSyll(t *testing.T, fName string) (Syllabifier, error) {
 	}
 	return syller, nil
 }
+func loadAndTestSyllURL(t *testing.T, url string) (Syllabifier, error) {
+	syller, err := LoadSyllURL(url)
+	if err != nil {
+		return syller, fmt.Errorf("didn't expect error for input file %s : %s", url, err)
+	}
+
+	result := syller.Test()
+	if len(result.Errors) > 0 {
+		for _, e := range result.Errors {
+			fmt.Printf("ERROR: %v\n", e)
+		}
+		fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), url)
+	}
+	if len(result.Warnings) > 0 {
+		for _, e := range result.Warnings {
+			fmt.Printf("WARNING: %v\n", e)
+		}
+		fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), url)
+	}
+	if len(result.FailedTests) > 0 {
+		for _, e := range result.FailedTests {
+			fmt.Printf("FAILED TEST: %v\n", e)
+		}
+		fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(syller.Tests), url)
+	} else {
+		fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(syller.Tests), url)
+	}
+	if len(result.Errors) > 0 || len(result.FailedTests) > 0 {
+		return syller, fmt.Errorf("Init/tests failed for %s", url)
+	}
+	return syller, nil
+}
 
 func TestSwsSyll(t *testing.T) {
 	_, err := loadAndTestSyll(t, "test_data/sws_test_syll.g2p")
@@ -590,6 +622,19 @@ func TestSwsSyll(t *testing.T) {
 	}
 }
 
+func TestSwsSyllURL(t *testing.T) {
+	_, err := loadAndTestSyllURL(t, "https://raw.githubusercontent.com/stts-se/rbg2p/master/test_data/sws_test_syll.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
+func TestSwsSyllFailURL(t *testing.T) {
+	_, err := loadAndTestSyllURL(t, "https://raw.githubusercontent.com/stts-se/rbg2p/master/test_data/sws_test_syll_fail.g2p")
+	if err == nil {
+		t.Errorf("expected error here")
+	}
+}
 func TestSwsSyllFail(t *testing.T) {
 	_, err := loadAndTestSyll(t, "test_data/sws_test_syll_fail.g2p")
 	if err == nil {
@@ -600,6 +645,17 @@ func TestSwsSyllFail(t *testing.T) {
 func TestSwsFail1(t *testing.T) {
 	fName := "test_data/sws_test_fail.g2p"
 	_, err := LoadFile(fName)
+	expectErr := "duplicate rules for input file"
+	errS := fmt.Sprintf("%s", err)
+	if err == nil {
+		t.Errorf("expected error here")
+	} else if !strings.Contains(errS, expectErr) {
+		t.Errorf("expected error: %s, found: %s", expectErr, err)
+	}
+}
+func TestSwsFail1URL(t *testing.T) {
+	url := "https://raw.githubusercontent.com/stts-se/rbg2p/master/test_data/sws_test_fail.g2p"
+	_, err := LoadURL(url)
 	expectErr := "duplicate rules for input file"
 	errS := fmt.Sprintf("%s", err)
 	if err == nil {

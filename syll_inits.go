@@ -3,31 +3,49 @@ package rbg2p
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
 
+// LoadSyllURL loads a syllabifier from an URL
+func LoadSyllURL(url string) (Syllabifier, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return Syllabifier{}, err
+	}
+	defer resp.Body.Close()
+	scanner := bufio.NewScanner(resp.Body)
+	return loadSyll(scanner, url)
+}
+
 // LoadSyllFile loads a syllabifier from the specified file
 func LoadSyllFile(fName string) (Syllabifier, error) {
+	fh, err := os.Open(filepath.Clean(fName))
+	if err != nil {
+		return Syllabifier{}, err
+	}
+	defer fh.Close()
+	scanner := bufio.NewScanner(fh)
+	return loadSyll(scanner, fName)
+}
+
+// LoadSyllFile loads a syllabifier from the specified file
+func loadSyll(scanner *bufio.Scanner, inputPath string) (Syllabifier, error) {
+	var err error
 	syllDefLines := []string{}
 	res := Syllabifier{}
 	phonemeDelimiter := " "
-	fh, err := os.Open(filepath.Clean(fName))
-	if err != nil {
-		return res, err
-	}
-	defer fh.Close()
 	n := 0
 	var phonemeSetLine string
-	s := bufio.NewScanner(fh)
-	for s.Scan() {
-		if err := s.Err(); err != nil {
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
 			return res, err
 		}
 		n++
-		l := trimComment(strings.TrimSpace(s.Text()))
+		l := trimComment(strings.TrimSpace(scanner.Text()))
 		if isBlankLine(l) || isComment(l) {
 		} else if isSyllTest(l) {
 			t, err := newSyllTest(l)
