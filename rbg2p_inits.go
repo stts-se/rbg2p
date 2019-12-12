@@ -321,7 +321,7 @@ func expandVarsWithBrackets(re0 string, vars map[string]string) (string, usedVar
 }
 
 var unexpandedContextVar1 = regexp.MustCompile("^[A-Z0-9]{2,}$")
-var unexpandedContextVar2 = regexp.MustCompile("[A-Z]{2,}")
+var unexpandedContextVar2 = regexp.MustCompile("^[A-Z]")
 
 func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2.Regexp, usedVars, error) {
 	usedVars := usedVars{}
