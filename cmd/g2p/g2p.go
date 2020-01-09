@@ -128,9 +128,7 @@ FLAGS:
 		os.Exit(1)
 	}
 
-	if *debug {
-		rbg2p.Debug = true
-	}
+	rbg2p.Debug = *debug
 
 	g2pFile := args[0]
 	ruleSet, err := rbg2p.LoadFile(g2pFile)
