@@ -2,12 +2,15 @@ package rbg2p
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
 
 	"github.com/dlclark/regexp2"
 )
+
+var Debug = false
 
 // Context in which the rule applies (left hand/right hand context specified by a regular expression)
 type Context struct {
@@ -270,6 +273,9 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 					i = i + ruleInputLen
 					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
+					if Debug {
+						fmt.Fprintf(os.Stderr, "%s\t%v\t%v\t%v\t%v\n", "RULE APPLIED", rule, s, ss, res)
+					}
 					break
 				}
 			}

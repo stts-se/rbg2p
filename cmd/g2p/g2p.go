@@ -84,6 +84,7 @@ func compareForDiff(old []string, new []string) (string, bool) {
 func main() {
 
 	var f = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	var debug = f.Bool("debug", false, "print extra debug info (default: false)")
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
@@ -95,6 +96,7 @@ func main() {
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
+   -debug      bool    print extra debug info (default: false)
    -column     string  only convert specified column (default: first field)
    -quiet      bool    inhibit warnings (default: false)
    -test       bool    test g2p against input file; orth <tab> trans (default: false)
@@ -124,6 +126,10 @@ FLAGS:
 	if len(args) < 1 {
 		l.Println(usage)
 		os.Exit(1)
+	}
+
+	if *debug {
+		rbg2p.Debug = true
 	}
 
 	g2pFile := args[0]
