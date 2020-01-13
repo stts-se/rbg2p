@@ -43,7 +43,7 @@ var removeStressAndBoundaries = regexp.MustCompile("[.\"%!~] *")
 func cleanTransForDiff(t string) string {
 	var res = t
 	res = removeStressAndBoundaries.ReplaceAllString(res, "")
-	res = strings.Replace(res, "'", "", -1)
+	//res = strings.Replace(res, "'", "", -1)
 	return res
 }
 
@@ -60,14 +60,14 @@ func compareForDiff(old []string, new []string) (string, bool) {
 	for i, s := range new {
 		new[i] = cleanTransForDiff(s)
 	}
-	var oldIJ = []string{}
-	var newIJ = []string{}
-	for _, s := range old {
-		oldIJ = append(oldIJ, cleanTransForIJDiff(s))
-	}
-	for _, s := range new {
-		newIJ = append(newIJ, cleanTransForIJDiff(s))
-	}
+	// var oldIJ = []string{}
+	// var newIJ = []string{}
+	// for _, s := range old {
+	// 	oldIJ = append(oldIJ, cleanTransForIJDiff(s))
+	// }
+	// for _, s := range new {
+	// 	newIJ = append(newIJ, cleanTransForIJDiff(s))
+	// }
 	if reflect.DeepEqual(old, new) {
 		return "ALL EQ", true
 	} else if old[0] == new[0] {
