@@ -41,6 +41,7 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string) transResult {
 var removeBoundariesRE = regexp.MustCompile(`[.!~] *`)
 var removeStressRE = regexp.MustCompile(`[%"] *`)
 var removeStress *bool
+var transSplitRE = regexp.MustCompile(" +# +")
 
 func cleanTransForDiff(t string) string {
 	var res = t
@@ -188,7 +189,7 @@ FLAGS:
 	nTests := 0
 	testRes := make(map[string]int)
 	if *test {
-		fmt.Println("ORTH\tNEW TRANSES\tOLD TRANSES\tDIFFTAG\t(DIFF)?")
+		fmt.Println("ORTH\tG2P TRANSES\tREF TRANSES\tDIFFTAG\t(DIFF)?")
 	}
 	var processString = func(s string) {
 		nTotal = nTotal + 1
@@ -198,11 +199,16 @@ FLAGS:
 		if res.result || *force {
 			nTrans = nTrans + 1
 			if *test {
-				refTranses := fs[(*column + 1):]
+				refTranses := []string{}
+				for _, s := range fs[(*column + 1):] {
+					for _, refT := range transSplitRE.Split(s, -1) {
+						refTranses = append(refTranses, refT)
+					}
+				}
 				nTests++
 				info, _ := compareForDiff(res.transes, refTranses)
 				testRes[info]++
-				outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, "#"), info}
+				outFs := []string{res.orth, strings.Join(res.transes, " # "), strings.Join(refTranses, " # "), info}
 				if info == "DIFF" {
 					dmp := diffmatchpatch.New()
 					diffs := dmp.DiffMain(outFs[1], outFs[2], false)
