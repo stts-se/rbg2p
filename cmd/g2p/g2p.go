@@ -38,11 +38,16 @@ func transcribe(ruleSet rbg2p.RuleSet, orth string) transResult {
 	return transResult{orth: orth, transes: transes, result: true}
 }
 
-var removeStressAndBoundaries = regexp.MustCompile("[.\"%!~] *")
+var removeBoundariesRE = regexp.MustCompile(`[.!~] *`)
+var removeStressRE = regexp.MustCompile(`[%"] *`)
+var removeStress *bool
 
 func cleanTransForDiff(t string) string {
 	var res = t
-	res = removeStressAndBoundaries.ReplaceAllString(res, "")
+	res = removeBoundariesRE.ReplaceAllString(res, "")
+	if *removeStress {
+		res = removeStressRE.ReplaceAllString(res, "")
+	}
 	//res = strings.Replace(res, "'", "", -1)
 	return res
 }
@@ -89,6 +94,7 @@ func main() {
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
+	removeStress = f.Bool("testremovestress", false, "remove stress when comparing using the -test switch (default: false)")
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help message")
 
@@ -100,6 +106,7 @@ FLAGS:
    -column     string  only convert specified column (default: first field)
    -quiet      bool    inhibit warnings (default: false)
    -test       bool    test g2p against input file; orth <tab> trans (default: false)
+   -testremovestress bool remove stress when comparing using the -test switch (default: false)
    -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
    -help       bool    print help message`
 
