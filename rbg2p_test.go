@@ -523,33 +523,34 @@ func TestIPA(t *testing.T) {
 	}
 }
 
-func xxxTestHun(t *testing.T) {
-	_, err := loadAndTest(t, "test_data/hun.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
+// func xxxTestHun(t *testing.T) {
+// 	_, err := loadAndTest(t, "test_data/hun.g2p")
+// 	if err != nil {
+// 		t.Errorf("%v", err)
+// 	}
+// }
 
-func xxxTestMkd(t *testing.T) {
-	_, err := loadAndTest(t, "test_data/mkd.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
+// func xxxTestMkd(t *testing.T) {
+// 	_, err := loadAndTest(t, "test_data/mkd.g2p")
+// 	if err != nil {
+// 		t.Errorf("%v", err)
+// 	}
+// }
 
-func xxxTestCze(t *testing.T) {
-	_, err := loadAndTest(t, "test_data/czc.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
+// func xxxTestCze(t *testing.T) {
+// 	_, err := loadAndTest(t, "test_data/czc.g2p")
+// 	if err != nil {
+// 		t.Errorf("%v", err)
+// 	}
+// }
 
-func xxxTestBaq(t *testing.T) {
-	_, err := loadAndTest(t, "server/g2p_files/basque_sampa.g2p")
-	if err != nil {
-		t.Errorf("%v", err)
-	}
-}
+// func xxxTestBaq(t *testing.T) {
+// 	_, err := loadAndTest(t, "server/g2p_files/basque_sampa.g2p")
+// 	if err != nil {
+// 		t.Errorf("%v", err)
+// 	}
+// }
+
 func loadAndTestSyll(t *testing.T, fName string) (Syllabifier, error) {
 	syller, err := LoadSyllFile(fName)
 	if err != nil {
@@ -683,7 +684,7 @@ func TestFailForUndefinedBracketVar(t *testing.T) {
 	fName := "test_data/test_specs_fail_bracketvar.g2p"
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
-	expectErr := `Undefined variable FILTERTEST2`
+	expectErr := `undefined variable FILTERTEST2`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
@@ -693,7 +694,7 @@ func TestFailForUndefinedVar(t *testing.T) {
 	fName := "test_data/test_specs_fail_var.g2p"
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
-	expectErr := `Undefined variable VOICELES`
+	expectErr := `undefined variable VOICELES`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}
@@ -703,7 +704,7 @@ func TestFailForUnusedVar(t *testing.T) {
 	fName := "test_data/test_fail_unused_var.g2p"
 	_, err := LoadFile(fName)
 	errS := fmt.Sprintf("%v", err)
-	expectErr := `Unused variable(s) IMNOTUSED`
+	expectErr := `unused variable(s) IMNOTUSED`
 	if !strings.Contains(errS, expectErr) {
 		t.Errorf("expected error: %s, found: %s", expectErr, err)
 	}

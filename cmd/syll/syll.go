@@ -118,6 +118,7 @@ FLAGS:
 				l.Println(err)
 				os.Exit(1)
 			}
+			/* #nosec G307 */
 			defer fh.Close()
 			sc := bufio.NewScanner(fh)
 			for sc.Scan() {

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net/http"
+	u "net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,7 +13,11 @@ import (
 
 // LoadSyllURL loads a syllabifier from an URL
 func LoadSyllURL(url string) (Syllabifier, error) {
-	resp, err := http.Get(url)
+	urlP, err := u.Parse(url)
+	if err != nil {
+		return Syllabifier{}, err
+	}
+	resp, err := http.Get(urlP.String())
 	if err != nil {
 		return Syllabifier{}, err
 	}
@@ -27,6 +32,7 @@ func LoadSyllFile(fName string) (Syllabifier, error) {
 	if err != nil {
 		return Syllabifier{}, err
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 	scanner := bufio.NewScanner(fh)
 	return loadSyll(scanner, fName)

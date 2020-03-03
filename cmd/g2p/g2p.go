@@ -53,11 +53,11 @@ func cleanTransForDiff(t string) string {
 	return res
 }
 
-func cleanTransForIJDiff(t string) string {
-	var res = t
-	res = strings.Replace(res, " i ", " j ", -1)
-	return res
-}
+// func cleanTransForIJDiff(t string) string {
+// 	var res = t
+// 	res = strings.Replace(res, " i ", " j ", -1)
+// 	return res
+// }
 
 func compareForDiff(old []string, new []string) (string, bool) {
 	for i, s := range old {
@@ -201,9 +201,10 @@ FLAGS:
 			if *test {
 				refTranses := []string{}
 				for _, s := range fs[(*column + 1):] {
-					for _, refT := range transSplitRE.Split(s, -1) {
-						refTranses = append(refTranses, refT)
-					}
+					refTranses = append(refTranses, transSplitRE.Split(s, -1)...)
+					// for _, refT := range transSplitRE.Split(s, -1) {
+					// 	refTranses = append(refTranses, refT)
+					// }
 				}
 				nTests++
 				info, _ := compareForDiff(res.transes, refTranses)
@@ -255,6 +256,7 @@ FLAGS:
 					l.Println(err)
 					os.Exit(1)
 				}
+				/* #nosec G307 */
 				defer fh.Close()
 				sc := bufio.NewScanner(fh)
 				for sc.Scan() {

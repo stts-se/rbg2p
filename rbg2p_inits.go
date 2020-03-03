@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net/http"
+	u "net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -36,7 +37,11 @@ type usedVars map[string]int
 
 // LoadURL loads a g2p rule set from an URL
 func LoadURL(url string) (RuleSet, error) {
-	resp, err := http.Get(url)
+	urlP, err := u.Parse(url)
+	if err != nil {
+		return RuleSet{}, err
+	}
+	resp, err := http.Get(urlP.String())
 	if err != nil {
 		return RuleSet{}, err
 	}
@@ -51,6 +56,7 @@ func LoadFile(fName string) (RuleSet, error) {
 	if err != nil {
 		return RuleSet{}, err
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 	scanner := bufio.NewScanner(fh)
 	return load(scanner, fName)
@@ -173,7 +179,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	}
 	if len(unusedVars) > 0 {
 		sort.Strings(unusedVars)
-		return ruleSet, fmt.Errorf("Unused variable(s) %s in %s", strings.Join(unusedVars, ", "), inputPath)
+		return ruleSet, fmt.Errorf("unused variable(s) %s in %s", strings.Join(unusedVars, ", "), inputPath)
 	}
 
 	return ruleSet, nil
@@ -315,7 +321,7 @@ func expandVarsWithBrackets(re0 string, vars map[string]string) (string, usedVar
 	}
 	unexpandedMatch := unexpandedBracketVar.FindStringSubmatch(re)
 	if len(unexpandedMatch) > 1 {
-		return "", usedVars, fmt.Errorf("Undefined variable %s", unexpandedMatch[1])
+		return "", usedVars, fmt.Errorf("undefined variable %s", unexpandedMatch[1])
 	}
 	return re, usedVars, nil
 }
@@ -336,8 +342,9 @@ func expandContextVars(s0 string, isLeft bool, vars map[string]string) (*regexp2
 			splitted[i] = val
 			usedVars[s]++
 		} else { // if it's not a VAR, it should be valid orthographic
-			if unexpandedContextVar1.MatchString(s) && unexpandedContextVar1.MatchString(s) {
-				return &regexp2.Regexp{}, usedVars, fmt.Errorf("Undefined variable %s", s)
+			if unexpandedContextVar1.MatchString(s) && unexpandedContextVar2.MatchString(s) {
+				//if unexpandedContextVar1.MatchString(s) {
+				return &regexp2.Regexp{}, usedVars, fmt.Errorf("undefined variable %s", s)
 			}
 		}
 	}

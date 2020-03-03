@@ -39,6 +39,7 @@ func LoadPhonemeSetFile(fName string, delimiter string) (PhonemeSet, error) {
 	if err != nil {
 		return PhonemeSet{}, err
 	}
+	/* #nosec G307 */
 	defer fh.Close()
 	n := 0
 	s := bufio.NewScanner(fh)
