@@ -1,7 +1,9 @@
 package rbg2p
 
 import (
+	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -66,6 +68,47 @@ func TestMOPValidOnset(t *testing.T) {
 	testMOPValidOnset(t, def, "p r", true)
 	testMOPValidOnset(t, def, "", true)
 	testMOPValidOnset(t, def, "?", true)
+}
+
+//автопило́т 'автопило́т', expected /V . f t 7 . p' I . " l o t/, got /V f . t 7 . p' I . " l o t/
+//ка́льмар 'ка́льмар', expected /" k a l' . m 7 r/, got /" k a l' . . m 7 r/
+//партсъе́зд 'партсъе́зд', expected /p V r ts . " j e s t/, got /p V r . " ts j e s t/
+
+func TestMOPValidOnsetIssueMay2020(t *testing.T) {
+	def := MOPSyllDef{
+		Onsets: []string{
+			"b", "b l", "b r", "b Z", "d", "d j", "d l", "d m", "d n", "d r", "d v", "d z", "dz", "dZ", "f", "f j", "f l", "f r", "f p", "f s", "f s k", "f s p", "f s t r", "f t", "f x", "f Z", "g", "g d", "g l", "g m", "g n", "g r", "g v", "g Z", "j", "k", "k l", "k n", "k p", "k r", "k r Z", "k s", "k s t", "k ts", "k v", "l", "l b", "l d", "l g", "l j", "l v", "l Z", "m", "m g", "m g l", "m k", "m r", "m S", "m s t", "m t s", "m ts", "m tS", "n", "n j", "p", "p l", "p j", "p n", "p r", "p r Z", "p s", "p S", "p s k", "p t", "p tS", "p x", "r", "s", "S", "s f", "s j", "S j", "s k", "S k", "s k l", "s k r", "s k v", "s l", "S l", "s m", "S m", "s n", "S n", "s p", "S p", "s p l", "s p r", "s r", "s t", "s ts", "S t", "s t r", "S t r", "s t v", "S ts", "s v", "S v", "s x", "t", "t k", "t l", "t m", "t p", "t r", "ts", "tS", "t s", "tS", "tS j", "tS k", "tS n", "ts j", "ts m", "ts v", "ts k", "tS m", "ts v", "t v", "v", "v d", "v g r", "v j", "v l", "v n", "v r", "v x", "v z", "v z l", "v z m", "v z v", "v Z", "x", "x l", "x m", "x n", "x r", "x v", "x p", "x t", "x k", "z", "Z", "z b", "z b r", "z d", "Z d", "z d r", "Z g", "Z g l", "Z j", "z l", "Z l", "z m", "Z m", "Z n", "z n", "z r", "z v", "b'", "b l'", "b r'", "b Z'", "d'", "d j'", "d l'", "d m'", "d n'", "d r'", "d v'", "d z'", "dz'", "dZ'", "f'", "f j'", "f l'", "f r'", "g'", "g d'", "g l'", "g m'", "g n'", "g r'", "g v'", "g Z'", "j'", "k'", "k l'", "k n'", "k p'", "k r'", "k r Z'", "k s'", "k s t'", "k ts'", "k v'", "l'", "l b'", "l d'", "l g'", "l j'", "l v'", "l Z'", "m'", "m g'", "m g l'", "m k'", "m r'", "m S'", "m s t'", "m t s'", "m ts'", "m tS'", "n'", "n j'", "p'", "p l'", "p j'", "p n'", "p r'", "p r Z'", "p s'", "p S'", "p s k'", "p t'", "p tS'", "p x'", "r'", "s'", "S'", "s f'", "s j'", "S j'", "s k'", "S k'", "s k l'", "s k r'", "s k v'", "s l'", "S l'", "s m'", "S m'", "s n'", "S n'", "s p'", "S p'", "s p l'", "s p r'", "s r'", "s t'", "s ts'", "S t'", "s t r'", "S t r'", "s t v'", "S ts'", "s v'", "S v'", "s x'", "t'", "t k'", "t l'", "t m'", "t p'", "t r'", "ts'", "tS'", "t s'", "tS'", "tS j'", "tS k'", "tS n'", "ts j'", "ts m'", "ts v'", "ts k'", "tS m'", "ts v'", "t v'", "v'", "v l'", "v n'", "v r'", "v x'", "v z'", "v z l'", "v z m'", "v z v'", "v Z'", "x'", "x l'", "x m'", "x n'", "x r'", "x v'", "z'", "Z'", "z b'", "z b r'", "z d'", "Z d'", "z d r'", "Z g'", "Z g l'", "Z j'", "z l'", "Z l'", "z m'", "Z m'", "Z n'", "z n'", "z r'", "z v'",
+		},
+		PhnDelim:  " ",
+		SyllDelim: ".",
+		Syllabic:  []string{"a", "e", "E", "i", "I", "o", "u", "@", "V", "1", "7"},
+	}
+	testMOPValidOnset(t, def, "f t", true)
+	phnSet := PhonemeSet{
+		Symbols:     []string{"a", "e", "E", "i", "I", "o", "u", "@", "V", "1", "7", "j", "r", "p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "S", "Z", "x", "m", "n", "l", "p'", "b'", "t'", "d'", "k'", "g'", "f'", "v'", "s'", "z'", "S'", "x'", "m'", "n'", "l'", "r'", "tS", "dZ", "ts", "dz", "tS'", "dZ'", "\"", "%", ".", "-"},
+		DelimiterRe: regexp.MustCompile(" "),
+	}
+	syller := Syllabifier{
+		SyllDef:         def,
+		Tests:           []SyllTest{},
+		StressPlacement: FirstInSyllable,
+		PhonemeSet:      phnSet,
+	}
+
+	myExpGotFmt := "For input <%v>, expected <%v>, got <%v>"
+
+	//
+	input := "V f t 7 p' I l \" o t"
+	expect := "V . f t 7 . p' I . \" l o t"
+	res, err := syller.SyllabifyFromString(input)
+	if err != nil {
+		t.Errorf("Got error from SyllabifyFromString: %v", err)
+	}
+	if res != expect {
+		fmt.Printf("%#v\n", res)
+		fmt.Printf("%#v\n", expect)
+		t.Errorf(myExpGotFmt, input, expect, res)
+	}
 }
 
 func TestSylledTransString(t *testing.T) {

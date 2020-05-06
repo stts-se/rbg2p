@@ -76,6 +76,7 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 		return true
 	}
 	for _, s := range def.Onsets {
+		//fmt.Printf("DEBUG <%v> <%v> %v\n", s, onset, s == onset)
 		if s == onset {
 			return true
 		}
@@ -84,7 +85,22 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 }
 
 // ValidSplit is called by Syllabifier.Syllabify to test where to put the boundaries
-func (def MOPSyllDef) ValidSplit(left []string, right []string) bool {
+func (def MOPSyllDef) ValidSplit(left0 []string, right0 []string) bool {
+	left := left0
+	right := right0
+	// left := []string{}
+	// for _, s := range left0 {
+	// 	if s != "" {
+	// 		left = append(left, s)
+	// 	}
+	// }
+	// right := []string{}
+	// for _, s := range right0 {
+	// 	if s != "" {
+	// 		right = append(right, s)
+	// 	}
+	// }
+
 	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
 		return false
 	}

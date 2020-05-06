@@ -23,7 +23,9 @@ type g2p struct {
 func (t trans) listPhonemes() []string {
 	var phns []string
 	for _, g2p := range t.phonemes {
+		//if len(g2p.p) > 0 {
 		phns = append(phns, g2p.p...)
+		//}
 	}
 	return phns
 }

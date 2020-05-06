@@ -114,6 +114,13 @@ func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlaceme
 		}
 	}
 
+	// fmt.Printf("DEBUG <%v>\n", def.Onsets[0])
+	// for _, onset := range def.Onsets {
+	// 	if onset == "f t" {
+	// 		fmt.Printf("DEBUG <%v> <%v>\n", onset, len([]rune(onset)))
+	// 	}
+	// }
+
 	if len(def.Stress) == 0 {
 		return def, stressPlacement, fmt.Errorf("STRESS is required for the syllable definition")
 	}
