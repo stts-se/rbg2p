@@ -78,7 +78,7 @@ type Rule struct {
 	RightContext Context
 }
 
-// String returns a string representation of the Context
+// String returns a string representation of the Rule
 func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
 }
@@ -119,6 +119,7 @@ type RuleSet struct {
 	DowncaseInput     bool
 	Vars              map[string]string
 	Rules             []Rule
+	RulesApplied      map[string]int // for coverage checks
 	Tests             []Test
 	Filters           []Filter
 	Syllabifier       Syllabifier
@@ -273,6 +274,8 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 					i = i + ruleInputLen
 					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
+					ruleString := rule.String()
+					rs.RulesApplied[ruleString]++
 					if Debug {
 						fmt.Fprintf(os.Stderr, "%s\t%v\t%v\t%v\t%v\n", "RULE APPLIED", rule, s, ss, res)
 					}

@@ -93,6 +93,7 @@ func main() {
 	var debug = f.Bool("debug", false, "print extra debug info (default: false)")
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
+	var coverageCheck = f.Bool("coverage", false, "coverage check (rules applied/not applied (default: false)")
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	removeStress = f.Bool("test:removestress", false, "remove stress when comparing using the -test switch (default: false)")
@@ -104,6 +105,7 @@ func main() {
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)
    -debug      bool    print extra debug info (default: false)
+   -coverage   string  coverage check (rules applied/not applied (default: false)
    -column     string  only convert specified column (default: first field)
    -quiet      bool    inhibit warnings (default: false)
    -test       bool    test g2p against input file; orth <tab> trans (default: false)
@@ -177,6 +179,31 @@ FLAGS:
 		haltingError = true
 	} else {
 		l.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), g2pFile)
+	}
+
+	var rulesApplied, rulesNotApplied int
+	if *coverageCheck {
+		rulesApplied = 0
+		rulesNotApplied = 0
+		for _, r := range ruleSet.Rules {
+			rs := r.String()
+			if n, ok := ruleSet.RulesApplied[rs]; ok {
+				if !*quiet {
+					l.Printf("TEST RULE APPLIED\t%s\t%v", rs, n)
+				}
+				rulesApplied++
+			} else {
+				if !*quiet {
+					l.Printf("TEST RULE NOT APPLIED\t%s\t%v", rs, 0)
+				}
+				rulesNotApplied++
+			}
+		}
+		l.Printf("%-18s: % 7d", "TEST RULES APPLIED", rulesApplied)
+		l.Printf("%-18s: % 7d", "TEST RULES NOT APPLIED", rulesNotApplied)
+		rulesApplied = 0
+		rulesNotApplied = 0
+		ruleSet.RulesApplied = make(map[string]int)
 	}
 
 	if haltingError && !*force {
@@ -328,9 +355,33 @@ FLAGS:
 			processString(line)
 		}
 	}
+	if *coverageCheck {
+		rulesApplied = 0
+		rulesNotApplied = 0
+		for _, r := range ruleSet.Rules {
+			rs := r.String()
+			if n, ok := ruleSet.RulesApplied[rs]; ok {
+				if !*quiet {
+					l.Printf("RULE APPLIED\t%s\t%v", rs, n)
+				}
+				rulesApplied++
+			} else {
+				if !*quiet {
+					l.Printf("RULE NOT APPLIED\t%s\t%v", rs, 0)
+				}
+				rulesNotApplied++
+			}
+		}
+		ruleSet.RulesApplied = make(map[string]int)
+	}
+
 	l.Printf("%-18s: % 7d", "TOTAL INPUT", nTotal)
 	l.Printf("%-18s: % 7d", "ERRORS", nErrs)
 	l.Printf("%-18s: % 7d", "TRANSCRIBED", nTrans)
+	if *coverageCheck {
+		l.Printf("%-18s: % 7d", "RULES APPLIED", rulesApplied)
+		l.Printf("%-18s: % 7d", "RULES NOT APPLIED", rulesNotApplied)
+	}
 	if *test {
 		l.Printf("%-18s: % 7d", "TESTED", nTests)
 		var keys []string

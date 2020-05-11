@@ -66,6 +66,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	var err error
 	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
+	ruleSet.RulesApplied = make(map[string]int)
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
 	syllDefLines := []string{}
