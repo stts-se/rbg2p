@@ -199,8 +199,8 @@ FLAGS:
 				rulesNotApplied++
 			}
 		}
-		l.Printf("%-18s: % 7d", "TEST RULES APPLIED", rulesApplied)
-		l.Printf("%-18s: % 7d", "TEST RULES NOT APPLIED", rulesNotApplied)
+		l.Printf("%-24s: % 7d", "TEST RULES APPLIED", rulesApplied)
+		l.Printf("%-24s: % 7d", "TEST RULES NOT APPLIED", rulesNotApplied)
 		rulesApplied = 0
 		rulesNotApplied = 0
 		ruleSet.RulesApplied = make(map[string]int)
@@ -375,15 +375,15 @@ FLAGS:
 		ruleSet.RulesApplied = make(map[string]int)
 	}
 
-	l.Printf("%-18s: % 7d", "TOTAL INPUT", nTotal)
-	l.Printf("%-18s: % 7d", "ERRORS", nErrs)
-	l.Printf("%-18s: % 7d", "TRANSCRIBED", nTrans)
+	l.Printf("%-21s: % 7d", "TOTAL INPUT", nTotal)
+	l.Printf("%-21s: % 7d", "ERRORS", nErrs)
+	l.Printf("%-21s: % 7d", "TRANSCRIBED", nTrans)
 	if *coverageCheck {
-		l.Printf("%-18s: % 7d", "RULES APPLIED", rulesApplied)
-		l.Printf("%-18s: % 7d", "RULES NOT APPLIED", rulesNotApplied)
+		l.Printf("%-21s: % 7d", "RULES APPLIED", rulesApplied)
+		l.Printf("%-21s: % 7d", "RULES NOT APPLIED", rulesNotApplied)
 	}
 	if *test {
-		l.Printf("%-18s: % 7d", "TESTED", nTests)
+		l.Printf("%-21s: % 7d", "TESTED", nTests)
 		var keys []string
 		for k := range testRes {
 			keys = append(keys, k)
@@ -392,7 +392,7 @@ FLAGS:
 		for _, tag := range keys {
 			freq := testRes[tag]
 			s := " > TEST " + tag
-			l.Printf("%-18s: % 7d", s, freq)
+			l.Printf("%-21s: % 7d", s, freq)
 		}
 	}
 }
