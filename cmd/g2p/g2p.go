@@ -189,12 +189,12 @@ FLAGS:
 			rs := r.String()
 			if n, ok := ruleSet.RulesApplied[rs]; ok {
 				if !*quiet {
-					l.Printf("TEST RULE APPLIED\t%s\t%v", rs, n)
+					l.Printf("TEST RULE APPLIED\t%s\tat input line %v\t%v", rs, r.LineNumber, n)
 				}
 				rulesApplied++
 			} else {
 				if !*quiet {
-					l.Printf("TEST RULE NOT APPLIED\t%s\t%v", rs, 0)
+					l.Printf("TEST RULE NOT APPLIED\t%s\tat input line %v", rs, r.LineNumber)
 				}
 				rulesNotApplied++
 			}
@@ -362,12 +362,12 @@ FLAGS:
 			rs := r.String()
 			if n, ok := ruleSet.RulesApplied[rs]; ok {
 				if !*quiet {
-					l.Printf("RULE APPLIED\t%s\t%v", rs, n)
+					l.Printf("RULE APPLIED\t%s\tat input line %v\t%v", rs, r.LineNumber, n)
 				}
 				rulesApplied++
 			} else {
 				if !*quiet {
-					l.Printf("RULE NOT APPLIED\t%s\t%v", rs, 0)
+					l.Printf("RULE NOT APPLIED\t%s\tat input line %v", rs, r.LineNumber)
 				}
 				rulesNotApplied++
 			}

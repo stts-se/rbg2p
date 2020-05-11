@@ -72,6 +72,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	syllDefLines := []string{}
 	var inputLines []string
 	var ruleLines []string
+	var ruleLinesWithLineNumber = make(map[string]int)
 	var filterLines []string
 	var phonemeSetLine string
 	var n = 0
@@ -115,6 +116,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 			ruleSet.Tests = append(ruleSet.Tests, t)
 		} else { // is a rule
 			ruleLines = append(ruleLines, l)
+			ruleLinesWithLineNumber[l] = n
 		}
 
 	}
@@ -157,6 +159,11 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 		if err != nil {
 			return ruleSet, err
 		}
+		lineNo, ok := ruleLinesWithLineNumber[l]
+		if !ok {
+			return ruleSet, fmt.Errorf("No line number for rule %s", r)
+		}
+		r.LineNumber = lineNo
 		for _, r0 := range ruleSet.Rules {
 			if r0.equalsExceptOutput(r) {
 				return ruleSet, fmt.Errorf("duplicate rules for input file %s: %s vs. %s", inputPath, r0, r)

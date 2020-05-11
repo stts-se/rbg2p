@@ -76,6 +76,7 @@ type Rule struct {
 	Output       []string
 	LeftContext  Context
 	RightContext Context
+	LineNumber   int // for debugging
 }
 
 // String returns a string representation of the Rule
