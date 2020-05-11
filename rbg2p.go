@@ -80,7 +80,13 @@ type Rule struct {
 
 // String returns a string representation of the Rule
 func (r Rule) String() string {
-	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, r.Output, r.LeftContext, r.RightContext)
+	var output string
+	if len(r.Output) == 1 {
+		output = r.Output[0]
+	} else {
+		output = fmt.Sprintf("(%s)", strings.Join(r.Output, ", "))
+	}
+	return fmt.Sprintf("%s -> %s / %s _ %s", r.Input, output, r.LeftContext, r.RightContext)
 }
 
 // equals: checks for equality (including underlying slices and regexps); used for unit tests
