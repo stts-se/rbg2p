@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/dlclark/regexp2"
 )
@@ -67,8 +68,9 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	var err error
 	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
-	log.Println("[rbg2p] New ruleset created with mutex")
+	log.Println("[rbg2p] New ruleset created with new mutex instance")
 	ruleSet.RulesApplied = make(map[string]int)
+	ruleSet.RulesAppliedMutex = &sync.RWMutex{}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
 	syllDefLines := []string{}

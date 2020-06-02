@@ -127,7 +127,7 @@ type RuleSet struct {
 	DowncaseInput     bool
 	Vars              map[string]string
 	Rules             []Rule
-	RulesAppliedMutex sync.RWMutex
+	RulesAppliedMutex *sync.RWMutex
 	RulesApplied      map[string]int // for coverage checks
 	Tests             []Test
 	Filters           []Filter
