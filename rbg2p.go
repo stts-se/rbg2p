@@ -236,7 +236,10 @@ func (rs RuleSet) expandLoop(head g2p, tail []g2p, acc []trans) []trans {
 }
 
 func (rs RuleSet) expand(phonemes []g2p) []trans {
-	return rs.expandLoop(phonemes[0], phonemes[1:], []trans{{}})
+	if len(phonemes) > 1 {
+		return rs.expandLoop(phonemes[0], phonemes[1:], []trans{{}})
+	}
+	return rs.expandLoop(phonemes[0], []g2p{}, []trans{{}})
 }
 
 func (rs RuleSet) applyFilters(trans string) (string, error) {
