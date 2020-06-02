@@ -3,7 +3,6 @@ package rbg2p
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"net/http"
 	u "net/url"
 	"os"
@@ -68,7 +67,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	var err error
 	usedVars := usedVars{}
 	ruleSet := RuleSet{Vars: map[string]string{}}
-	log.Println("[rbg2p] New ruleset created with new mutex instance")
+	//log.Println("[rbg2p] New ruleset created with new mutex instance")
 	ruleSet.RulesApplied = make(map[string]int)
 	ruleSet.RulesAppliedMutex = &sync.RWMutex{}
 	ruleSet.DefaultPhoneme = "_"
