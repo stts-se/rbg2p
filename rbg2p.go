@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/dlclark/regexp2"
 )
@@ -126,6 +127,7 @@ type RuleSet struct {
 	DowncaseInput     bool
 	Vars              map[string]string
 	Rules             []Rule
+	RulesAppliedMutex sync.RWMutex
 	RulesApplied      map[string]int // for coverage checks
 	Tests             []Test
 	Filters           []Filter
@@ -282,7 +284,9 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 					res = append(res, g2p{g: rule.Input, p: rule.Output})
 					matchFound = true
 					ruleString := rule.String()
+					rs.RulesAppliedMutex.Lock()
 					rs.RulesApplied[ruleString]++
+					rs.RulesAppliedMutex.Unlock()
 					if Debug {
 						fmt.Fprintf(os.Stderr, "%s\t%v\t%v\t%v\t%v\n", "RULE APPLIED", rule, s, ss, res)
 					}

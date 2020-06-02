@@ -187,6 +187,7 @@ FLAGS:
 		rulesNotApplied = 0
 		for _, r := range ruleSet.Rules {
 			rs := r.String()
+			ruleSet.RulesAppliedMutex.RLock()
 			if n, ok := ruleSet.RulesApplied[rs]; ok {
 				if !*quiet {
 					l.Printf("TEST RULE APPLIED\t%s\tat input line %v\t%v", rs, r.LineNumber, n)
