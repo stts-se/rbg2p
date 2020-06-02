@@ -285,10 +285,8 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 					matchFound = true
 					ruleString := rule.String()
 					rs.RulesAppliedMutex.Lock()
-					fmt.Fprintf(os.Stderr, "Mutex locked\n")
 					rs.RulesApplied[ruleString]++
 					rs.RulesAppliedMutex.Unlock()
-					fmt.Fprintf(os.Stderr, "Mutex unlocked\n")
 					if Debug {
 						fmt.Fprintf(os.Stderr, "%s\t%v\t%v\t%v\t%v\n", "RULE APPLIED", rule, s, ss, res)
 					}
