@@ -164,7 +164,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 		}
 		lineNo, ok := ruleLinesWithLineNumber[l]
 		if !ok {
-			return ruleSet, fmt.Errorf("No line number for rule %s", r)
+			return ruleSet, fmt.Errorf("no line number for rule %s", r)
 		}
 		r.LineNumber = lineNo
 		for _, r0 := range ruleSet.Rules {
@@ -226,13 +226,13 @@ func parseConst(s string, ruleSet *RuleSet) error {
 				ruleSet.DowncaseInput = false
 				downcaseInputIsSet = true
 			} else {
-				return fmt.Errorf("invalid boolean value for " + name + ": " + value)
+				return fmt.Errorf("invalid boolean value for %s: %s", name, value)
 			}
 		} else {
-			return fmt.Errorf("invalid const definition: " + s)
+			return fmt.Errorf("invalid const definition: %s", s)
 		}
 	} else {
-		return fmt.Errorf("invalid const definition: " + s)
+		return fmt.Errorf("invalid const definition: %s", s)
 	}
 	if !downcaseInputIsSet {
 		ruleSet.DowncaseInput = true
@@ -247,7 +247,7 @@ func newVar(s string) (string, string, error) {
 	// VAR NAME VALUE
 	matchRes := varRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return "", "", fmt.Errorf("invalid VAR definition: " + s)
+		return "", "", fmt.Errorf("invalid VAR definition: %s", s)
 	}
 	name := matchRes[1]
 	value := matchRes[2]
@@ -281,12 +281,12 @@ func newTest(s string) (Test, error) {
 	} else {
 		matchRes = testReVariants.FindStringSubmatch(s)
 		if matchRes == nil {
-			return Test{}, fmt.Errorf("invalid TEST definition: " + s)
+			return Test{}, fmt.Errorf("invalid TEST definition: %s", s)
 		}
 		outputS = matchRes[2]
 	}
 	if strings.Contains(outputS, "->") {
-		return Test{}, fmt.Errorf("invalid TEST definition: " + s)
+		return Test{}, fmt.Errorf("invalid TEST definition: %s", s)
 	}
 	input := matchRes[1]
 	output := commaSplit.Split(outputS, -1)
@@ -298,12 +298,12 @@ var filterRe = regexp.MustCompile("^FILTER +\"(.+)\" +-> +\"(.*)\"$")
 func newFilter(s string, vars map[string]string) (Filter, usedVars, error) {
 	matchRes := filterRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: " + s)
+		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: %s", s)
 	}
 	input := matchRes[1]
 	output := strings.Replace(matchRes[2], "\\\"", "\"", -1)
 	if strings.Contains(output, "->") {
-		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: " + s)
+		return Filter{}, usedVars{}, fmt.Errorf("invalid FILTER definition: %s", s)
 	}
 	input, usedVars, err := expandVarsWithBrackets(input, vars)
 	if err != nil {
@@ -376,7 +376,7 @@ func newContext(s string, vars map[string]string) (Context, Context, usedVars, e
 	}
 	matchRes := contextRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Context{}, Context{}, usedVars, fmt.Errorf("invalid context definition: " + s)
+		return Context{}, Context{}, usedVars, fmt.Errorf("invalid context definition: %s", s)
 	}
 	left := Context{}
 	right := Context{}
@@ -422,12 +422,12 @@ func newRuleOutput(s string, l string) ([]string, error) {
 	} else {
 		matchRes = ruleOutputReVariants.FindStringSubmatch(s)
 		if matchRes == nil {
-			return []string{}, fmt.Errorf("invalid rule output definition: " + l)
+			return []string{}, fmt.Errorf("invalid rule output definition: %s", l)
 		}
 		outputS = matchRes[1]
 	}
 	if strings.Contains(outputS, "->") {
-		return []string{}, fmt.Errorf("invalid rule output definition: " + l)
+		return []string{}, fmt.Errorf("invalid rule output definition: %s", l)
 	}
 	outputS = strings.Replace(outputS, emptyOutput, "", -1)
 	return commaSplit.Split(outputS, -1), nil
@@ -439,7 +439,7 @@ func newRule(s string, vars map[string]string) (Rule, usedVars, error) {
 	// INPUT -> OUTPUT / LEFTCONTEXT _ RIGHTCONTEXT
 	matchRes := ruleRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return Rule{}, usedVars, fmt.Errorf("invalid rule definition: " + s)
+		return Rule{}, usedVars, fmt.Errorf("invalid rule definition: %s", s)
 	}
 	input := matchRes[1]
 	if input == "\u00a0" { // nbsp

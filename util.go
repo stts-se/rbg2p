@@ -79,7 +79,7 @@ var phnDelimRe = regexp.MustCompile("^(PHONEME_DELIMITER) +\"(.*)\"$")
 func parsePhonemeDelimiter(s string) (string, error) {
 	matchRes := phnDelimRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return "", fmt.Errorf("invalid phoneme delimiter definition: " + s)
+		return "", fmt.Errorf("invalid phoneme delimiter definition: %s", s)
 	}
 	return matchRes[2], nil
 }
@@ -93,7 +93,7 @@ var phnSetRe = regexp.MustCompile("^(PHONEME_SET) +\"(.*)\"$")
 func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
 	matchRes := phnSetRe.FindStringSubmatch(line)
 	if matchRes == nil {
-		return PhonemeSet{}, fmt.Errorf("invalid phoneme set definition: " + line)
+		return PhonemeSet{}, fmt.Errorf("invalid phoneme set definition: %s", line)
 	}
 	value := matchRes[2]
 	phonemes := multiSpace.Split(value, -1)

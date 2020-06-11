@@ -146,12 +146,12 @@ var syllTestRe = regexp.MustCompile("^SYLLDEF TEST +(.+) +-> +(.+)$")
 func newSyllTest(s string) (SyllTest, error) {
 	matchRes := syllTestRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		return SyllTest{}, fmt.Errorf("invalid test definition: " + s)
+		return SyllTest{}, fmt.Errorf("invalid test definition: %s", s)
 	}
 	input := matchRes[1]
 	output := matchRes[2]
 	if strings.Contains(output, "->") {
-		return SyllTest{}, fmt.Errorf("invalid test definition: " + s)
+		return SyllTest{}, fmt.Errorf("invalid test definition: %s", s)
 	}
 	return SyllTest{Input: input, Output: output}, nil
 }
@@ -166,7 +166,7 @@ func newStressPlacement(s string) (StressPlacement, error) {
 	if matchRes == nil {
 		matchRes = syllDefTypeRe.FindStringSubmatch(s)
 		if matchRes == nil {
-			return Undefined, fmt.Errorf("invalid stress placement definition: " + s)
+			return Undefined, fmt.Errorf("invalid stress placement definition: %s", s)
 		}
 	}
 	value := matchRes[1]
@@ -179,7 +179,7 @@ func newStressPlacement(s string) (StressPlacement, error) {
 	} else if strings.ToLower(value) == "aftersyllabic" {
 		return AfterSyllabic, nil
 	}
-	return Undefined, fmt.Errorf("invalid stress placement: " + s)
+	return Undefined, fmt.Errorf("invalid stress placement: %s", s)
 }
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")
@@ -192,7 +192,7 @@ func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 	if matchRes == nil {
 		matchRes = syllDefTypeRe.FindStringSubmatch(s)
 		if matchRes == nil {
-			return fmt.Errorf("invalid sylldef definition: " + s)
+			return fmt.Errorf("invalid sylldef definition: %s", s)
 		}
 	}
 	name := matchRes[1]
