@@ -135,6 +135,10 @@ type RuleSet struct {
 	Content           string
 }
 
+func (rs RuleSet) isInitialized() bool {
+	return len(rs.Rules) > 0
+}
+
 func (rs RuleSet) checkForUnusedChars(coveredChars map[string]bool, individualChars map[string]bool, validation *TestResult) {
 	var errors = []string{}
 	for _, char := range rs.CharacterSet {
@@ -261,6 +265,10 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s string) ([]string, error) {
+	if !rs.isInitialized() {
+		return []string{}, fmt.Errorf("RuleSet is not initialized")
+	}
+
 	var i = 0
 	if rs.DowncaseInput {
 		s = strings.ToLower(s)
