@@ -326,6 +326,7 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 		filtered = append(filtered, fted)
 	}
 	if len(couldntMap) > 0 {
+		fmt.Fprintf(os.Stderr, "rbg2p debug %#v\n", []rune(s))
 		return filtered, fmt.Errorf("found unmappable symbol(s) in input string: %v in %s", couldntMap, s)
 	}
 	return filtered, nil
