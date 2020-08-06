@@ -268,7 +268,7 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 	for _, f := range rs.Filters {
 		res, err = f.Apply(res)
 		if err != nil {
-			return res, fmt.Errorf("couldn't execute regexp : %s", err)
+			return res, fmt.Errorf("couldn't execute regexp : %v", err)
 		}
 		//HB
 		//fmt.Printf("FILTER: %s\nRES: %s\n", f, res)
@@ -282,7 +282,7 @@ func (rs RuleSet) applyPrefilters(trans string) (string, error) {
 	for _, pf := range rs.Prefilters {
 		res, err = pf.Apply(res)
 		if err != nil {
-			return res, fmt.Errorf("couldn't execute regexp : %s", err)
+			return res, fmt.Errorf("couldn't execute regexp : %v", err)
 		}
 	}
 	return res, nil
