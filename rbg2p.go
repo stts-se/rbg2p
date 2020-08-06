@@ -71,6 +71,18 @@ func (f Filter) Apply(s string) (string, error) {
 	return f.Regexp.Replace(s, f.Output, -1, -1)
 }
 
+// Prefilter is a regexp filter
+type Prefilter struct {
+	Regexp *regexp2.Regexp
+	Output string
+}
+
+// Apply is used to apply the prefilter to an input string
+func (pf Prefilter) Apply(s string) (string, error) {
+	//return f.Regexp.ReplaceAllString(s, f.Output)
+	return pf.Regexp.Replace(s, pf.Output, -1, -1)
+}
+
 // Rule is a g2p rule representation
 type Rule struct {
 	Input        string
@@ -131,6 +143,7 @@ type RuleSet struct {
 	RulesApplied      map[string]int // for coverage checks
 	Tests             []Test
 	Filters           []Filter
+	Prefilters        []Prefilter
 	Syllabifier       Syllabifier
 	Content           string
 }
@@ -263,6 +276,18 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 	return res, nil
 }
 
+func (rs RuleSet) applyPrefilters(trans string) (string, error) {
+	res := trans
+	var err error
+	for _, pf := range rs.Prefilters {
+		res, err = pf.Apply(res)
+		if err != nil {
+			return res, fmt.Errorf("couldn't execute regexp : %s", err)
+		}
+	}
+	return res, nil
+}
+
 // Apply applies the rules to an input string, returns a slice of transcriptions. If unknown input characters are found, an error will be created, and an underscore will be appended to the transcription. Even if an error is returned, the loop will continue until the end of the input string.
 func (rs RuleSet) Apply(s string) ([]string, error) {
 	if !rs.isInitialized() {
@@ -273,7 +298,13 @@ func (rs RuleSet) Apply(s string) ([]string, error) {
 	if rs.DowncaseInput {
 		s = strings.ToLower(s)
 	}
-	var s0 = []rune(s)
+	var prefiltered string
+	pfted, pferr := rs.applyPrefilters(s)
+	if pferr != nil {
+		return []string{}, fmt.Errorf("couldn't apply prefilter: %s", s)
+	}
+	prefiltered = pfted
+	var s0 = []rune(prefiltered)
 	res := []g2p{}
 	var couldntMap = []string{}
 	for i < len(s0) {

@@ -27,8 +27,12 @@ func isFilter(s string) bool {
 	return strings.HasPrefix(s, "FILTER ")
 }
 
+func isPrefilter(s string) bool {
+	return strings.HasPrefix(s, "PREFILTER ")
+}
+
 //var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
-var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|DOWNCASE_INPUT) .*")
+var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|PREFILTER|VAR|DOWNCASE_INPUT) .*")
 
 func isG2PLine(s string) bool {
 	return g2pLineRe.MatchString(s) || ruleRe.MatchString(s)
@@ -77,6 +81,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	var ruleLines []string
 	var ruleLinesWithLineNumber = make(map[string]int)
 	var filterLines []string
+	var prefilterLines []string
 	var phonemeSetLine string
 	var n = 0
 	for scanner.Scan() {
@@ -111,6 +116,8 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 			syllDefLines = append(syllDefLines, l)
 		} else if isFilter(l) {
 			filterLines = append(filterLines, l)
+		} else if isPrefilter(l) {
+			prefilterLines = append(prefilterLines, l)
 		} else if isTest(l) {
 			t, err := newTest(l)
 			if err != nil {
@@ -152,6 +159,16 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 			return ruleSet, err
 		}
 		ruleSet.Filters = append(ruleSet.Filters, t)
+		for k, v := range usedVarsTmp {
+			usedVars[k] += v
+		}
+	}
+	for _, l := range prefilterLines {
+		t, usedVarsTmp, err := newPrefilter(l, ruleSet.Vars)
+		if err != nil {
+			return ruleSet, err
+		}
+		ruleSet.Prefilters = append(ruleSet.Prefilters, t)
 		for k, v := range usedVarsTmp {
 			usedVars[k] += v
 		}
@@ -314,6 +331,29 @@ func newFilter(s string, vars map[string]string) (Filter, usedVars, error) {
 		return Filter{}, usedVars, fmt.Errorf("invalid FILTER definition (invalid regexp /%s/): %v", re, err)
 	}
 	return Filter{Regexp: re, Output: output}, usedVars, nil
+}
+
+var prefilterRe = regexp.MustCompile("^PREFILTER +\"(.+)\" +-> +\"(.*)\"$")
+
+func newPrefilter(s string, vars map[string]string) (Prefilter, usedVars, error) {
+	matchRes := prefilterRe.FindStringSubmatch(s)
+	if matchRes == nil {
+		return Prefilter{}, usedVars{}, fmt.Errorf("invalid PREFILTER definition: %s", s)
+	}
+	input := matchRes[1]
+	output := strings.Replace(matchRes[2], "\\\"", "\"", -1)
+	if strings.Contains(output, "->") {
+		return Prefilter{}, usedVars{}, fmt.Errorf("invalid PREFILTER definition: %s", s)
+	}
+	input, usedVars, err := expandVarsWithBrackets(input, vars)
+	if err != nil {
+		return Prefilter{}, usedVars, fmt.Errorf("invalid PREFILTER definition %s : %v", s, err)
+	}
+	re, err := regexp2.Compile(input, regexp2.None)
+	if err != nil {
+		return Prefilter{}, usedVars, fmt.Errorf("invalid PREFILTER definition (invalid regexp /%s/): %v", re, err)
+	}
+	return Prefilter{Regexp: re, Output: output}, usedVars, nil
 }
 
 var unexpandedBracketVar = regexp.MustCompile(`(?:^|[^\\]){([^},\\]+)}`)
