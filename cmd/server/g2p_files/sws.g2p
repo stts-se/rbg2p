@@ -31,7 +31,7 @@ SYLLDEF STRESS_PLACEMENT AfterSyllabic
 // Variables
 
 VAR VOICELESS [p|k|t|f|s|h|c]
-VAR VOICED [b|d|g|z]
+//VAR VOICED [b|d|g|z]
 VAR CONS [wrtpsdfghjklzxcvbnm]
 VAR SHORTCONS ([wrtpsdfghjklxcvbnm]|r[tdnsl])
 VAR LONGCONS ([wrtpsdfghjklxcvbnm])\1
