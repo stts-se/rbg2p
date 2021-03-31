@@ -11,8 +11,9 @@ Utilities for rule based, manually written, grapheme to phoneme rules
     
     FLAGS:
        -force      bool    print transcriptions even if errors are found (default: false)
-       -symbolset  string  use specified symbol set file for validating the symbols in
-                           the g2p rule set (default: none)
+       -column     string  only convert specified column (default: first field)
+       -quiet      bool    inhibit warnings (default: false)
+       -test       bool    test g2p against input file; orth <tab> trans (default: false)
        -help       bool    print help message
 
 
