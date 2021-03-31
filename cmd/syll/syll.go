@@ -31,7 +31,7 @@ func main() {
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var help = f.Bool("help", false, "print help message")
 
-	var usage = `go run syll.go <FLAGS> <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+	var usage = `syll <FLAGS> <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
 
 FLAGS:
    -force      bool    print transcriptions even if errors are found (default: false)

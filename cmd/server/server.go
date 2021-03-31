@@ -348,7 +348,7 @@ func langFromFilePath(p string) string {
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "server <G2P FILES DIRS>\n")
+		fmt.Fprintf(os.Stderr, "server <G2P FILES DIR(S)>\n")
 		os.Exit(0)
 	}
 

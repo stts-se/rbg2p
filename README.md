@@ -7,7 +7,7 @@ Utilities for rule based, manually written, grapheme to phoneme rules
 
 ### G2P
 
-    $ go run cmd/g2p/g2p.go <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+    $ g2p <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
     
     FLAGS:
        -force      bool    print transcriptions even if errors are found (default: false)
@@ -16,14 +16,16 @@ Utilities for rule based, manually written, grapheme to phoneme rules
        -help       bool    print help message
 
 
+<!--
 ### Syllabification
 
-    $ go run cmd/syll/syll.go <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+    $ syll <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+-->
 
 
 ### Microservice API/server
 
-     $ go run cmd/server/*.go cmd/server/g2p_files
+     $ server cmd/server/g2p_files
      
  Visit http://localhost:6771/ for info on available API calls
  
