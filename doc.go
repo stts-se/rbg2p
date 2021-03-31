@@ -100,11 +100,22 @@ Examples:
      h -> ∅ / # _
 
 
+PREFILTERS
+
+Regexp replacement filters for transcriptions. The filters are applied before the g2p rules. Pre-defined variables (above) can be use in the input regexp surrounded by curly brackets.
+     PREFILTER "<FROM RE>" -> "<TO STRING>"
+     PREFILTER "<FROM RE WITH {VARIABLENAME}>" -> "<TO STRING>"
+
+Example:
+     PREFILTER "п" -> "p" // cyrillic char to latin
+
+
+
 FILTERS
 
 Regexp replacement filters for transcriptions. The filters are applied after the g2p rules.  Pre-defined variables (above) can be use in the input regexp surrounded by curly brackets.
-     FILTER "<FROM RE>" -> "<TO RE>"
-     FILTER "<FROM RE WITH {VARIABLENAME}>" -> "<TO RE>"
+     FILTER "<FROM RE>" -> "<TO STRING>"
+     FILTER "<FROM RE WITH {VARIABLENAME}>" -> "<TO STRING>"
 
 Example:
      FILTER "^" -> "\" " // place stress first in transcription

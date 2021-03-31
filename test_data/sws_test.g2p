@@ -32,6 +32,13 @@ VAR LONGCONS ([wrtpsdfghjklxcvbnm])\1
 #VAR VOWEL [eéyuioåaöä]
 VAR PALAT [eéyiöä]
 VAR NOVOWEL [wrtpsdfghjklxcvbnm]+
+VAR GRCP [пπ]
+
+
+// Prefilters
+
+PREFILTER "{GRCP}" -> "p"
+PREFILTER "п" -> "p"
 
 // Rules
 
@@ -185,3 +192,5 @@ TEST part -> p " A: rt
 TEST borta -> b "" O . rt a
 TEST bra -> b r " A:
 
+TEST пall -> p " a l
+TEST πall -> p " a l
