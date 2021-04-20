@@ -30,3 +30,7 @@ Utilities for rule based, manually written, grapheme to phoneme rules
      
  Visit http://localhost:6771/ for info on available API calls
  
+
+---
+
+_This work was supported by the Swedish Post and Telecom Authority (PTS) through the grant "Wikispeech – en användargenererad talsyntes på Wikipedia" (2016–2017)._
