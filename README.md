@@ -7,14 +7,18 @@ Utilities for rule based, manually written, grapheme to phoneme rules
 
 ### G2P
 
-    $ g2p <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
-    
-    FLAGS:
-       -force      bool    print transcriptions even if errors are found (default: false)
-       -column     string  only convert specified column (default: first field)
-       -quiet      bool    inhibit warnings (default: false)
-       -test       bool    test g2p against input file; orth <tab> trans (default: false)
-       -help       bool    print help message
+   g2p <FLAGS> <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
+
+   FLAGS:
+      -force      bool    print transcriptions even if errors are found (default: false)
+      -debug      bool    print extra debug info (default: false)
+      -coverage   string  coverage check (rules applied/not applied (default: false)
+      -column     string  only convert specified column (default: first field)
+      -quiet      bool    inhibit warnings (default: false)
+      -test       bool    test g2p against input file; orth <tab> trans (default: false)
+      -test:removestress bool remove stress when comparing using the -test switch (default: false)
+      -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
+      -help       bool    print help message
 
 
 <!--
