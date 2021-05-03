@@ -97,7 +97,7 @@ func main() {
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	removeStress = f.Bool("test:removestress", false, "remove stress when comparing using the -test switch (default: false)")
-	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
+	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set, one symbol per line (default: none; overrides the g2p rule file's symbolset, if any)")
 	var help = f.Bool("help", false, "print help and exit")
 
 	f.Usage = func() {
