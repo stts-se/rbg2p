@@ -93,28 +93,17 @@ func main() {
 	var debug = f.Bool("debug", false, "print extra debug info (default: false)")
 	var force = f.Bool("force", false, "print transcriptions even if errors are found (default: false)")
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
-	var coverageCheck = f.Bool("coverage", false, "coverage check (rules applied/not applied (default: false)")
+	var coverageCheck = f.Bool("coverage", false, "run coverage check (rules applied/not applied) (default: false)")
 	var quiet = f.Bool("quiet", false, "inhibit warnings (default: false)")
 	var test = f.Bool("test", false, "test g2p against input file; orth <tab> trans (default: false)")
 	removeStress = f.Bool("test:removestress", false, "remove stress when comparing using the -test switch (default: false)")
 	var ssFile = f.String("symbolset", "", "use specified symbol set file for validating the symbols in the g2p rule set (default: none; overrides the g2p rule file's symbolset, if any)")
-	var help = f.Bool("help", false, "print help message")
-
-	var usage = `g2p <FLAGS> <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
-
-FLAGS:
-   -force      bool    print transcriptions even if errors are found (default: false)
-   -debug      bool    print extra debug info (default: false)
-   -coverage   string  coverage check (rules applied/not applied (default: false)
-   -column     string  only convert specified column (default: first field)
-   -quiet      bool    inhibit warnings (default: false)
-   -test       bool    test g2p against input file; orth <tab> trans (default: false)
-   -test:removestress bool remove stress when comparing using the -test switch (default: false)
-   -symbolset  string  use specified symbol set file for validating the symbols in the g2p rule set (default: none)
-   -help       bool    print help message`
+	var help = f.Bool("help", false, "print help and exit")
 
 	f.Usage = func() {
-		l.Printf(usage)
+		fmt.Fprintf(os.Stderr, "g2p <FLAGS> <G2P RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)\n")
+		fmt.Fprintf(os.Stderr, "\nFLAGS:\n")
+		f.PrintDefaults()
 	}
 
 	var args = os.Args
@@ -129,12 +118,12 @@ FLAGS:
 	args = f.Args()
 
 	if *help {
-		l.Println(usage)
+		f.Usage()
 		os.Exit(1)
 	}
 
 	if len(args) < 1 {
-		l.Println(usage)
+		f.Usage()
 		os.Exit(1)
 	}
 
