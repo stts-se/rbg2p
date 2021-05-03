@@ -31,15 +31,10 @@ func main() {
 	var column = f.Int("column", 0, "only convert specified column (default: first field)")
 	var help = f.Bool("help", false, "print help message")
 
-	var usage = `syll <FLAGS> <G2P/SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)
-
-FLAGS:
-   -force      bool    print transcriptions even if errors are found (default: false)
-   -column     string  only convert specified column (default: first field)
-   -help       bool    print help message`
-
 	f.Usage = func() {
-		l.Printf(usage)
+		fmt.Fprintf(os.Stderr, "syll <FLAGS> <SYLL RULE FILE> <WORDS (FILES OR LIST OF WORDS)> (optional)\n")
+		fmt.Fprintf(os.Stderr, "\nFLAGS:\n")
+		f.PrintDefaults()
 	}
 
 	var args = os.Args
@@ -54,12 +49,12 @@ FLAGS:
 	args = f.Args()
 
 	if *help {
-		l.Println(usage)
+		f.Usage()
 		os.Exit(1)
 	}
 
 	if len(args) < 1 {
-		l.Println(usage)
+		f.Usage()
 		os.Exit(1)
 	}
 
