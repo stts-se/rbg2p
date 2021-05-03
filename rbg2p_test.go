@@ -263,6 +263,19 @@ func TestSws(t *testing.T) {
 	}
 }
 
+func TestVerticalBar(t *testing.T) {
+	var err error
+	// _, err = loadAndTest(t, "test_data/sws_test_vertical_bar_syll.g2p")
+	// if err != nil {
+	// 	t.Errorf("%v", err)
+	// }
+
+	_, err = loadAndTest(t, "test_data/sws_test_vertical_bar_nosyll.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
+
 func TestSwsFromURL(t *testing.T) {
 	_, err := loadAndTestURL(t, "https://raw.githubusercontent.com/stts-se/rbg2p/master/test_data/sws_test.g2p")
 	if err != nil {

@@ -19,7 +19,10 @@ type PhonemeSet struct {
 func NewPhonemeSet(symbols []string, delimiter string) (PhonemeSet, error) {
 	reString := delimiter
 	if len(delimiter) > 0 {
-		reString = delimiter + "+"
+		reString = "[" + delimiter + "]"
+		if delimiter == " " {
+			reString = reString + "+"
+		}
 	}
 	delimRe, err := regexp.Compile(reString)
 
