@@ -265,15 +265,27 @@ func TestSws(t *testing.T) {
 
 func TestVerticalBar(t *testing.T) {
 	var err error
-	// _, err = loadAndTest(t, "test_data/sws_test_vertical_bar_syll.g2p")
-	// if err != nil {
-	// 	t.Errorf("%v", err)
-	// }
+
+	syllFile := "test_data/sws_test_syll_vertical_bar.g2p"
+	syller, err := LoadSyllFile(syllFile)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+	syllErrs := syller.Test().AllErrors()
+	if len(syllErrs) > 0 {
+		t.Errorf("Syll tests failed for %s: %#v", syllFile, syllErrs)
+	}
 
 	_, err = loadAndTest(t, "test_data/sws_test_vertical_bar_nosyll.g2p")
 	if err != nil {
 		t.Errorf("%v", err)
 	}
+
+	_, err = loadAndTest(t, "test_data/sws_test_vertical_bar_withsyll.g2p")
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
 }
 
 func TestSwsFromURL(t *testing.T) {
