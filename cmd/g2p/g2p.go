@@ -137,7 +137,12 @@ func main() {
 	}
 
 	if *ssFile != "" {
-		phonemeSet, err := rbg2p.LoadPhonemeSetFile(*ssFile, ruleSet.PhonemeDelimiter)
+		syllDelimIncludesPhnDelim := true
+		if ruleSet.Syllabifier.SyllDef != nil {
+			syllDelimIncludesPhnDelim = ruleSet.Syllabifier.SyllDef.IncludePhonemeDelimiter()
+		}
+
+		phonemeSet, err := rbg2p.LoadPhonemeSetFile(*ssFile, syllDelimIncludesPhnDelim, ruleSet.SyllableDelimiter, ruleSet.PhonemeDelimiter)
 		if err != nil {
 			l.Printf("couldn't load symbol set : %s", err)
 			os.Exit(1)

@@ -14,20 +14,27 @@ type SyllDef interface {
 	IsSyllabic(symbol string) bool
 	PhonemeDelimiter() string
 	SyllableDelimiter() string
+	IncludePhonemeDelimiter() bool
 }
 
 // MOPSyllDef is a Maximum Onset Principle implementation of the SyllDef interface
 type MOPSyllDef struct {
-	Onsets    []string
-	Syllabic  []string
-	PhnDelim  string
-	SyllDelim string
-	Stress    []string
+	Onsets          []string
+	Syllabic        []string
+	PhnDelim        string
+	SyllDelim       string
+	Stress          []string
+	IncludePhnDelim bool
 }
 
 // PhonemeDelimiter is the string used to separate phonemes (required by interface)
 func (def MOPSyllDef) PhonemeDelimiter() string {
 	return def.PhnDelim
+}
+
+// IncludePhonemeDelimiter is the string used to separate phonemes (required by interface)
+func (def MOPSyllDef) IncludePhonemeDelimiter() bool {
+	return def.IncludePhnDelim
 }
 
 // SyllableDelimiter is the string used to separate syllables (required by interface)
@@ -226,5 +233,8 @@ func (s Syllabifier) stringWithStressPlacement(t sylledTrans) string {
 		}
 		res = append(res, strings.Join(newSyll, s.SyllDef.PhonemeDelimiter()))
 	}
-	return strings.Join(res, s.SyllDef.PhonemeDelimiter()+s.SyllDef.SyllableDelimiter()+s.SyllDef.PhonemeDelimiter())
+	if s.SyllDef.IncludePhonemeDelimiter() {
+		return strings.Join(res, s.SyllDef.PhonemeDelimiter()+s.SyllDef.SyllableDelimiter()+s.SyllDef.PhonemeDelimiter())
+	}
+	return strings.Join(res, s.SyllDef.SyllableDelimiter())
 }

@@ -85,8 +85,8 @@ func dontTestMOPValidOnsetIssueMay2020(t *testing.T) {
 	}
 	testMOPValidOnset(t, def, "f t", true)
 	phnSet := PhonemeSet{
-		Symbols:     []string{"a", "e", "E", "i", "I", "o", "u", "@", "V", "1", "7", "j", "r", "p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "S", "Z", "x", "m", "n", "l", "p'", "b'", "t'", "d'", "k'", "g'", "f'", "v'", "s'", "z'", "S'", "x'", "m'", "n'", "l'", "r'", "tS", "dZ", "ts", "dz", "tS'", "dZ'", "\"", "%", ".", "-"},
-		DelimiterRe: regexp.MustCompile(" "),
+		Symbols:   []string{"a", "e", "E", "i", "I", "o", "u", "@", "V", "1", "7", "j", "r", "p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "S", "Z", "x", "m", "n", "l", "p'", "b'", "t'", "d'", "k'", "g'", "f'", "v'", "s'", "z'", "S'", "x'", "m'", "n'", "l'", "r'", "tS", "dZ", "ts", "dz", "tS'", "dZ'", "\"", "%", ".", "-"},
+		SyllDelim: Regexp{RE: regexp.MustCompile(" "), Source: " "},
 	}
 	syller := Syllabifier{
 		SyllDef:         def,

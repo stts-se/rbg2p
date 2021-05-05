@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -79,15 +80,15 @@ func loadSyll(scanner *bufio.Scanner, inputPath string) (Syllabifier, error) {
 		return res, fmt.Errorf("missing required phoneme set definition")
 	}
 
-	phnSet, err := parsePhonemeSet(phonemeSetLine, phonemeDelimiter)
-	if err != nil {
-		return res, err
-	}
 	syllDef, stressPlacement, err := loadSyllDef(syllDefLines, phonemeDelimiter)
 	if err != nil {
 		return res, err
 	}
 	res.SyllDef = syllDef
+	phnSet, err := parsePhonemeSet(phonemeSetLine, res.SyllDef, phonemeDelimiter)
+	if err != nil {
+		return res, err
+	}
 	res.StressPlacement = stressPlacement
 	res.PhonemeSet = phnSet
 
@@ -183,18 +184,23 @@ func newStressPlacement(s string) (StressPlacement, error) {
 }
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")
+var syllDefBoolRe = regexp.MustCompile("^SYLLDEF +(INCLUDE_PHONEME_DELIMITER) (true|false)$")
 var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
 
 func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
-	// SYLLDEF (ONSETS|SYLLABIC|DELIMITER) "VALUE"
+	// SYLLDEF (ONSETS|SYLLABIC|DELIMITER|...) "VALUE"
 	// SYLLDEF TYPE VALUE
 	matchRes := syllDefRe.FindStringSubmatch(s)
 	if matchRes == nil {
 		matchRes = syllDefTypeRe.FindStringSubmatch(s)
 		if matchRes == nil {
-			return fmt.Errorf("invalid sylldef definition: %s", s)
+			matchRes = syllDefBoolRe.FindStringSubmatch(s)
+			if matchRes == nil {
+				return fmt.Errorf("invalid sylldef definition: %s", s)
+			}
 		}
 	}
+	var includePhnDelimSet = false
 	name := matchRes[1]
 	value := strings.Replace(strings.TrimSpace(matchRes[2]), "\\\"", "\"", -1)
 	if name == "TYPE" {
@@ -209,8 +215,18 @@ func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 		syllDef.Stress = multiSpace.Split(value, -1)
 	} else if name == "DELIMITER" {
 		syllDef.SyllDelim = value
+	} else if name == "INCLUDE_PHONEME_DELIMITER" {
+		var bl, err = strconv.ParseBool(value)
+		if err != nil {
+			return fmt.Errorf("failed to parse boolean value for %s : %s", name, value)
+		}
+		syllDef.IncludePhnDelim = bl
+		includePhnDelimSet = true
 	} else {
 		return fmt.Errorf("invalid sylldef variable : %s", s)
+	}
+	if !includePhnDelimSet {
+		syllDef.IncludePhnDelim = true
 	}
 	return nil
 }

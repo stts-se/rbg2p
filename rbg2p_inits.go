@@ -137,13 +137,6 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 		}
 		ruleSet.Vars[k] = v
 	}
-	if len(phonemeSetLine) > 0 {
-		phnSet, err := parsePhonemeSet(phonemeSetLine, ruleSet.PhonemeDelimiter)
-		if err != nil {
-			return ruleSet, err
-		}
-		ruleSet.PhonemeSet = phnSet
-	}
 	if len(syllDefLines) > 0 {
 		syllDef, stressPlacement, err := loadSyllDef(syllDefLines, ruleSet.PhonemeDelimiter)
 		if err != nil {
@@ -151,6 +144,13 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 		}
 		ruleSet.SyllableDelimiter = syllDef.SyllableDelimiter()
 		ruleSet.Syllabifier = Syllabifier{SyllDef: syllDef, StressPlacement: stressPlacement, PhonemeSet: ruleSet.PhonemeSet}
+	}
+	if len(phonemeSetLine) > 0 {
+		phnSet, err := parsePhonemeSet(phonemeSetLine, ruleSet.Syllabifier.SyllDef, ruleSet.PhonemeDelimiter)
+		if err != nil {
+			return ruleSet, err
+		}
+		ruleSet.PhonemeSet = phnSet
 	}
 
 	for _, l := range filterLines {

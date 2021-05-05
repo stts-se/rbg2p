@@ -90,14 +90,23 @@ func isPhonemeSet(s string) bool {
 
 var phnSetRe = regexp.MustCompile("^(PHONEME_SET) +\"(.*)\"$")
 
-func parsePhonemeSet(line string, phnDelim string) (PhonemeSet, error) {
+func parsePhonemeSet(line string, syllDef SyllDef, phnDelim string) (PhonemeSet, error) {
 	matchRes := phnSetRe.FindStringSubmatch(line)
 	if matchRes == nil {
 		return PhonemeSet{}, fmt.Errorf("invalid phoneme set definition: %s", line)
 	}
 	value := matchRes[2]
 	phonemes := multiSpace.Split(value, -1)
-	phonemeSet, err := NewPhonemeSet(phonemes, phnDelim)
+	var includePhnDelim bool
+	var syllDelim string
+	if syllDef != nil {
+		includePhnDelim = syllDef.IncludePhonemeDelimiter()
+		syllDelim = syllDef.SyllableDelimiter()
+	} else {
+		includePhnDelim = true
+		syllDelim = ""
+	}
+	phonemeSet, err := NewPhonemeSet(phonemes, includePhnDelim, syllDelim, phnDelim)
 	if err != nil {
 		return PhonemeSet{}, fmt.Errorf("couldn't create phoneme set : %s", err)
 	}
