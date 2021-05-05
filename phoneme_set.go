@@ -109,7 +109,6 @@ func (ps PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 				res = append(res, p)
 			}
 		}
-		//fmt.Println("???", splitted, res)
 		return res, nil
 	}
 	return ps.PhnDelim.RE.Split(trans, -1), nil
