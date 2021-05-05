@@ -146,6 +146,7 @@ type RuleSet struct {
 	Prefilters        []Prefilter
 	Syllabifier       Syllabifier
 	Content           string
+	Debug             bool
 }
 
 func (rs RuleSet) isInitialized() bool {
@@ -266,12 +267,14 @@ func (rs RuleSet) applyFilters(trans string) (string, error) {
 	res := trans
 	var err error
 	for _, f := range rs.Filters {
+		input := res
 		res, err = f.Apply(res)
 		if err != nil {
 			return res, fmt.Errorf("couldn't execute regexp : %v", err)
 		}
-		//HB
-		//fmt.Printf("FILTER: %s\nRES: %s\n", f, res)
+		if rs.Debug {
+			fmt.Fprintf(os.Stderr, "FILTER\t%s\t%s\t%s\n", f, input, res)
+		}
 	}
 	return res, nil
 }

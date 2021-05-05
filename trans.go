@@ -1,6 +1,8 @@
 package rbg2p
 
-import "strings"
+import (
+	"strings"
+)
 
 // trans is a container for phonemes in a transcription. Primarily for package internal use.
 type trans struct {
@@ -95,6 +97,7 @@ func (t sylledTrans) syllables() [][]string {
 		}
 	}
 	res = append(res, thisSyllable)
+	//fmt.Println("???", t, res)
 	return res
 }
 

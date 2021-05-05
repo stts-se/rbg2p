@@ -95,7 +95,7 @@ func (ps PhonemeSet) SplitTranscription(trans string) ([]string, error) {
 			return []string{}, fmt.Errorf("found unknown phonemes in transcription /%v/: %s", trans, unknown)
 		}
 		return splitted, nil
-	} else if !ps.SyllDelimIncludesPhnDelim { // TODO
+	} else if !ps.SyllDelimIncludesPhnDelim {
 		splitted, unknown, err := splitIntoPhonemes(ps.Symbols, trans)
 		if err != nil {
 			return []string{}, err

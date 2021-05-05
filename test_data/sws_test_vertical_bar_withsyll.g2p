@@ -168,8 +168,6 @@ z -> s
 
 // Tests
 
-// sh|u|-k|u|-l|a1|-t|ax
-
 TEST dusch -> (d|"|u0|S, d|"|u0|x)
 TEST duscha -> (d|""|u0|-S|a, d|""|u0|-x|a)
 TEST borta -> b|""|O|-rt|a

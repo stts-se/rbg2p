@@ -463,7 +463,7 @@ func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
 
 	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
 
-	input := strings.Split("\" d u0 S a", " ")
+	input := strings.Split("d \" u0 S a", " ")
 	expect := "\" d u0 . S a"
 	result := syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -471,7 +471,7 @@ func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d", " ")
+	input = strings.Split("p a r \" A: d", " ")
 	expect = "p a . \" r A: d"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -479,7 +479,7 @@ func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	input = strings.Split("p a r \" A: d g r % e: n", " ")
 	expect = "p a . \" r A: d . % g r e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -539,15 +539,14 @@ func TestSwsInputWithStressPlacement_AfterSyllabic(t *testing.T) {
 
 	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
 
-	input := strings.Split("\" d u0 S a", " ")
+	input := strings.Split("d u0 \" S a", " ")
 	expect := "d u0 \" . S a"
 	result := syll.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)
-
 	}
 
-	input = strings.Split("p a \" r A: d", " ")
+	input = strings.Split("p a r A: \" d", " ")
 	expect = "p a . r A: \" d"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -555,7 +554,7 @@ func TestSwsInputWithStressPlacement_AfterSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	input = strings.Split("p a r A: \" d g r e: % n", " ")
 	expect = "p a . r A: \" d . g r e: % n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -587,7 +586,7 @@ func TestSwsInputWithStressPlacement_AfterSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	input = strings.Split("p a r A: \" d g r e: \"\" n", " ")
 	expect = "p a . r A: \" d . g r e: \"\" n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -615,7 +614,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	syll := Syllabifier{SyllDef: def, StressPlacement: stressP}
 
-	input := strings.Split("\" d u0 S a", " ")
+	input := strings.Split("d \" u0 S a", " ")
 	expect := "d \" u0 . S a"
 	result := syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -623,7 +622,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d", " ")
+	input = strings.Split("p a r \" A: d", " ")
 	expect = "p a . r \" A: d"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -631,7 +630,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d % g r e: n", " ")
+	input = strings.Split("p a r \" A: d g r % e: n", " ")
 	expect = "p a . r \" A: d . g r % e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -663,7 +662,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("p a \" r A: d \"\" g r e: n", " ")
+	input = strings.Split("p a r \" A: d g r \"\" e: n", " ")
 	expect = "p a . r \" A: d . g r \"\" e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
@@ -671,7 +670,7 @@ func TestSwsInputWithStressPlacement_BeforeSyllabic(t *testing.T) {
 
 	}
 
-	input = strings.Split("a \" r A: d \"\" g r e: n", " ")
+	input = strings.Split("a r \" A: d g r \"\" e: n", " ")
 	expect = "a . r \" A: d . g r \"\" e: n"
 	result = syll.SyllabifyFromPhonemes(input)
 	if result != expect {
