@@ -102,18 +102,6 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 func (def MOPSyllDef) ValidSplit(left0 []string, right0 []string) bool {
 	left := left0
 	right := right0
-	// left := []string{}
-	// for _, s := range left0 {
-	// 	if s != "" {
-	// 		left = append(left, s)
-	// 	}
-	// }
-	// right := []string{}
-	// for _, s := range right0 {
-	// 	if s != "" {
-	// 		right = append(right, s)
-	// 	}
-	// }
 
 	// if def.StressPlacement() != AfterSyllabic {
 	// 	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
