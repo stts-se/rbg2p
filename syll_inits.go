@@ -96,9 +96,12 @@ func loadSyll(scanner *bufio.Scanner, inputPath string) (Syllabifier, error) {
 }
 
 func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlacement, error) {
+	var err error
+
 	def := MOPSyllDef{} // TODO: Handle other sylldefs too?
 	def.PhnDelim = phnDelim
 	stressPlacement := Undefined
+	includePhnDelim := true
 
 	for _, l := range syllDefLines {
 		if isStressPlacement(l) {
@@ -107,6 +110,12 @@ func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlaceme
 				return def, stressPlacement, err
 			}
 			stressPlacement = stress
+			continue
+		} else if isIncludePhnDelim(l) {
+			includePhnDelim, err = newIncludePhnDelim(l)
+			if err != nil {
+				return def, stressPlacement, err
+			}
 			continue
 		}
 		err := parseMOPSyllDef(l, &def)
@@ -135,6 +144,8 @@ func loadSyllDef(syllDefLines []string, phnDelim string) (SyllDef, StressPlaceme
 		return def, stressPlacement, fmt.Errorf("DELIMITER is required for the syllable definition")
 	}
 
+	def.IncludePhnDelim = includePhnDelim
+	def.StressPlcmnt = stressPlacement
 	return def, stressPlacement, nil
 }
 
@@ -157,6 +168,22 @@ func newSyllTest(s string) (SyllTest, error) {
 	return SyllTest{Input: input, Output: output}, nil
 }
 
+var includePhnDelimRe = regexp.MustCompile("^SYLLDEF INCLUDE_PHONEME_DELIMITER (true|false)$")
+
+func isIncludePhnDelim(s string) bool {
+	return strings.HasPrefix(s, "SYLLDEF INCLUDE_PHONEME_DELIMITER ")
+}
+
+func newIncludePhnDelim(s string) (bool, error) {
+	matchRes := includePhnDelimRe.FindStringSubmatch(s)
+	value := matchRes[1]
+	var bl, err = strconv.ParseBool(value)
+	if err != nil {
+		return false, fmt.Errorf("invalid value for INCLUDE_PHONEME_DELIMITER : %s", value)
+	}
+	return bl, nil
+}
+
 var stressPlacementRe = regexp.MustCompile("^SYLLDEF +STRESS_PLACEMENT +(FirstInSyllable|BeforeSyllabic|AfterSyllabic)$")
 
 func isStressPlacement(s string) bool {
@@ -165,14 +192,10 @@ func isStressPlacement(s string) bool {
 func newStressPlacement(s string) (StressPlacement, error) {
 	matchRes := stressPlacementRe.FindStringSubmatch(s)
 	if matchRes == nil {
-		matchRes = syllDefTypeRe.FindStringSubmatch(s)
-		if matchRes == nil {
-			return Undefined, fmt.Errorf("invalid stress placement definition: %s", s)
-		}
+		return Undefined, fmt.Errorf("invalid stress placement definition: %s", s)
 	}
 	value := matchRes[1]
 
-	// TODO: generate _strings.go using 'stringer -type=StressPlacement' but this doesn't work right now for some reason (tried two different computers)
 	if strings.ToLower(value) == "firstinsyllable" {
 		return FirstInSyllable, nil
 	} else if strings.ToLower(value) == "beforesyllabic" {
@@ -184,7 +207,6 @@ func newStressPlacement(s string) (StressPlacement, error) {
 }
 
 var syllDefRe = regexp.MustCompile("^SYLLDEF +(ONSETS|SYLLABIC|DELIMITER|STRESS) +\"(.+)\"$")
-var syllDefBoolRe = regexp.MustCompile("^SYLLDEF +(INCLUDE_PHONEME_DELIMITER) (true|false)$")
 var syllDefTypeRe = regexp.MustCompile("^SYLLDEF (TYPE) (MOP)$")
 
 func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
@@ -194,13 +216,9 @@ func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 	if matchRes == nil {
 		matchRes = syllDefTypeRe.FindStringSubmatch(s)
 		if matchRes == nil {
-			matchRes = syllDefBoolRe.FindStringSubmatch(s)
-			if matchRes == nil {
-				return fmt.Errorf("invalid sylldef definition: %s", s)
-			}
+			return fmt.Errorf("invalid sylldef definition: %s", s)
 		}
 	}
-	var includePhnDelimSet = false
 	name := matchRes[1]
 	value := strings.Replace(strings.TrimSpace(matchRes[2]), "\\\"", "\"", -1)
 	if name == "TYPE" {
@@ -215,18 +233,8 @@ func parseMOPSyllDef(s string, syllDef *MOPSyllDef) error {
 		syllDef.Stress = multiSpace.Split(value, -1)
 	} else if name == "DELIMITER" {
 		syllDef.SyllDelim = value
-	} else if name == "INCLUDE_PHONEME_DELIMITER" {
-		var bl, err = strconv.ParseBool(value)
-		if err != nil {
-			return fmt.Errorf("failed to parse boolean value for %s : %s", name, value)
-		}
-		syllDef.IncludePhnDelim = bl
-		includePhnDelimSet = true
 	} else {
 		return fmt.Errorf("invalid sylldef variable : %s", s)
-	}
-	if !includePhnDelimSet {
-		syllDef.IncludePhnDelim = true
 	}
 	return nil
 }

@@ -131,6 +131,8 @@ func main() {
 
 	g2pFile := args[0]
 	ruleSet, err := rbg2p.LoadFile(g2pFile)
+	ruleSet.Debug = *debug
+	ruleSet.Syllabifier.Debug = *debug
 	if err != nil {
 		l.Printf("couldn't load rule file %s : %s", g2pFile, err)
 		os.Exit(1)
