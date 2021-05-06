@@ -565,16 +565,36 @@ func TestStressPlacements(t *testing.T) {
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)
 	}
+	input = strings.Split("p a r a 1 d", " ")
+	expect = "p a . r a 1 d"
+	result = syllAfterSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
 
+	//
 	input = strings.Split("d 1 u k a", " ")
 	expect = "d 1 u . k a"
 	result = syllBeforeSyllabic.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)
 	}
+	input = strings.Split("p a r 1 a d", " ")
+	expect = "p a . r 1 a d"
+	result = syllBeforeSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
 
+	//
 	input = strings.Split("d 1 u k a", " ")
 	expect = "1 d u . k a"
+	result = syllFirstInSyllable.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+	input = strings.Split("p a r 1 a d", " ")
+	expect = "p a . 1 r a d"
 	result = syllFirstInSyllable.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)

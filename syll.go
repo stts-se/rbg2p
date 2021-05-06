@@ -127,7 +127,7 @@ func (def MOPSyllDef) ValidSplit(left0 []string, right0 []string) bool {
 	// 	}
 	// }
 
-	//fmt.Println("? internal left/right", left, right)
+	//fmt.Println("debug validsplit internal left/right", left, right)
 
 	onset := []string{}
 	keepCond := func(s string) bool {
@@ -145,16 +145,16 @@ func (def MOPSyllDef) ValidSplit(left0 []string, right0 []string) bool {
 			onset = append(onset, right[i])
 		}
 	}
-	// s := strings.Join(onset, def.PhonemeDelimiter())
-	// fmt.Println("? test onset1", s, def.validOnset(s))
+	//s := strings.Join(onset, def.PhonemeDelimiter())
+	//fmt.Println("debug validsplit test onset1", s, def.validOnset(s))
 	if !def.validOnset(strings.Join(onset, def.PhonemeDelimiter())) {
 		return false
 	}
 	test := onset
 	for i := len(left) - 1; i >= 0 && keepCond(left[i]); i-- {
 		test = append([]string{left[i]}, test...)
-		// s := strings.Join(test, def.PhonemeDelimiter())
-		// fmt.Println("? test onset2", s, def.validOnset(s))
+		//s := strings.Join(test, def.PhonemeDelimiter())
+		//fmt.Println("debug validsplit test onset2", s, def.validOnset(s))
 		if def.validOnset(strings.Join(test, def.PhonemeDelimiter())) {
 			return false
 		}
@@ -217,10 +217,11 @@ func (s Syllabifier) syllabify(t trans) sylledTrans {
 	for gi, g2p := range t.phonemes {
 		for pi, p := range g2p.p {
 			validSplit := s.SyllDef.ValidSplit(left, right)
-			//fmt.Println("???", gi, pi, p, left, right, validSplit, s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right))
+			//fmt.Println("debug syllabify", gi, pi, p, left, right, validSplit, s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right))
 			if len(left) > 0 && validSplit && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
 				index := boundary{g: gi, p: pi}
 				res.boundaries = append(res.boundaries, index)
+				left = []string{}
 			}
 			left = append(left, p)
 			right = right[1:]
