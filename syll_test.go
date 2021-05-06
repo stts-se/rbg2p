@@ -521,7 +521,7 @@ func TestSwsInputWithStressPlacement_FirstInSyllable(t *testing.T) {
 
 }
 
-func TestStressPlacements(t *testing.T) {
+func TestStressPlacements1(t *testing.T) {
 	var fsExpGot = "Input: %s; Expected: %v got: %v"
 
 	var err error
@@ -595,6 +595,87 @@ func TestStressPlacements(t *testing.T) {
 	}
 	input = strings.Split("p a r 1 a d", " ")
 	expect = "p a . 1 r a d"
+	result = syllFirstInSyllable.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+}
+
+func TestStressPlacements2(t *testing.T) {
+	var fsExpGot = "Input: %s; Expected: %v got: %v"
+
+	var err error
+	var def SyllDef
+	var stressP StressPlacement
+	var expect, result string
+	var input []string
+
+	var baseLines = []string{"SYLLDEF TYPE MOP",
+		`SYLLDEF ONSETS "r, t, p, s, d, f, g, h, j, k, l, v, b, n, m, p r"`,
+		`SYLLDEF SYLLABIC "a o u e i"`,
+		`SYLLDEF STRESS "1"`,
+		`SYLLDEF DELIMITER "|-"`,
+		`SYLLDEF INCLUDE_PHONEME_DELIMITER false`,
+	}
+	def, stressP, err = loadSyllDef(append(baseLines, "SYLLDEF STRESS_PLACEMENT AfterSyllabic"), "|")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+	syllAfterSyllabic := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	def, stressP, err = loadSyllDef(append(baseLines, "SYLLDEF STRESS_PLACEMENT BeforeSyllabic"), "|")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+	syllBeforeSyllabic := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	def, stressP, err = loadSyllDef(append(baseLines, "SYLLDEF STRESS_PLACEMENT FirstInSyllable"), "|")
+	if err != nil {
+		t.Errorf("%v", err)
+		return
+	}
+	syllFirstInSyllable := Syllabifier{SyllDef: def, StressPlacement: stressP}
+
+	//
+
+	input = strings.Split("d u 1 k a", " ")
+	expect = "d|u|1|-k|a"
+	result = syllAfterSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+	input = strings.Split("p a r a 1 d", " ")
+	expect = "p|a|-r|a|1|d"
+	result = syllAfterSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+
+	//
+	input = strings.Split("d 1 u k a", " ")
+	expect = "d|1|u|-k|a"
+	result = syllBeforeSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+	input = strings.Split("p a r 1 a d", " ")
+	expect = "p|a|-r|1|a|d"
+	result = syllBeforeSyllabic.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+
+	//
+	input = strings.Split("d 1 u k a", " ")
+	expect = "1|d|u|-k|a"
+	result = syllFirstInSyllable.SyllabifyFromPhonemes(input)
+	if result != expect {
+		t.Errorf(fsExpGot, input, expect, result)
+	}
+	input = strings.Split("p a r 1 a d", " ")
+	expect = "p|a|-1|r|a|d"
 	result = syllFirstInSyllable.SyllabifyFromPhonemes(input)
 	if result != expect {
 		t.Errorf(fsExpGot, input, expect, result)
