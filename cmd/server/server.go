@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -345,16 +346,28 @@ func langFromFilePath(p string) string {
 	return b
 }
 
+func pluralS(n int) string {
+	if n == 1 {
+		return ""
+	}
+	return "s"
+}
+
 func main() {
 
-	if len(os.Args) < 2 {
+	var quiet = flag.Bool("quiet", false, "inhibit warnings (default: false)")
+	var help = flag.Bool("help", false, "print help and exit")
+	flag.Parse()
+
+	if *help || len(flag.Args()) < 1 {
 		fmt.Fprintf(os.Stderr, "server <G2P FILES DIR(S)>\n")
+		flag.PrintDefaults()
 		os.Exit(0)
 	}
 
 	// g2p file dir. Each file in dir with .g2p extension
 	// is treated as a g2p file
-	for _, dir := range os.Args[1:] {
+	for _, dir := range flag.Args() {
 
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
@@ -364,10 +377,10 @@ func main() {
 
 		// populate map of g2p rules from files.
 		// The base file name minus '.g2p' is the language name.
-		var fn string
 		haltingError := false
+		fails := []string{}
 		for _, f := range files {
-			fn = filepath.Join(dir, f.Name())
+			fn := filepath.Join(dir, f.Name())
 			if strings.HasSuffix(fn, ".g2p") {
 
 				ruleSet, err := rbg2p.LoadFile(fn)
@@ -377,33 +390,36 @@ func main() {
 					continue
 					//fmt.Fprintf(os.Stderr, "server: skipping file: '%s'\n", fn)
 				}
-
+				errors := 0
 				result := ruleSet.Test()
 				if len(result.Errors) > 0 {
 					for _, e := range result.Errors {
 						fmt.Printf("ERROR: %v\n", e)
 					}
 					fmt.Printf("%d ERROR(S) FOR %s\n", len(result.Errors), fn)
+					errors += len(result.Errors)
 				}
-				if len(result.Warnings) > 0 {
+				if !*quiet && len(result.Warnings) > 0 {
 					for _, e := range result.Warnings {
 						fmt.Printf("WARNING: %v\n", e)
 					}
 					fmt.Printf("%d WARNING(S) FOR %s\n", len(result.Warnings), fn)
-				}
-				if len(result.Errors) > 0 {
-					haltingError = true
 				}
 				if len(result.FailedTests) > 0 {
 					for _, e := range result.FailedTests {
 						fmt.Printf("FAILED TEST: %v\n", e)
 					}
 					fmt.Printf("%d OF %d TESTS FAILED FOR %s\n", len(result.FailedTests), len(ruleSet.Tests), fn)
-					haltingError = true
+					errors += len(result.FailedTests)
 				}
 				// else {
 				// 	fmt.Printf("ALL %d TESTS PASSED FOR %s\n", len(ruleSet.Tests), fn)
 				// }
+
+				if errors > 0 {
+					haltingError = true
+					fails = append(fails, fmt.Sprintf("%s: %d error%s", fn, errors, pluralS(errors)))
+				}
 
 				if haltingError {
 					continue
@@ -435,6 +451,12 @@ func main() {
 				continue
 			}
 
+		}
+		if len(fails) > 0 {
+			fmt.Fprintf(os.Stderr, "%d file%s failed:\n", len(fails), pluralS(len(fails)))
+			for _, fail := range fails {
+				fmt.Fprintf(os.Stderr, " > %s\n", fail)
+			}
 		}
 		if haltingError {
 			os.Exit(1)
