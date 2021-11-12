@@ -1,12 +1,10 @@
-# github.com/dlclark/regexp2 v1.2.0
+# github.com/dlclark/regexp2 v1.4.0
 ## explicit
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
-# github.com/gorilla/mux v1.7.3
+# github.com/gorilla/mux v1.8.0
 ## explicit
 github.com/gorilla/mux
-# github.com/sergi/go-diff v1.0.0
+# github.com/sergi/go-diff v1.2.0
 ## explicit
 github.com/sergi/go-diff/diffmatchpatch
-# github.com/stretchr/testify v1.4.0
-## explicit
