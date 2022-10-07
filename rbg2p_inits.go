@@ -76,6 +76,7 @@ func load(scanner *bufio.Scanner, inputPath string) (RuleSet, error) {
 	ruleSet.RulesAppliedMutex = &sync.RWMutex{}
 	ruleSet.DefaultPhoneme = "_"
 	ruleSet.PhonemeDelimiter = " "
+	ruleSet.DowncaseInput = true // Default, might be changed by value in rule file
 	syllDefLines := []string{}
 	var inputLines []string
 	var ruleLines []string
@@ -226,8 +227,10 @@ func isConst(s string) bool {
 }
 
 func parseConst(s string, ruleSet *RuleSet) error {
+	fmt.Println("parseConst", s)
+
 	matchRes := constRe.FindStringSubmatch(s)
-	var downcaseInputIsSet = false
+	//var downcaseInputIsSet = false
 	if matchRes != nil {
 		name := matchRes[1]
 		value := matchRes[2]
@@ -239,12 +242,15 @@ func parseConst(s string, ruleSet *RuleSet) error {
 		} else if name == "DEFAULT_PHONEME" {
 			ruleSet.DefaultPhoneme = value
 		} else if name == "DOWNCASE_INPUT" {
+
+			fmt.Println("DOWNCASE_INPUT", value)
+
 			if isTrueRe.MatchString(value) {
 				ruleSet.DowncaseInput = true
-				downcaseInputIsSet = true
+				//downcaseInputIsSet = true
 			} else if isFalseRe.MatchString(value) {
 				ruleSet.DowncaseInput = false
-				downcaseInputIsSet = true
+				//downcaseInputIsSet = true
 			} else {
 				return fmt.Errorf("invalid boolean value for %s: %s", name, value)
 			}
@@ -254,9 +260,12 @@ func parseConst(s string, ruleSet *RuleSet) error {
 	} else {
 		return fmt.Errorf("invalid const definition: %s", s)
 	}
-	if !downcaseInputIsSet {
-		ruleSet.DowncaseInput = true
-	}
+	// if !downcaseInputIsSet {
+	// 	ruleSet.DowncaseInput = true
+	// }
+
+	fmt.Println("ruleSet.DowncaseInput", ruleSet.DowncaseInput)
+
 	return nil
 }
 

@@ -1,5 +1,6 @@
 // Specs
 
+DOWNCASE_INPUT TRUE
 CHARACTER_SET "abcdeéfghijklmnopqrstuvwxyzåäöüá'"
 PHONEME_SET "i: I u0 }: a A: u: U E: {: E { au y: Y e: e 2: 9: 2 9 o: O @ eu p b t rt m n d rd k g N rn f v C rs r l s x S h rl j . " """
 DEFAULT_PHONEME "_"
