@@ -2,6 +2,7 @@ package rbg2p
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -13,8 +14,9 @@ type SyllDef interface {
 	IsStress(symbol string) bool
 	IsSyllabic(symbol string) bool
 	PhonemeDelimiter() string
-	SyllableDelimiter() string
+	StressPlacement() StressPlacement
 	IncludePhonemeDelimiter() bool
+	SyllableDelimiter() string
 }
 
 // MOPSyllDef is a Maximum Onset Principle implementation of the SyllDef interface
@@ -24,6 +26,7 @@ type MOPSyllDef struct {
 	PhnDelim        string
 	SyllDelim       string
 	Stress          []string
+	StressPlcmnt    StressPlacement
 	IncludePhnDelim bool
 }
 
@@ -32,7 +35,7 @@ func (def MOPSyllDef) PhonemeDelimiter() string {
 	return def.PhnDelim
 }
 
-// IncludePhonemeDelimiter is the string used to separate phonemes (required by interface)
+// IncludePhonemeDelimiter defines whether the syllable boundaries should be surrounded by the phoneme delimiter
 func (def MOPSyllDef) IncludePhonemeDelimiter() bool {
 	return def.IncludePhnDelim
 }
@@ -40,6 +43,11 @@ func (def MOPSyllDef) IncludePhonemeDelimiter() bool {
 // SyllableDelimiter is the string used to separate syllables (required by interface)
 func (def MOPSyllDef) SyllableDelimiter() string {
 	return def.SyllDelim
+}
+
+// StressPlacement
+func (def MOPSyllDef) StressPlacement() StressPlacement {
+	return def.StressPlcmnt
 }
 
 // IsDefined is used to determine if there is a syllabifier defined or not (required by interface)
@@ -83,7 +91,6 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 		return true
 	}
 	for _, s := range def.Onsets {
-		//fmt.Printf("DEBUG <%v> <%v> %v\n", s, onset, s == onset)
 		if s == onset {
 			return true
 		}
@@ -95,39 +102,47 @@ func (def MOPSyllDef) validOnset(onset string) bool {
 func (def MOPSyllDef) ValidSplit(left0 []string, right0 []string) bool {
 	left := left0
 	right := right0
-	// left := []string{}
-	// for _, s := range left0 {
-	// 	if s != "" {
-	// 		left = append(left, s)
-	// 	}
-	// }
-	// right := []string{}
-	// for _, s := range right0 {
-	// 	if s != "" {
-	// 		right = append(right, s)
+
+	// if def.StressPlacement() != AfterSyllabic {
+	// 	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
+	// 		return false
 	// 	}
 	// }
 
-	if len(left) > 0 && def.IsStress(left[len(left)-1]) {
-		return false
-	}
+	// if def.StressPlacement() == AfterSyllabic {
+	// 	if len(right) > 0 && def.IsStress(right[0]) {
+	// 		right = right[1:]
+	// 	}
+	// }
 
-	if len(right) > 0 && def.IsStress(right[0]) {
-		right = right[1:]
-	}
+	//fmt.Println("debug validsplit internal left/right", left, right)
 
 	onset := []string{}
-	for i := 0; i < len(right) && !def.IsSyllabic(right[i]); i++ {
-		if !def.IsStress(right[i]) {
+	keepCond := func(s string) bool {
+		if def.StressPlacement() != AfterSyllabic {
+			return !def.IsSyllabic(s)
+		}
+		return !def.IsSyllabic(s) // && !def.IsStress(s)
+	}
+	for i := 0; i < len(right) && keepCond(right[i]); i++ {
+		if def.IsStress(right[i]) {
+			if def.StressPlacement() == AfterSyllabic {
+				onset = append(onset, right[i])
+			}
+		} else {
 			onset = append(onset, right[i])
 		}
 	}
+	//s := strings.Join(onset, def.PhonemeDelimiter())
+	//fmt.Println("debug validsplit test onset1", s, def.validOnset(s))
 	if !def.validOnset(strings.Join(onset, def.PhonemeDelimiter())) {
 		return false
 	}
 	test := onset
-	for i := len(left) - 1; i >= 0 && !def.IsSyllabic(left[i]); i-- {
+	for i := len(left) - 1; i >= 0 && keepCond(left[i]); i-- {
 		test = append([]string{left[i]}, test...)
+		//s := strings.Join(test, def.PhonemeDelimiter())
+		//fmt.Println("debug validsplit test onset2", s, def.validOnset(s))
 		if def.validOnset(strings.Join(test, def.PhonemeDelimiter())) {
 			return false
 		}
@@ -147,6 +162,7 @@ type Syllabifier struct {
 	Tests           []SyllTest
 	StressPlacement StressPlacement
 	PhonemeSet      PhonemeSet
+	Debug           bool
 }
 
 // IsDefined is used to determine if there is a syllabifier defined or not
@@ -174,8 +190,12 @@ func (s Syllabifier) SyllabifyFromString(trans string) (string, error) {
 
 // syllabifyToString is used to divide a transcription into syllables and create an output string
 func (s Syllabifier) syllabifyToString(t trans) string {
-	res := s.syllabify(t)
-	return s.stringWithStressPlacement(res)
+	sylled := s.syllabify(t)
+	res := s.stringWithStressPlacement(sylled)
+	if s.Debug {
+		fmt.Fprintf(os.Stderr, "%s\t%s\t%v\t%s\n", "SYLLABIFY", t, sylled, res)
+	}
+	return res
 }
 
 func (s Syllabifier) syllabify(t trans) sylledTrans {
@@ -184,9 +204,12 @@ func (s Syllabifier) syllabify(t trans) sylledTrans {
 	right := t.listPhonemes()
 	for gi, g2p := range t.phonemes {
 		for pi, p := range g2p.p {
-			if len(left) > 0 && s.SyllDef.ValidSplit(left, right) && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
+			validSplit := s.SyllDef.ValidSplit(left, right)
+			//fmt.Println("debug syllabify", gi, pi, p, left, right, validSplit, s.SyllDef.ContainsSyllabic(left), s.SyllDef.ContainsSyllabic(right))
+			if len(left) > 0 && validSplit && s.SyllDef.ContainsSyllabic(left) && s.SyllDef.ContainsSyllabic(right) {
 				index := boundary{g: gi, p: pi}
 				res.boundaries = append(res.boundaries, index)
+				left = []string{}
 			}
 			left = append(left, p)
 			right = right[1:]
@@ -216,6 +239,9 @@ func (s Syllabifier) stringWithStressPlacement(t sylledTrans) string {
 		return t.string(s.SyllDef.PhonemeDelimiter(), s.SyllDef.SyllableDelimiter())
 	}
 	syllables := s.parse(t)
+	if s.Debug {
+		fmt.Fprintf(os.Stderr, "PARSED SYLLABLES\t%v\n", syllables)
+	}
 	res := []string{}
 	for _, syll := range syllables {
 		newSyll := []string{}
