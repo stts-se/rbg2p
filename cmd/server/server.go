@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -63,19 +64,19 @@ func syllabify(lang string, trans string) (string, int, error) {
 				return "", http.StatusInternalServerError, err
 			}
 			msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
-			return "", http.StatusBadRequest, fmt.Errorf(msg)
+			return "", http.StatusBadRequest, errors.New(msg)
 		}
 
 		if !ruleSet.Syllabifier.IsDefined() {
 			msg := fmt.Sprintf("no syllabifier defined for language %s", lang)
-			return "", http.StatusInternalServerError, fmt.Errorf(msg)
+			return "", http.StatusInternalServerError, errors.New(msg)
 		}
 		syller = ruleSet.Syllabifier
 	}
 	phns, err := syller.PhonemeSet.SplitTranscription(trans)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't split input transcription /%s/ : %s", trans, err)
-		return "", http.StatusInternalServerError, fmt.Errorf(msg)
+		return "", http.StatusInternalServerError, errors.New(msg)
 	}
 	sylled := syller.SyllabifyFromPhonemes(phns)
 	return sylled, http.StatusOK, nil
@@ -126,13 +127,13 @@ func transcribe(lang string, word string) (Word, int, error) {
 		msg := "unknown 'lang': " + lang
 		langs := listG2PLanguages()
 		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
-		return Word{}, http.StatusBadRequest, fmt.Errorf(msg)
+		return Word{}, http.StatusBadRequest, errors.New(msg)
 	}
 
 	transes, err := ruleSet.Apply(word)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't transcribe word : %v", err)
-		return Word{}, http.StatusInternalServerError, fmt.Errorf(msg)
+		return Word{}, http.StatusInternalServerError, errors.New(msg)
 	}
 	res := Word{word, transes}
 	return res, http.StatusOK, nil
@@ -146,7 +147,7 @@ func ruleContent(lang string) (string, int, error) {
 		msg := "unknown 'lang': " + lang
 		langs := listG2PLanguages()
 		msg = fmt.Sprintf("%s. Known 'lang' values: %s", msg, strings.Join(langs, ", "))
-		return "", http.StatusBadRequest, fmt.Errorf(msg)
+		return "", http.StatusBadRequest, errors.New(msg)
 	}
 	return ruleSet.Content, http.StatusOK, nil
 }

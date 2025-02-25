@@ -2,6 +2,7 @@ package rbg2p
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net/http"
 	u "net/url"
@@ -31,7 +32,7 @@ func isPrefilter(s string) bool {
 	return strings.HasPrefix(s, "PREFILTER ")
 }
 
-//var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
+// var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|VAR|) .*")
 var g2pLineRe = regexp.MustCompile("^(CHARACTER_SET|TEST|DEFAULT_PHONEME|FILTER|PREFILTER|VAR|DOWNCASE_INPUT) .*")
 
 func isG2PLine(s string) bool {
@@ -283,7 +284,7 @@ func newVar(s string) (string, string, error) {
 	_, err := regexp2.Compile(value, regexp2.None)
 	if err != nil {
 		msg := fmt.Sprintf("invalid VAR input - regular expression failed: %s : %v", s, err)
-		return "", "", fmt.Errorf(msg)
+		return "", "", errors.New(msg)
 	}
 	if strings.Contains(name, "_") {
 		return "", "", fmt.Errorf("invalid VAR input - var names cannot contain underscore: %s", s)
